@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MRPL - Sovereign AI Workbench</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- ====================================================================
+       LEFT SIDEBAR NAVIGATION (MATCHES REFERENCE IMAGE)
+       ==================================================================== -->
+  <aside class="sidebar">
+    <div class="brand-header">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L8 8h8l-4-6z"></path>
+          <path d="M12 8v14"></path>
+          <path d="M8 14c-2.5 0-4-1.5-4-4 3 0 4 2 4 4z"></path>
+          <path d="M16 14c2.5 0 4-1.5 4-4-3 0-4 2-4 4z"></path>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">MRPL</div>
+        <div class="brand-subtitle">Mangalore Refinery &amp;<br>Petrochemicals Ltd.</div>
+      </div>
+    </div>
+
+    <!-- Section: Plant Status -->
+    <div class="nav-section-label">PLANT STATUS</div>
+    <ul class="nav-list">
+      <li class="nav-item active" data-tab="overview">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Overview</span>
+      </li>
+      <li class="nav-item" data-tab="main-refinery">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 22V7l4-4h4l4 4v15"></path>
+          <path d="M2 22h20"></path>
+          <path d="M7 11h10"></path>
+        </svg>
+        <span>Main Refinery</span>
+      </li>
+      <li class="nav-item" data-tab="petrochemicals">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 2v7.31L4.15 20.3a1 1 0 0 0 .85 1.7h14a1 1 0 0 0 .85-1.7L14 9.31V2"></path>
+          <path d="M8.5 2h7"></path>
+        </svg>
+        <span>Petrochemicals</span>
+      </li>
+      <li class="nav-item" data-tab="aromatics">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <circle cx="19" cy="6" r="2"></circle>
+          <circle cx="5" cy="18" r="2"></circle>
+          <path d="M14.5 10l3-2.5M9.5 14l-3 2.5"></path>
+        </svg>
+        <span>Aromatics Complex</span>
+      </li>
+      <li class="nav-item" data-tab="utilities">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>Offsites &amp; Utilities</span>
+      </li>
+    </ul>
+
+    <!-- Other Nav Items (Clean, No Redundant Headings) -->
+    <ul class="nav-list" style="margin-top: 14px;">
+      <li class="nav-item" data-tab="alerts">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <span>Alerts</span>
+        <span class="nav-badge">3</span>
+      </li>
+      <li class="nav-item" data-tab="reports">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <span>Reports</span>
+      </li>
+      <li class="nav-item" data-tab="analytics">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span>Analytics</span>
+      </li>
+      <li class="nav-item" data-tab="documents">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>Documents</span>
+      </li>
+      <li class="nav-item" data-tab="settings">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>Settings</span>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- ====================================================================
+       CENTER WORKSPACE (MATCHES REFERENCE IMAGE)
+       ==================================================================== -->
+  <main class="workspace">
+    <!-- Top Header Bar -->
+    <header class="workspace-header">
+      <div class="header-left">
+        <h1 id="page-title">Overview</h1>
+        <p id="page-subtitle">Real-time overview of all plants and operations</p>
+      </div>
+
+      <div class="header-right">
+        <div class="status-tag">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="#10B981" stroke-width="2.5" fill="none">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <line x1="12" y1="20" x2="12.01" y2="20"></line>
+          </svg>
+          <span>Offline Mode</span>
+        </div>
+
+        <button class="icon-button theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle Night/Day Mode">
+          <svg class="theme-icon sun-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon moon-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <button class="icon-button" onclick="switchTab('alerts')" title="Alerts">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="icon-badge">3</span>
+        </button>
+
+        <div class="user-profile">
+          <div class="user-avatar">OP</div>
+          <div class="user-meta">
+            <span class="user-name">Operator</span>
+            <span class="user-role">Shift A</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ------------------------------------------------------------------
+         TAB 1: OVERVIEW
+         ------------------------------------------------------------------ -->
+    <section class="tab-content active" id="tab-overview">
+      <!-- Top Row: Alerts & Predictions -->
+      <div class="grid-2">
+        <!-- Immediate Alerts Card -->
+        <div class="dash-card">
+          <div class="card-header">
+            <div class="card-title">Immediate Alerts</div>
+            <a class="card-link" onclick="switchTab('alerts')">View All</a>
+          </div>
+          <div class="alert-list">
+            <div class="alert-row">
+              <div class="alert-main">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#EF4444" stroke-width="2" fill="none">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div>
+                  <div class="alert-unit text-danger">Hydrocracker</div>
+                  <div class="alert-desc">High temperature detected</div>
+                </div>
+              </div>
+              <div class="alert-time text-danger">2 min ago</div>
+            </div>
+
+            <div class="alert-row">
+              <div class="alert-main">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#EF4444" stroke-width="2" fill="none">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div>
+                  <div class="alert-unit">Tank T-104</div>
+                  <div class="alert-desc">High pressure detected</div>
+                </div>
+              </div>
+              <div class="alert-time text-danger">5 min ago</div>
+            </div>
+
+            <div class="alert-row">
+              <div class="alert-main">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#F59E0B" stroke-width="2" fill="none">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div>
+                  <div class="alert-unit text-warning">Cooling Water System</div>
+                  <div class="alert-desc">Flow rate below normal</div>
+                </div>
+              </div>
+              <div class="alert-time text-warning">12 min ago</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Predicted Issues (Next 24 Hrs) Card -->
+        <div class="dash-card">
+          <div class="card-header">
+            <div class="card-title">Predicted Issues (Next 24 Hrs)</div>
+            <a class="card-link" onclick="switchTab('alerts')">View All</a>
+          </div>
+          <div class="alert-list">
+            <div class="alert-row">
+              <div class="alert-main">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#EF4444" stroke-width="2" fill="none">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div>
+                  <div class="alert-unit text-danger">Hydrocracker</div>
+                  <div class="alert-desc">High probability of temperature deviation</div>
+                </div>
+              </div>
+              <div class="alert-prob prob-danger">87%</div>
+            </div>
+
+            <div class="alert-row">
+              <div class="alert-main">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#F59E0B" stroke-width="2" fill="none">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                <div>
+                  <div class="alert-unit text-warning">Pump P-17</div>
+                  <div class="alert-desc">Possible mechanical failure</div>
+                </div>
+              </div>
+              <div class="alert-prob prob-warning">72%</div>
+            </div>
+
+            <div class="alert-row">
+              <div class="alert-main">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#F59E0B" stroke-width="2" fill="none">
+                  <path d="M10 2v7.31L4.15 20.3a1 1 0 0 0 .85 1.7h14a1 1 0 0 0 .85-1.7L14 9.31V2"></path>
+                  <path d="M8.5 2h7"></path>
+                </svg>
+                <div>
+                  <div class="alert-unit text-warning">CCR Platformer</div>
+                  <div class="alert-desc">Catalyst activity may decrease</div>
+                </div>
+              </div>
+              <div class="alert-prob prob-warning">65%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Middle Row: Key Parameters (Live) -->
+      <div class="dash-card">
+        <div class="card-header">
+          <div class="card-title">Key Parameters (Live)</div>
+        </div>
+        <div class="grid-6">
+          <div class="kpi-tile">
+            <div class="kpi-label">Temperature</div>
+            <div class="kpi-value">384 °C</div>
+            <div class="kpi-status"><span class="status-dot dot-success"></span> Normal</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-label">Pressure</div>
+            <div class="kpi-value">4.8 bar</div>
+            <div class="kpi-status"><span class="status-dot dot-success"></span> Normal</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-label">Flow Rate</div>
+            <div class="kpi-value">87 %</div>
+            <div class="kpi-status"><span class="status-dot dot-warning"></span> Warning</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-label">Energy Usage</div>
+            <div class="kpi-value">32 MW</div>
+            <div class="kpi-status"><span class="status-dot dot-success"></span> Normal</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-label">Steam Generation</div>
+            <div class="kpi-value">215 TPH</div>
+            <div class="kpi-status"><span class="status-dot dot-success"></span> Normal</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-label">Safety Systems</div>
+            <div class="kpi-value" style="font-size: 16px;">Normal</div>
+            <div class="kpi-status"><span class="status-dot dot-success"></span> Normal</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row: Real-time Overview -->
+      <div class="dash-card">
+        <div class="card-header">
+          <div class="card-title">Real-time Overview</div>
+        </div>
+        <div class="grid-4">
+          <!-- Main Refinery -->
+          <div class="unit-card" onclick="switchTab('main-refinery')">
+            <div class="unit-title">Main Refinery</div>
+            <div class="unit-preview-box">
+              <svg viewBox="0 0 160 70" width="100%" height="100%">
+                <rect x="22" y="12" width="28" height="48" rx="2" fill="#1C2438" stroke="#38BDF8" stroke-width="1.2"/>
+                <line x1="22" y1="24" x2="50" y2="24" stroke="#38BDF8" stroke-dasharray="2 2" stroke-width="1"/>
+                <line x1="22" y1="36" x2="50" y2="36" stroke="#38BDF8" stroke-dasharray="2 2" stroke-width="1"/>
+                <line x1="22" y1="48" x2="50" y2="48" stroke="#38BDF8" stroke-dasharray="2 2" stroke-width="1"/>
+                <path d="M 6 45 L 22 45" stroke="#10B981" stroke-width="1.5"/>
+                <path d="M 50 16 L 82 16 L 82 26" stroke="#38BDF8" stroke-width="1.2" fill="none"/>
+                <rect x="76" y="26" width="18" height="12" rx="2" fill="#1C2438" stroke="#38BDF8" stroke-width="1"/>
+                <path d="M 50 36 L 115 36" stroke="#F59E0B" stroke-width="1.2"/>
+                <path d="M 50 50 L 142 50" stroke="#EF4444" stroke-width="1.2"/>
+                <circle cx="115" cy="36" r="3" fill="#F59E0B"/>
+                <circle cx="142" cy="50" r="3" fill="#EF4444"/>
+              </svg>
+            </div>
+            <div class="unit-status-row">
+              <span class="status-dot dot-success"></span> Operational
+            </div>
+            <div>
+              <div class="unit-metric-label">Throughput</div>
+              <div class="unit-metric-value">245 KBPD</div>
+            </div>
+          </div>
+
+          <!-- Petrochemicals -->
+          <div class="unit-card" onclick="switchTab('petrochemicals')">
+            <div class="unit-title">Petrochemicals</div>
+            <div class="unit-preview-box">
+              <svg viewBox="0 0 160 70" width="100%" height="100%">
+                <ellipse cx="40" cy="35" rx="18" ry="24" fill="#1C2438" stroke="#10B981" stroke-width="1.2"/>
+                <ellipse cx="110" cy="35" rx="16" ry="20" fill="#1C2438" stroke="#818CF8" stroke-width="1.2"/>
+                <path d="M 58 25 C 75 16, 85 16, 94 25" fill="none" stroke="#10B981" stroke-width="1.2" stroke-dasharray="3 2"/>
+                <path d="M 94 45 C 85 54, 75 54, 58 45" fill="none" stroke="#818CF8" stroke-width="1.2" stroke-dasharray="3 2"/>
+                <line x1="40" y1="11" x2="40" y2="4" stroke="#10B981" stroke-width="1.2"/>
+                <line x1="110" y1="15" x2="110" y2="8" stroke="#818CF8" stroke-width="1.2"/>
+              </svg>
+            </div>
+            <div class="unit-status-row">
+              <span class="status-dot dot-success"></span> Operational
+            </div>
+            <div>
+              <div class="unit-metric-label">Production</div>
+              <div class="unit-metric-value">145 TPD</div>
+            </div>
+          </div>
+
+          <!-- Aromatics Complex -->
+          <div class="unit-card" onclick="switchTab('aromatics')">
+            <div class="unit-title">Aromatics Complex</div>
+            <div class="unit-preview-box">
+              <svg viewBox="0 0 160 70" width="100%" height="100%">
+                <polygon points="45,18 62,28 62,48 45,58 28,48 28,28" fill="#1C2438" stroke="#F59E0B" stroke-width="1.2"/>
+                <circle cx="45" cy="38" r="7" fill="none" stroke="#F59E0B" stroke-width="1" stroke-dasharray="2 2"/>
+                <line x1="62" y1="38" x2="95" y2="38" stroke="#38BDF8" stroke-width="1.2"/>
+                <rect x="95" y="18" width="20" height="40" rx="2" fill="#1C2438" stroke="#38BDF8" stroke-width="1.2"/>
+                <line x1="115" y1="26" x2="140" y2="26" stroke="#10B981" stroke-width="1.2"/>
+                <line x1="115" y1="46" x2="140" y2="46" stroke="#F59E0B" stroke-width="1.2"/>
+              </svg>
+            </div>
+            <div class="unit-status-row">
+              <span class="status-dot dot-success"></span> Operational
+            </div>
+            <div>
+              <div class="unit-metric-label">Production</div>
+              <div class="unit-metric-value">210 TPD</div>
+            </div>
+          </div>
+
+          <!-- Offsites & Utilities -->
+          <div class="unit-card" onclick="switchTab('utilities')">
+            <div class="unit-title">Offsites &amp; Utilities</div>
+            <div class="unit-preview-box">
+              <svg viewBox="0 0 160 70" width="100%" height="100%">
+                <circle cx="40" cy="35" r="18" fill="#1C2438" stroke="#A855F7" stroke-width="1.2"/>
+                <path d="M 32 35 L 48 35 M 40 27 L 40 43" stroke="#A855F7" stroke-width="1.2"/>
+                <line x1="58" y1="35" x2="88" y2="35" stroke="#38BDF8" stroke-width="1.5"/>
+                <rect x="88" y="22" width="34" height="26" rx="2" fill="#1C2438" stroke="#38BDF8" stroke-width="1.2"/>
+                <line x1="122" y1="30" x2="145" y2="30" stroke="#10B981" stroke-width="1.2"/>
+                <line x1="122" y1="40" x2="145" y2="40" stroke="#38BDF8" stroke-width="1.2"/>
+              </svg>
+            </div>
+            <div class="unit-status-row">
+              <span class="status-dot dot-success"></span> Operational
+            </div>
+            <div>
+              <div class="unit-metric-label">Power Generated</div>
+              <div class="unit-metric-value">72 MW</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         TAB 2: MAIN REFINERY
+         ------------------------------------------------------------------ -->
+    <section class="tab-content" id="tab-main-refinery">
+      <div class="dash-card">
+        <div class="card-header">
+          <div class="card-title">CDU Column-04 Diagnostics</div>
+          <span class="status-badge-red">API 510 CML Audit Required</span>
+        </div>
+
+        <div class="grid-2" style="margin-top: 10px;">
+          <div class="alert-row">
+            <div>
+              <div class="alert-unit">Equipment Tag</div>
+              <div class="alert-desc">CDU-Col-04 (Atmospheric Distillation Column)</div>
+            </div>
+            <span class="status-badge-red">CRITICAL</span>
+          </div>
+          <div class="alert-row">
+            <div>
+              <div class="alert-unit">Wall Thickness</div>
+              <div class="alert-desc">UT-01 Point: 4.2 mm (API 510 limit: 6.0 mm)</div>
+            </div>
+            <span class="status-badge-red">-1.8 mm DEFICIT</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Inspection Point</th>
+                <th>Elevation</th>
+                <th>Nominal</th>
+                <th>Measured</th>
+                <th>API 510 Min</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>UT-01</code></td>
+                <td>Elev +4.2m</td>
+                <td>14.0 mm</td>
+                <td style="color: #EF4444; font-weight: 700;">4.2 mm</td>
+                <td>6.0 mm</td>
+                <td><span class="status-badge-red">FAILED</span></td>
+              </tr>
+              <tr>
+                <td><code>UT-02</code></td>
+                <td>Elev +4.8m</td>
+                <td>14.0 mm</td>
+                <td style="color: #EF4444; font-weight: 700;">4.6 mm</td>
+                <td>6.0 mm</td>
+                <td><span class="status-badge-red">FAILED</span></td>
+              </tr>
+              <tr>
+                <td><code>UT-03</code></td>
+                <td>Elev +5.5m</td>
+                <td>14.0 mm</td>
+                <td>7.1 mm</td>
+                <td>6.0 mm</td>
+                <td><span class="status-badge-yellow">WARNING</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         TAB 3: REPORTS & DELIVERABLES
+         ------------------------------------------------------------------ -->
+    <section class="tab-content" id="tab-reports">
+      <div class="dash-card">
+        <div class="card-header">
+          <div class="card-title">Generated Reports &amp; Approval Notes</div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>File Name</th>
+              <th>Type</th>
+              <th>Size</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="deliverables-tbody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-dim); padding: 20px;">Loading reports...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         TAB 4: CODE SANDBOX & ANALYTICS
+         ------------------------------------------------------------------ -->
+    <section class="tab-content" id="tab-analytics">
+      <div class="dash-card">
+        <div class="card-header">
+          <div class="card-title">Python Code Execution Sandbox</div>
+          <span class="status-badge-green">Runtime Ready</span>
+        </div>
+        
+        <div class="grid-2" style="margin-top: 12px;">
+          <div>
+            <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Script: Darcy-Weisbach Pipeline Drop</div>
+            <pre style="background: #080B12; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; font-size: 11px; color: #93C5FD; overflow-x: auto; height: 230px;">
+length_m = 500.0          # Pipeline length (m)
+diameter_m = 0.3048       # 12-inch pipe ID
+flow_rate_m3_h = 450.0    # Transfer rate (m3/h)
+density_kg_m3 = 875.0     # Crude density at 35C
+viscosity_cSt = 15.0      # Kinematic viscosity
+
+velocity_m_s = (flow_rate_m3_h / 3600.0) / (3.14159 * (diameter_m**2) / 4.0)
+reynolds = (velocity_m_s * diameter_m) / (viscosity_cSt * 1e-6)
+f = 0.02324 # Swamee-Jain friction factor
+delta_p_bar = (f * (length_m/diameter_m) * 0.5 * density_kg_m3 * (velocity_m_s**2)) / 100000.0
+print(f"Total Pressure Drop: {delta_p_bar:.3f} bar")
+            </pre>
+
+            <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin: 10px 0 6px 0;">Execution Output (stdout)</div>
+            <div id="sandbox-stdout" style="background: #080B12; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; font-family: monospace; font-size: 11px; color: var(--color-success); min-height: 70px;">
+Flow Velocity: 1.71 m/s<br>
+Reynolds Number: 34,811 (Turbulent Flow)<br>
+Darcy Friction Factor: 0.02305<br>
+Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
+[Exit Code: 0 | Execution Time: 2.65s]
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Generated Hydraulic Gradient Plot</div>
+            <div style="background: #080B12; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center;">
+              <img id="sandbox-plot-img" src="/api/download/pipeline_pressure_gradient.png?source=sandbox" alt="Pipeline Pressure Gradient" style="max-width: 100%; height: auto; border-radius: 4px;" onerror="this.src='/static/placeholder_plot.png'">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         TAB 5: DOCUMENTS
+         ------------------------------------------------------------------ -->
+    <section class="tab-content" id="tab-documents">
+      <div class="dash-card">
+        <div class="card-header">
+          <div class="card-title">Indexed Documents &amp; Standards</div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Document</th>
+              <th>Category</th>
+              <th>Engine</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+            <tr>
+              <td><code>pid_sample_open_dataset.png</code></td>
+              <td>Open P&amp;ID Dataset (Piping &amp; Instrumentation Diagram)</td>
+              <td>Vision Cache</td>
+              <td><span class="status-badge-green">Active</span></td>
+            </tr>
+            <tr>
+              <td><code>pid_process_piping_01.jpg</code></td>
+              <td>Open P&amp;ID Dataset (High-Res Engineering Schematic)</td>
+              <td>Vision Cache</td>
+              <td><span class="status-badge-green">Active</span></td>
+            </tr>
+            <tr>
+              <td><code>csb_chevron_api_recommendation.pdf</code></td>
+              <td>US Chemical Safety Board (Refinery Sulfidation &amp; API 939-C)</td>
+              <td>SQLite BM25</td>
+              <td><span class="status-badge-green">Active</span></td>
+            </tr>
+            <tr>
+              <td><code>real_cdu_ultrasonic_thickness_scan.pdf</code></td>
+              <td>MRPL NDT Ultrasonic Thickness Report (12 CML Points)</td>
+              <td>PyMuPDF + OCR</td>
+              <td><span class="status-badge-green">Active</span></td>
+            </tr>
+            <tr>
+              <td><code>real_crude_oil_assays.csv</code></td>
+              <td>Crude Assays (Arab Light, Maya, Brent TBP Distillation Cuts)</td>
+              <td>DuckDB</td>
+              <td><span class="status-badge-green">Active</span></td>
+            </tr>
+            <tr>
+              <td><code>asme_pipe_schedules_astm_a106.csv</code></td>
+              <td>ASME B36.10M / ASTM A106 Pipe Schedules (1/2" - 24")</td>
+              <td>DuckDB</td>
+              <td><span class="status-badge-green">Active</span></td>
+            </tr>
+            <tr>
+              <td><code>refinery_equipment_spares_catalog.csv</code></td>
+              <td>Refinery OEM Spares (Fisher Valves, John Crane Seals)</td>
+              <td>DuckDB</td>
+              <td><span class="status-badge-green">Active</span></td>
+            </tr>
+            <tr>
+              <td><code>api_510_inspection_code_statutory.md</code></td>
+              <td>API 510 Sec 7 Minimum Required Thickness Formula</td>
+              <td>SQLite BM25</td>
+              <td><span class="status-badge-green">Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         TAB 6: SETTINGS
+         ------------------------------------------------------------------ -->
+    <section class="tab-content" id="tab-settings">
+      <div class="dash-card">
+        <div class="card-header">
+          <div class="card-title">Model Registry</div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Primary Model</th>
+              <th>Fallback</th>
+              <th>VRAM</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Code &amp; Math</td>
+              <td><code>qwen2.5-coder:7b</code></td>
+              <td><code>qwen2.5-coder:3b</code></td>
+              <td>~4.5 GB</td>
+            </tr>
+            <tr>
+              <td>Reasoning &amp; Diagnostics</td>
+              <td><code>deepseek-r1-distill-qwen:7b</code></td>
+              <td><code>deepseek-r1-distill-qwen:1.5b</code></td>
+              <td>~4.7 GB</td>
+            </tr>
+            <tr>
+              <td>PSU Approval Notes</td>
+              <td><code>qwen2.5:7b</code></td>
+              <td><code>llama3.2:3b</code></td>
+              <td>~4.5 GB</td>
+            </tr>
+            <tr>
+              <td>Vision &amp; Drawings</td>
+              <td><code>qwen2-vl:2b</code></td>
+              <td><code>qwen2-vl:7b</code></td>
+              <td>~1.8 GB</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Additional Tabs -->
+    <section class="tab-content" id="tab-petrochemicals">
+      <div class="dash-card">
+        <div class="card-header"><div class="card-title">Petrochemicals Telemetry</div></div>
+        <div class="grid-2">
+          <div class="alert-row">
+            <div>
+              <div class="alert-unit">Polypropylene Reactor Loop</div>
+              <div class="alert-desc">Pressure: 32 bar | Slurry density: 480 kg/m3</div>
+            </div>
+            <span class="status-badge-green">Normal</span>
+          </div>
+          <div class="alert-row">
+            <div>
+              <div class="alert-unit">Catalyst Feed System</div>
+              <div class="alert-desc">Feed rate: 1.8 kg/h</div>
+            </div>
+            <span class="status-badge-green">Normal</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-content" id="tab-aromatics">
+      <div class="dash-card">
+        <div class="card-header"><div class="card-title">Aromatics Complex Telemetry</div></div>
+        <div class="grid-2">
+          <div class="alert-row">
+            <div>
+              <div class="alert-unit">CCR Platformer Unit</div>
+              <div class="alert-desc">Bed Temp: 518°C | RON: 102.4</div>
+            </div>
+            <span class="status-badge-green">Normal</span>
+          </div>
+          <div class="alert-row">
+            <div>
+              <div class="alert-unit">Paraxylene Crystallizer</div>
+              <div class="alert-desc">Separator temp: -12°C | Purity: 99.82%</div>
+            </div>
+            <span class="status-badge-green">Normal</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-content" id="tab-utilities">
+      <div class="dash-card">
+        <div class="card-header"><div class="card-title">Offsites &amp; Utilities Telemetry</div></div>
+        <div class="grid-2">
+          <div class="alert-row">
+            <div>
+              <div class="alert-unit">Gas Turbine GTG-2</div>
+              <div class="alert-desc">Output: 36.2 MW | Freq: 50.02 Hz</div>
+            </div>
+            <span class="status-badge-green">Normal</span>
+          </div>
+          <div class="alert-row">
+            <div>
+              <div class="alert-unit">Demineralized Water Unit</div>
+              <div class="alert-desc">Conductivity: 0.08 µS/cm</div>
+            </div>
+            <span class="status-badge-green">Normal</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-content" id="tab-alerts">
+      <div class="dash-card">
+        <div class="card-header"><div class="card-title">Operational Alerts</div></div>
+        <div class="alert-list" style="margin-top: 10px;">
+          <div class="alert-row">
+            <div class="alert-main">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="#EF4444" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
+              <div>
+                <div class="alert-unit text-danger">Hydrocracker Unit</div>
+                <div class="alert-desc">Exothermic excursion in reactor bed 2 | 412°C</div>
+              </div>
+            </div>
+            <div class="alert-time text-danger">2 min ago</div>
+          </div>
+          <div class="alert-row">
+            <div class="alert-main">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="#EF4444" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
+              <div>
+                <div class="alert-unit text-danger">CDU Column-04 Bottom Shell</div>
+                <div class="alert-desc">Remaining wall thickness (4.2mm) below API 510 limit (6.0mm)</div>
+              </div>
+            </div>
+            <div class="alert-time text-danger">10 min ago</div>
+          </div>
+          <div class="alert-row">
+            <div class="alert-main">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="#F59E0B" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
+              <div>
+                <div class="alert-unit text-warning">Cooling Water Header B</div>
+                <div class="alert-desc">Flow rate below normal (1,240 m3/h)</div>
+              </div>
+            </div>
+            <div class="alert-time text-warning">12 min ago</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ====================================================================
+       RIGHT PANEL: AI COPILOT (PIXEL-ALIGNED WITH REFERENCE IMAGE)
+       ==================================================================== -->
+  <aside class="copilot-panel">
+    <!-- Copilot Header -->
+    <div class="copilot-header">
+      <div class="copilot-title">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+        </svg>
+        <span>AI COPILOT</span>
+      </div>
+      <div class="llm-badge">
+        <span class="status-dot dot-success"></span> Offline LLM Active
+      </div>
+    </div>
+
+    <!-- Chat Stream -->
+    <div class="chat-container" id="chat-container">
+      <div class="chat-bubble chat-bot">
+        <div><strong>Hello! I am your MRPL AI Assistant.</strong></div>
+        <div style="margin-top: 4px;">Ask me anything about plant operations, equipment status, reports, or any operational guidance.</div>
+        <div style="margin-top: 8px;">How can I help you today?</div>
+        
+        <!-- Clean, uncluttered suggestion buttons matching reference image -->
+        <div class="chips-container">
+          <div class="suggestion-chip" onclick="sendMessage('Show refinery performance summary')">
+            Show refinery performance summary
+          </div>
+          <div class="suggestion-chip" onclick="sendMessage('Why is hydrocracker temperature high?')">
+            Why is hydrocracker temperature high?
+          </div>
+          <div class="suggestion-chip" onclick="sendMessage('Process CDU Column-04 inspection report and draft approval note', ['data/mrpl_cdu_inspection_report.png'])">
+            Process CDU Column-04 inspection report
+          </div>
+          <div class="suggestion-chip" onclick="sendMessage('Which spare parts in inventory are below their reorder threshold and what is replenishment cost?', ['data/refinery_equipment_spares_catalog.csv'])">
+            Inventory replenishment analysis (DuckDB)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Input Area -->
+    <div class="chat-input-area">
+      <div class="input-row">
+        <input type="text" class="chat-input" id="chat-input" placeholder="Ask anything about MRPL..." onkeydown="if(event.key==='Enter') sendMessage()">
+        <button class="send-button" onclick="sendMessage()" title="Send">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="#FFFFFF">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Upload Files & Images Card -->
+    <div class="copilot-upload-card">
+      <div class="card-header" style="margin-bottom: 8px;">
+        <div class="card-title" style="font-size: 12px;">Upload Files &amp; Images</div>
+      </div>
+      <div class="dropzone-box" onclick="document.getElementById('file-upload-input').click()">
+        <div class="dropzone-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.8" fill="none">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+        </div>
+        <div class="dropzone-title">Drag &amp; drop files here</div>
+        <div class="dropzone-sub">or click to browse</div>
+        <div class="dropzone-meta">Supports: PDF, DOCX, XLSX, CSV, PNG, JPG (Max 10MB)</div>
+        <input type="file" id="file-upload-input" style="display: none;" onchange="handleFileUpload(this.files)">
+      </div>
+    </div>
+
+    <!-- Generated Results Drawer -->
+    <div class="copilot-results-card">
+      <div class="card-header" style="margin-bottom: 8px;">
+        <div class="card-title" style="font-size: 12px;">Generated Results</div>
+      </div>
+      <div id="results-drawer-list">
+        <div class="empty-results">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--text-dim)" stroke-width="1.8" fill="none">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Your generated reports and charts will appear here.</div>
+          <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Ask the AI to generate analysis, reports or charts.</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
