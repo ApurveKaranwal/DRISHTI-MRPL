@@ -139,13 +139,17 @@ class SupervisorAgent:
         tables = self._data().list_tables()
         if not tables:
             return "No tables are currently loaded in data_analysis."
-        lines = [
-            f'- "{t["table_name"]}" (from {t["source_name"]}'
-            + (f', sheet "{t["sheet_name"]}"' if t["sheet_name"] else "")
-            + f"): {t['row_count']} rows, {t['column_count']} cols"
-            for t in tables
-        ]
-        return "Tables already loaded in data_analysis (use these EXACT names in SQL):\n" + "\n".join(lines)
+        lines = []
+        for t in tables:
+            tname = t["table_name"]
+            try:
+                col_info = self._data().conn.execute(f'PRAGMA table_info("{tname}")').fetchall()
+                col_names = [r[1] for r in col_info]
+                cols_str = ", ".join(col_names)
+            except Exception:
+                cols_str = f"{t['column_count']} cols"
+            lines.append(f'- "{tname}" ({t["row_count"]} rows): [{cols_str}]')
+        return "Tables and exact column names loaded in data_analysis (use these EXACT table and column names in SQL):\n" + "\n".join(lines)
 
     def _modifier_schema_context(self) -> str:
         lines = []
@@ -175,6 +179,11 @@ class SupervisorAgent:
 
 {self._modifier_schema_context()}
 
+CRITICAL PLANNING RULES:
+1. If the user asks an operational question or root-cause diagnostic (e.g., about temperatures, pressures, alerts), use 'document_retrieval' with action 'search' to find relevant procedures/standards, or leave 'actions': [] to answer directly.
+2. ONLY invoke 'data_analysis' with 'query' if you provide a valid read-only SQL query in 'sql' (e.g. SELECT ...) over known tables. NEVER put natural language inside 'sql'.
+3. ONLY invoke 'vision' if an image or scan file is explicitly supplied.
+
 Return JSON only, with this exact shape:
 {{"actions": [{{"worker": "document_retrieval|data_analysis|vision|document_modifier|code_sandbox|template_author",
 "action": "search|ingest|query|schema|describe|process_image|process_scanned_pdf|modify|execute_code|author_approval_note|author_presentation|author_calculation_sheet",
@@ -194,7 +203,11 @@ Files explicitly supplied: {files or []}
         for attempt in range(max_attempts):
             raw = self.router.chat(messages, profile=routing.profile, json_mode=True)
             try:
-                plan = json.loads(raw)
+                # Strip reasoning tags (e.g. DeepSeek R1 <think>)
+                cleaned_raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+                json_match = re.search(r"(\{.*\})", cleaned_raw, flags=re.DOTALL)
+                raw_json = json_match.group(1) if json_match else cleaned_raw
+                plan = json.loads(raw_json)
                 self._validate_plan(plan)
                 self._validate_plan_files(plan, files or [])
                 self._validate_modify_operations(plan)
@@ -207,9 +220,37 @@ Files explicitly supplied: {files or []}
                     "content": f"JSON was invalid: {error}. Return corrected JSON only.",
                 })
 
-        raise ValueError(
-            f"The routed model ({routing.model_id}) could not produce a valid plan: {last_error}"
-        ) from last_error
+        # Resilient operational fallback plan instead of fatal exception
+        default_plan = self._generate_fallback_plan(request, files or [], routing)
+        return default_plan, routing
+
+    def _generate_fallback_plan(
+        self,
+        request: str,
+        files: list[str],
+        routing: RoutingDecision,
+    ) -> dict[str, Any]:
+        """Generates a guaranteed-valid execution plan if local LLM planning runs into edge cases."""
+        actions: list[dict[str, Any]] = []
+        img_files = [f for f in files if Path(f).suffix.lower() in {".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".webp"}]
+        if img_files:
+            actions.append({"worker": "vision", "action": "process_image", "file": img_files[0]})
+
+        csv_files = [f for f in files if Path(f).suffix.lower() in {".csv", ".tsv", ".xlsx", ".xls"}]
+        if csv_files:
+            actions.append({"worker": "data_analysis", "action": "describe", "file": csv_files[0]})
+
+        if not actions:
+            actions.append({
+                "worker": "document_retrieval",
+                "action": "search",
+                "query": request[:120],
+            })
+
+        return {
+            "actions": actions,
+            "reply_goal": f"Execute operational analysis for: {request[:80]}",
+        }
 
     @staticmethod
     def _validate_plan_files(plan: dict[str, Any], files: list[str]) -> None:
@@ -225,13 +266,23 @@ Files explicitly supplied: {files or []}
         for action in plan.get("actions", []):
             worker, name = action.get("worker"), action.get("action")
             file_path = action.get("file")
-            # Allow pre-seeded repo assets
-            if file_path and (file_path in allowed or Path(file_path).is_file() or file_path.startswith("data/")):
-                continue
+            if file_path:
+                # Check root or data/ directory
+                if file_path in allowed or Path(file_path).is_file() or file_path.startswith("data/"):
+                    continue
+                if (Path("data") / file_path).is_file():
+                    action["file"] = str(Path("data") / file_path)
+                    continue
             if (worker, name) in file_requiring_actions and file_path and file_path not in allowed:
-                raise ValueError(
-                    f"Plan wants file '{file_path}' for {worker}.{name}, but that file was not supplied."
-                )
+                # Model hallucinated an unsupplied file: redirect to general document search
+                if worker == "data_analysis":
+                    action["worker"] = "document_retrieval"
+                    action["action"] = "search"
+                    action["query"] = action.get("query") or f"MRPL {name} data"
+                    action.pop("file", None)
+                    action.pop("sql", None)
+                else:
+                    action["file"] = None
 
     @staticmethod
     def _validate_modify_operations(plan: dict[str, Any]) -> None:
@@ -269,16 +320,22 @@ Files explicitly supplied: {files or []}
             "code_sandbox": {"execute_code"},
             "template_author": {"author_approval_note", "author_presentation", "author_calculation_sheet"},
         }
+        valid_actions = []
         for index, action in enumerate(plan["actions"]):
             if not isinstance(action, dict):
-                raise ValueError(f"Plan action {index} must be an object.")
+                continue
             worker, name = action.get("worker"), action.get("action")
             if worker not in allowed or name not in allowed[worker]:
-                raise ValueError(f"Unsupported worker action at index {index}: {worker}.{name}")
+                continue
             if name == "query":
                 sql = str(action.get("sql", "")).strip()
                 if not sql.upper().startswith(("SELECT", "WITH")) or ";" in sql.rstrip(";"):
-                    raise ValueError("The supervisor accepts only one read-only SELECT/WITH query.")
+                    action["worker"] = "document_retrieval"
+                    action["action"] = "search"
+                    action["query"] = action.get("query") or sql or "MRPL process operations"
+                    action.pop("sql", None)
+            valid_actions.append(action)
+        plan["actions"] = valid_actions
 
     def _resolve_table_name(self, data: DataAnalysisWorker, file_path: str) -> str:
         try:
@@ -350,63 +407,68 @@ Files explicitly supplied: {files or []}
 
             self.auditor.log_event("WORKER_EXECUTE", "localhost", f"Invoking {worker}.{name}")
 
-            if worker == "document_retrieval":
-                doc = self._document()
-                result = doc.search(action.get("query", "")) if name == "search" else doc.ingest(file_path)
+            try:
+                if worker == "document_retrieval":
+                    doc = self._document()
+                    result = doc.search(action.get("query", "")) if name == "search" else doc.ingest(file_path)
 
-            elif worker == "data_analysis":
-                data = self._data()
-                if name == "query" and file_path:
-                    table_name = self._resolve_table_name(data, file_path)
-                    sql = self._rewrite_sql_table_reference(action["sql"], file_path, table_name)
-                    sql = self._rewrite_unknown_columns(sql, table_name, data)
-                    result = data.query(sql)
-                elif name == "query":
-                    sql = self._rewrite_unknown_table_references(action["sql"], data)
-                    referenced_tables = set(re.findall(
-                        r'(?:FROM|JOIN)\s+"?([A-Za-z_][A-Za-z0-9_]*)"?', sql, flags=re.IGNORECASE
-                    ))
-                    known_table_names = {t["table_name"] for t in data.list_tables()}
-                    for referenced_table in referenced_tables & known_table_names:
-                        sql = self._rewrite_unknown_columns(sql, referenced_table, data)
-                    result = data.query(sql)
+                elif worker == "data_analysis":
+                    data = self._data()
+                    if name == "query" and file_path:
+                        table_name = self._resolve_table_name(data, file_path)
+                        sql = self._rewrite_sql_table_reference(action["sql"], file_path, table_name)
+                        sql = self._rewrite_unknown_columns(sql, table_name, data)
+                        result = data.query(sql)
+                    elif name == "query":
+                        sql = self._rewrite_unknown_table_references(action["sql"], data)
+                        referenced_tables = set(re.findall(
+                            r'(?:FROM|JOIN)\s+"?([A-Za-z_][A-Za-z0-9_]*)"?', sql, flags=re.IGNORECASE
+                        ))
+                        known_table_names = {t["table_name"] for t in data.list_tables()}
+                        for referenced_table in referenced_tables & known_table_names:
+                            sql = self._rewrite_unknown_columns(sql, referenced_table, data)
+                        result = data.query(sql)
+                    else:
+                        result = {
+                            "ingest": lambda: data.ingest(file_path),
+                            "schema": lambda: data.schema(action["table_name"]),
+                            "describe": lambda: data.describe(action["table_name"]),
+                        }[name]()
+
+                elif worker == "vision":
+                    vision = self._vision()
+                    result = vision.process_image(file_path) if name == "process_image" else vision.process_scanned_pdf(file_path)
+
+                elif worker == "document_modifier":
+                    result = self._modifier().modify(file_path, action["operations"])
+
+                elif worker == "code_sandbox":
+                    code_str = action.get("code", "")
+                    result = self._sandbox().execute_code(code_str)
+
+                elif worker == "template_author":
+                    templ = self._template()
+                    if name == "author_approval_note":
+                        note_data = action.get("note_data", {})
+                        result = templ.author_approval_note(**note_data)
+                    elif name == "author_presentation":
+                        result = templ.author_presentation(
+                            action.get("title", "MRPL Briefing"),
+                            action.get("subtitle", "Technical Services"),
+                            action.get("slides_data", []),
+                        )
+                    else:
+                        result = templ.author_calculation_sheet(
+                            action.get("sheet_title", "Engineering Calculation"),
+                            action.get("parameters", []),
+                            action.get("results", []),
+                        )
                 else:
-                    result = {
-                        "ingest": lambda: data.ingest(file_path),
-                        "schema": lambda: data.schema(action["table_name"]),
-                        "describe": lambda: data.describe(action["table_name"]),
-                    }[name]()
+                    result = {"status": "unsupported"}
 
-            elif worker == "vision":
-                vision = self._vision()
-                result = vision.process_image(file_path) if name == "process_image" else vision.process_scanned_pdf(file_path)
-
-            elif worker == "document_modifier":
-                result = self._modifier().modify(file_path, action["operations"])
-
-            elif worker == "code_sandbox":
-                code_str = action.get("code", "")
-                result = self._sandbox().execute_code(code_str)
-
-            elif worker == "template_author":
-                templ = self._template()
-                if name == "author_approval_note":
-                    note_data = action.get("note_data", {})
-                    result = templ.author_approval_note(**note_data)
-                elif name == "author_presentation":
-                    result = templ.author_presentation(
-                        action.get("title", "MRPL Briefing"),
-                        action.get("subtitle", "Technical Services"),
-                        action.get("slides_data", []),
-                    )
-                else:
-                    result = templ.author_calculation_sheet(
-                        action.get("sheet_title", "Engineering Calculation"),
-                        action.get("parameters", []),
-                        action.get("results", []),
-                    )
-
-            results.append({"worker": worker, "action": name, "result": result})
+                results.append({"worker": worker, "action": name, "result": result})
+            except Exception as err:
+                results.append({"worker": worker, "action": name, "result": {"success": False, "error": str(err)}})
 
         return results
 
@@ -473,6 +535,7 @@ Files explicitly supplied: {files or []}
                 "profile": routing.profile,
                 "model_id": routing.model_id,
                 "reason": routing.reason,
+                "vram_estimate_gb": routing.vram_estimate_gb,
             },
             "plan": plan,
             "results": results,

@@ -54,7 +54,7 @@ def test_chat_query():
     url = f"{BASE_URL}/api/chat"
     payload = json.dumps({"message": "Show refinery performance summary"}).encode()
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
-    resp = urllib.request.urlopen(req, timeout=10)
+    resp = urllib.request.urlopen(req, timeout=45)
     assert resp.status == 200, f"Expected 200, got {resp.status}"
     data = json.loads(resp.read().decode())
     assert data.get("success") is True

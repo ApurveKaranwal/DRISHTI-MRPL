@@ -111,10 +111,19 @@ class ModelRouter:
                     "model_id": "qwen2.5:3b",
                     "fallback_model_id": "llama3.2:1b",
                     "vram_estimate_gb": 1.9,
-                    "description": "Low-latency classification",
+                    "description": "Low-latency classification & intent router",
                     "temperature": 0.0,
                     "context_window": 2048,
                     "triggers": []
+                },
+                "embedding": {
+                    "model_id": "bge-small-en-v1.5",
+                    "fallback_model_id": "nomic-embed-text",
+                    "vram_estimate_gb": 0.4,
+                    "description": "Dense vector retrieval for standards & P&IDs",
+                    "temperature": 0.0,
+                    "context_window": 8192,
+                    "triggers": ["rag", "search", "retrieve", "document", "standards", "oisd", "embedding"]
                 }
             }
         }
@@ -150,6 +159,12 @@ class ModelRouter:
         self._available_models = set()
         return False, []
 
+    @staticmethod
+    def _matches_trigger(trigger: str, text: str) -> bool:
+        """Word-boundary regex match to prevent substring false positives (e.g. 'crack' in 'hydrocracker')."""
+        pattern = r'(?:\b|_)' + re.escape(trigger) + r'(?:s|ed|ing)?(?:\b|_)'
+        return bool(re.search(pattern, text, re.IGNORECASE))
+
     def route(self, request: str, files: list[str] | None = None) -> RoutingDecision:
         """Analyzes prompt text and attached files to select the optimal model profile."""
         req_lower = request.lower()
@@ -158,7 +173,7 @@ class ModelRouter:
 
         # 1. Vision Profile check (images, drawings, or scan triggers)
         img_suffixes = {".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".webp"}
-        if file_suffixes & img_suffixes or any(t in req_lower for t in self.profiles.get("vision", ModelProfile("", "", 0, "", 0, 0)).triggers):
+        if file_suffixes & img_suffixes or any(self._matches_trigger(t, req_lower) for t in self.profiles.get("vision", ModelProfile("", "", 0, "", 0, 0)).triggers):
             p = self.profiles["vision"]
             return RoutingDecision(
                 profile="vision",
@@ -172,7 +187,7 @@ class ModelRouter:
         # 2. Code Profile check (Python scripts, hydraulic/pressure calculations, formulas)
         code_suffixes = {".py", ".sh", ".sql"}
         code_triggers = self.profiles.get("code", ModelProfile("", "", 0, "", 0, 0)).triggers
-        if file_suffixes & code_suffixes or any(t in req_lower for t in code_triggers):
+        if file_suffixes & code_suffixes or any(self._matches_trigger(t, req_lower) for t in code_triggers):
             p = self.profiles["code"]
             return RoutingDecision(
                 profile="code",
@@ -185,7 +200,7 @@ class ModelRouter:
 
         # 3. Reasoning Profile check (root-cause, failure diagnostics, risk evaluation)
         reasoning_triggers = self.profiles.get("reasoning", ModelProfile("", "", 0, "", 0, 0)).triggers
-        if any(t in req_lower for t in reasoning_triggers):
+        if any(self._matches_trigger(t, req_lower) for t in reasoning_triggers):
             p = self.profiles["reasoning"]
             return RoutingDecision(
                 profile="reasoning",
@@ -224,6 +239,7 @@ class ModelRouter:
 
         # If model is available in Ollama, make live call
         if ollama_ok and (model_id in available_models or any(model_id.split(":")[0] in m for m in available_models)):
+            max_tokens = 400 if json_mode else 1200
             payload: dict[str, Any] = {
                 "model": model_id,
                 "messages": messages,
@@ -231,6 +247,7 @@ class ModelRouter:
                 "options": {
                     "temperature": temperature if temperature is not None else (prof_obj.temperature if prof_obj else 0.0),
                     "num_ctx": prof_obj.context_window if prof_obj else 4096,
+                    "num_predict": max_tokens,
                 },
             }
             if json_mode:

@@ -18,13 +18,13 @@
       "triggers": ["code", "python", "calculate", "script", "algorithm", "darcy", "reynolds", "pressure drop", "plot", "graph", "syntax", "debug"]
     },
     "reasoning": {
-      "model_id": "deepseek-r1-distill-qwen:7b",
-      "fallback_model_id": "deepseek-r1-distill-qwen:1.5b",
-      "vram_estimate_gb": 4.7,
+      "model_id": "deepseek-r1:1.5b",
+      "fallback_model_id": "deepseek-r1:7b",
+      "vram_estimate_gb": 1.1,
       "description": "Chain-of-thought reasoning model for root-cause analysis, equipment failure diagnostics, and multi-step industrial decision-making.",
       "temperature": 0.2,
       "context_window": 4096,
-      "triggers": ["why", "root cause", "failure", "investigate", "evaluate", "compare", "corrosion risk", "risk assessment", "decision", "trade-off", "sulfidation", "crude assay", "tbp"]
+      "triggers": ["why", "root cause", "failure", "investigate", "evaluate", "compare", "corrosion risk", "risk assessment", "decision", "trade-off", "sulfidation", "crude assay", "tbp", "hydrocracker", "temperature", "deviation", "alert"]
     },
     "general": {
       "model_id": "qwen2.5:7b",
@@ -36,9 +36,9 @@
       "triggers": ["approval note", "draft", "memorandum", "summary", "report", "sop", "meeting minutes", "note", "letter", "executive"]
     },
     "vision": {
-      "model_id": "qwen2-vl:2b",
-      "fallback_model_id": "qwen2-vl:7b",
-      "vram_estimate_gb": 1.8,
+      "model_id": "qwen2.5vl:3b",
+      "fallback_model_id": "qwen2-vl:2b",
+      "vram_estimate_gb": 3.2,
       "description": "Ultra-lightweight multimodal vision model for P&IDs, equipment inspection photos, scanned handwritten logs, and schematics.",
       "temperature": 0.0,
       "context_window": 2048,
@@ -48,10 +48,19 @@
       "model_id": "qwen2.5:3b",
       "fallback_model_id": "llama3.2:1b",
       "vram_estimate_gb": 1.9,
-      "description": "Ultra-fast low-latency router for rapid classification and simple extraction.",
+      "description": "Ultra-fast low-latency router for rapid intent classification and parameter extraction.",
       "temperature": 0.0,
       "context_window": 2048,
       "triggers": []
+    },
+    "embedding": {
+      "model_id": "bge-small-en-v1.5",
+      "fallback_model_id": "nomic-embed-text",
+      "vram_estimate_gb": 0.4,
+      "description": "Dense semantic embedding engine for RAG vector search across refinery standards (OISD, API 510) and P&IDs.",
+      "temperature": 0.0,
+      "context_window": 8192,
+      "triggers": ["rag", "search", "retrieve", "document", "standards", "oisd", "embedding"]
     }
   }
 }

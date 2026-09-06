@@ -28,7 +28,7 @@ class VisionSettings:
     """Runtime settings, all controllable without code changes."""
 
     ollama_url: str = os.getenv("OLLAMA_URL", "http://localhost:11434")  # Local Ollama server endpoint.
-    vlm_model: str = os.getenv("VLM_MODEL", "qwen3-vl:8b")  # The locally pulled Ollama vision model tag.
+    vlm_model: str = os.getenv("VLM_MODEL", "qwen2.5vl:3b")  # The locally pulled Ollama vision model tag.
     vlm_system_prompt: str = (
         "You are a precise visual description assistant. Describe only what is visibly present in the image. "
         "If any number, label, or piece of text is blurry, cropped, or ambiguous, say so explicitly instead of "
@@ -142,7 +142,7 @@ class VisionWorker:
                     ],
                     "stream": False,
                 },
-                timeout=min(self.settings.request_timeout, 4.0),  # Fast fail if offline
+                timeout=min(self.settings.request_timeout, 30.0),  # Allow GPU model loading
             )
             response.raise_for_status()
             payload = response.json()

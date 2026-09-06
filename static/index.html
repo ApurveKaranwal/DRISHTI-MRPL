@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MRPL - Sovereign AI Workbench</title>
+  <title>DRISHTI-MRPL — Sovereign Industrial AI Workbench</title>
   <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
@@ -15,17 +15,31 @@
        ==================================================================== -->
   <aside class="sidebar">
     <div class="brand-header">
-      <div class="brand-logo">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2L8 8h8l-4-6z"></path>
-          <path d="M12 8v14"></path>
-          <path d="M8 14c-2.5 0-4-1.5-4-4 3 0 4 2 4 4z"></path>
-          <path d="M16 14c2.5 0 4-1.5 4-4-3 0-4 2-4 4z"></path>
+      <div class="brand-logo" title="DRISHTI-MRPL Sovereign AI">
+        <svg viewBox="0 0 36 36" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="drishti-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#10B981" />
+              <stop offset="50%" stop-color="#06B6D4" />
+              <stop offset="100%" stop-color="#6366F1" />
+            </linearGradient>
+          </defs>
+          <!-- Outer Shield / Hexagonal Ring -->
+          <rect x="2" y="2" width="32" height="32" rx="8" stroke="url(#drishti-grad)" stroke-width="1.8" fill="rgba(16, 185, 129, 0.08)" />
+          <!-- Optical Eye Contour (Drishti / All-Seeing Intelligence) -->
+          <path d="M7 18C10.5 12 25.5 12 29 18C25.5 24 10.5 24 7 18Z" stroke="url(#drishti-grad)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          <!-- Iris Ring -->
+          <circle cx="18" cy="18" r="4.2" stroke="#38BDF8" stroke-width="1.4" fill="rgba(6, 182, 212, 0.16)" />
+          <!-- Inner Core Pupil & Catalytic Flame -->
+          <circle cx="18" cy="18" r="1.8" fill="#10B981" />
+          <!-- Aperture Precision Guides -->
+          <line x1="18" y1="6" x2="18" y2="8.5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" />
+          <line x1="18" y1="27.5" x2="18" y2="30" stroke="#6366F1" stroke-width="1.5" stroke-linecap="round" />
         </svg>
       </div>
       <div>
-        <div class="brand-title">MRPL</div>
-        <div class="brand-subtitle">Mangalore Refinery &amp;<br>Petrochemicals Ltd.</div>
+        <div class="brand-title">DRISHTI-MRPL</div>
+        <div class="brand-subtitle">Sovereign Refinery AI &amp;<br>Operations Intelligence</div>
       </div>
     </div>
 
@@ -76,12 +90,9 @@
     <ul class="nav-list" style="margin-top: 14px;">
       <li class="nav-item" data-tab="alerts">
         <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-          <line x1="12" y1="9" x2="12" y2="13"></line>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
         </svg>
-        <span>Alerts</span>
-        <span class="nav-badge">3</span>
+        <span>Statutory Audits</span>
       </li>
       <li class="nav-item" data-tab="reports">
         <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -129,16 +140,28 @@
       </div>
 
       <div class="header-right">
-        <div class="status-tag">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="#10B981" stroke-width="2.5" fill="none">
-            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-            <line x1="12" y1="20" x2="12.01" y2="20"></line>
-          </svg>
-          <span>Offline Mode</span>
+        <!-- Unified System Telemetry & Model Pill -->
+        <div class="header-telemetry-pill" onclick="openModelRegistryModal()" title="Live System Analytics: Click for Hardware Diagnostics & Ollama Models">
+          <span class="status-dot dot-purple"></span>
+          <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">GPU</span>
+          <span class="ticker-val" id="ticker-gpu-val">--/-- GB</span>
+          <span class="hw-sep">|</span>
+          <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">CPU</span>
+          <span class="ticker-val" id="ticker-cpu-val">--%</span>
+          <span class="hw-sep">|</span>
+          <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">RAM</span>
+          <span class="ticker-val" id="ticker-ram-val">--/-- GB</span>
+          <span class="model-count-tag" id="header-model-label">Ollama Active</span>
+          <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" style="opacity: 0.6; margin-left: 2px;"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
 
+        <!-- PPAC Govt. Verified Badge -->
+        <div class="status-tag verified-badge" title="Verified against Petroleum Planning & Analysis Cell (PPAC), MoPNG, Govt. of India">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>PPAC Verified</span>
+        </div>
+
+        <!-- Day / Night Mode Toggle -->
         <button class="icon-button theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle Night/Day Mode">
           <svg class="theme-icon sun-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
             <circle cx="12" cy="12" r="5"></circle>
@@ -156,14 +179,7 @@
           </svg>
         </button>
 
-        <button class="icon-button" onclick="switchTab('alerts')" title="Alerts">
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-          <span class="icon-badge">3</span>
-        </button>
-
+        <!-- User Profile Avatar -->
         <div class="user-profile">
           <div class="user-avatar">OP</div>
           <div class="user-meta">
@@ -175,325 +191,481 @@
     </header>
 
     <!-- ------------------------------------------------------------------
-         TAB 1: OVERVIEW
+         TAB 1: OVERVIEW (CLEAN EXECUTIVE SCADA - GROUNDED IN PPAC & API 510)
          ------------------------------------------------------------------ -->
     <section class="tab-content active" id="tab-overview">
-      <!-- Top Row: Alerts & Predictions -->
+      <!-- 1. Top Hero KPI Bar: 4 Core Non-Redundant Operational Pillars -->
+      <div class="grid-4" style="margin-bottom: 16px;">
+        <!-- Pillar 1: Annual Throughput -->
+        <div class="dash-card kpi-hero-card">
+          <div class="kpi-hero-label">Annual Crude Throughput</div>
+          <div class="kpi-hero-value" id="kpi-annual-throughput">16.77 MMT</div>
+          <div class="kpi-hero-sub">
+            <span class="status-badge-green" id="kpi-capacity-util">111.8% Util</span>
+            <span style="color: var(--text-dim); font-size: 10px;">PPAC Certified (16,774 TMT)</span>
+          </div>
+        </div>
+
+        <!-- Pillar 2: Crude Basket Split -->
+        <div class="dash-card kpi-hero-card">
+          <div class="kpi-hero-label">Crude Basket Diet</div>
+          <div class="kpi-hero-value" style="color: var(--color-info);">82.4% / 17.6%</div>
+          <div class="kpi-hero-sub">
+            <span class="status-badge-blue">Import vs Local</span>
+            <span style="color: var(--text-dim); font-size: 10px;">Arab Heavy / Mangala</span>
+          </div>
+        </div>
+
+        <!-- Pillar 3: Finished Products Slate -->
+        <div class="dash-card kpi-hero-card">
+          <div class="kpi-hero-label">Finished Product Slate</div>
+          <div class="kpi-hero-value">615.4 <span style="font-size: 13px; font-weight: 500; color: var(--text-muted);">TMT / mo</span></div>
+          <div class="kpi-hero-sub">
+            <span class="status-badge-green">HSD Diesel BS-VI</span>
+            <span style="color: var(--text-dim); font-size: 10px;">Coastal / Pipeline Fleet</span>
+          </div>
+        </div>
+
+        <!-- Pillar 4: Statutory Asset Integrity -->
+        <div class="dash-card kpi-hero-card">
+          <div class="kpi-hero-label">Statutory Asset Health</div>
+          <div class="kpi-hero-value" style="color: var(--color-danger); font-size: 18px;">API 510 Deficit</div>
+          <div class="kpi-hero-sub">
+            <span class="status-badge-red">-1.82 mm CML</span>
+            <span style="color: var(--text-dim); font-size: 10px;">CDU-Col-04 Overlay Req.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Main Operations Grid: PPAC Processing & Statutory Asset Integrity -->
       <div class="grid-2">
-        <!-- Immediate Alerts Card -->
+        <!-- Panel A: PPAC Official Monthly Crude Processing -->
         <div class="dash-card">
           <div class="card-header">
-            <div class="card-title">Immediate Alerts</div>
-            <a class="card-link" onclick="switchTab('alerts')">View All</a>
+            <div>
+              <div class="card-title">PPAC Official Crude Processing Performance</div>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+                Petroleum Planning &amp; Analysis Cell (PPAC), MoPNG, Govt. of India (Ready Reckoner)
+              </div>
+            </div>
+            <span class="status-badge-green">15.00 MMTPA Capacity</span>
           </div>
-          <div class="alert-list">
-            <div class="alert-row">
-              <div class="alert-main">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#EF4444" stroke-width="2" fill="none">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                  <line x1="12" y1="9" x2="12" y2="13"></line>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <div>
-                  <div class="alert-unit text-danger">Hydrocracker</div>
-                  <div class="alert-desc">High temperature detected</div>
-                </div>
-              </div>
-              <div class="alert-time text-danger">2 min ago</div>
-            </div>
 
-            <div class="alert-row">
-              <div class="alert-main">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#EF4444" stroke-width="2" fill="none">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                  <line x1="12" y1="9" x2="12" y2="13"></line>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <div>
-                  <div class="alert-unit">Tank T-104</div>
-                  <div class="alert-desc">High pressure detected</div>
-                </div>
-              </div>
-              <div class="alert-time text-danger">5 min ago</div>
-            </div>
+          <!-- Clean, High-Contrast Monthly Table -->
+          <div style="overflow-x: auto; margin-top: 6px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Indigenous (TMT)</th>
+                  <th>Imported (TMT)</th>
+                  <th>Total Processed</th>
+                  <th>PPAC Target</th>
+                  <th>Utilization</th>
+                </tr>
+              </thead>
+              <tbody id="ppac-monthly-tbody">
+                <tr>
+                  <td><code>July 2026</code></td>
+                  <td>258.2</td>
+                  <td>1240.1</td>
+                  <td><strong style="color: var(--text-heading);">1498.3 TMT</strong></td>
+                  <td>1280.0</td>
+                  <td><span class="status-badge-green">119.9%</span></td>
+                </tr>
+                <tr>
+                  <td><code>June 2026</code></td>
+                  <td>251.8</td>
+                  <td>1224.2</td>
+                  <td><strong style="color: var(--text-heading);">1476.0 TMT</strong></td>
+                  <td>1280.0</td>
+                  <td><span class="status-badge-green">118.1%</span></td>
+                </tr>
+                <tr>
+                  <td><code>May 2026</code></td>
+                  <td>255.4</td>
+                  <td>1235.8</td>
+                  <td><strong style="color: var(--text-heading);">1491.2 TMT</strong></td>
+                  <td>1280.0</td>
+                  <td><span class="status-badge-green">119.3%</span></td>
+                </tr>
+                <tr>
+                  <td><code>April 2026</code></td>
+                  <td>249.0</td>
+                  <td>1218.4</td>
+                  <td><strong style="color: var(--text-heading);">1467.4 TMT</strong></td>
+                  <td>1280.0</td>
+                  <td><span class="status-badge-green">117.4%</span></td>
+                </tr>
+                <tr>
+                  <td><code>March 2026</code></td>
+                  <td>275.2</td>
+                  <td>1425.3</td>
+                  <td><strong style="color: var(--text-heading);">1700.5 TMT</strong></td>
+                  <td>1350.0</td>
+                  <td><span class="status-badge-green">136.0%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-            <div class="alert-row">
-              <div class="alert-main">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#F59E0B" stroke-width="2" fill="none">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                  <line x1="12" y1="9" x2="12" y2="13"></line>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <div>
-                  <div class="alert-unit text-warning">Cooling Water System</div>
-                  <div class="alert-desc">Flow rate below normal</div>
-                </div>
-              </div>
-              <div class="alert-time text-warning">12 min ago</div>
-            </div>
+          <div style="margin-top: 12px; font-size: 11px; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between;">
+            <span>Source: data/ppac_mrpl_monthly_crude_processing.csv</span>
+            <a class="card-link" onclick="switchTab('documents')">Inspect Raw PPAC Datasets &rarr;</a>
           </div>
         </div>
 
-        <!-- Predicted Issues (Next 24 Hrs) Card -->
+        <!-- Panel B: Statutory Asset Integrity & Inspection Log -->
         <div class="dash-card">
           <div class="card-header">
-            <div class="card-title">Predicted Issues (Next 24 Hrs)</div>
-            <a class="card-link" onclick="switchTab('alerts')">View All</a>
-          </div>
-          <div class="alert-list">
-            <div class="alert-row">
-              <div class="alert-main">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#EF4444" stroke-width="2" fill="none">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                  <line x1="12" y1="9" x2="12" y2="13"></line>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <div>
-                  <div class="alert-unit text-danger">Hydrocracker</div>
-                  <div class="alert-desc">High probability of temperature deviation</div>
-                </div>
+            <div>
+              <div class="card-title">Statutory Asset Integrity Audits</div>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+                API 510 Pressure Vessel Code &amp; OISD-STD-129 Ultrasonic Survey
               </div>
-              <div class="alert-prob prob-danger">87%</div>
             </div>
+            <span class="status-badge-orange">Action Required</span>
+          </div>
 
-            <div class="alert-row">
-              <div class="alert-main">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#F59E0B" stroke-width="2" fill="none">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-                <div>
-                  <div class="alert-unit text-warning">Pump P-17</div>
-                  <div class="alert-desc">Possible mechanical failure</div>
-                </div>
-              </div>
-              <div class="alert-prob prob-warning">72%</div>
+          <div style="margin: 8px 0 10px 0; background: var(--bg-card-sub); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-weight: 600; font-size: 12px; color: var(--text-heading);">Asset: CDU Column-04 (Atmospheric Distillation Bottom Shell)</span>
+              <span style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted);">Report: MRPL/NDT/CDU-01/2026/0488</span>
             </div>
-
-            <div class="alert-row">
-              <div class="alert-main">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#F59E0B" stroke-width="2" fill="none">
-                  <path d="M10 2v7.31L4.15 20.3a1 1 0 0 0 .85 1.7h14a1 1 0 0 0 .85-1.7L14 9.31V2"></path>
-                  <path d="M8.5 2h7"></path>
-                </svg>
-                <div>
-                  <div class="alert-unit text-warning">CCR Platformer</div>
-                  <div class="alert-desc">Catalyst activity may decrease</div>
-                </div>
-              </div>
-              <div class="alert-prob prob-warning">65%</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Middle Row: Key Parameters (Live) -->
-      <div class="dash-card">
-        <div class="card-header">
-          <div class="card-title">Key Parameters (Live)</div>
-        </div>
-        <div class="grid-6">
-          <div class="kpi-tile">
-            <div class="kpi-label">Temperature</div>
-            <div class="kpi-value">384 °C</div>
-            <div class="kpi-status"><span class="status-dot dot-success"></span> Normal</div>
-          </div>
-          <div class="kpi-tile">
-            <div class="kpi-label">Pressure</div>
-            <div class="kpi-value">4.8 bar</div>
-            <div class="kpi-status"><span class="status-dot dot-success"></span> Normal</div>
-          </div>
-          <div class="kpi-tile">
-            <div class="kpi-label">Flow Rate</div>
-            <div class="kpi-value">87 %</div>
-            <div class="kpi-status"><span class="status-dot dot-warning"></span> Warning</div>
-          </div>
-          <div class="kpi-tile">
-            <div class="kpi-label">Energy Usage</div>
-            <div class="kpi-value">32 MW</div>
-            <div class="kpi-status"><span class="status-dot dot-success"></span> Normal</div>
-          </div>
-          <div class="kpi-tile">
-            <div class="kpi-label">Steam Generation</div>
-            <div class="kpi-value">215 TPH</div>
-            <div class="kpi-status"><span class="status-dot dot-success"></span> Normal</div>
-          </div>
-          <div class="kpi-tile">
-            <div class="kpi-label">Safety Systems</div>
-            <div class="kpi-value" style="font-size: 16px;">Normal</div>
-            <div class="kpi-status"><span class="status-dot dot-success"></span> Normal</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom Row: Real-time Overview -->
-      <div class="dash-card">
-        <div class="card-header">
-          <div class="card-title">Real-time Overview</div>
-        </div>
-        <div class="grid-4">
-          <!-- Main Refinery -->
-          <div class="unit-card" onclick="switchTab('main-refinery')">
-            <div class="unit-title">Main Refinery</div>
-            <div class="unit-preview-box">
-              <svg viewBox="0 0 160 70" width="100%" height="100%">
-                <rect x="22" y="12" width="28" height="48" rx="2" fill="#1C2438" stroke="#38BDF8" stroke-width="1.2"/>
-                <line x1="22" y1="24" x2="50" y2="24" stroke="#38BDF8" stroke-dasharray="2 2" stroke-width="1"/>
-                <line x1="22" y1="36" x2="50" y2="36" stroke="#38BDF8" stroke-dasharray="2 2" stroke-width="1"/>
-                <line x1="22" y1="48" x2="50" y2="48" stroke="#38BDF8" stroke-dasharray="2 2" stroke-width="1"/>
-                <path d="M 6 45 L 22 45" stroke="#10B981" stroke-width="1.5"/>
-                <path d="M 50 16 L 82 16 L 82 26" stroke="#38BDF8" stroke-width="1.2" fill="none"/>
-                <rect x="76" y="26" width="18" height="12" rx="2" fill="#1C2438" stroke="#38BDF8" stroke-width="1"/>
-                <path d="M 50 36 L 115 36" stroke="#F59E0B" stroke-width="1.2"/>
-                <path d="M 50 50 L 142 50" stroke="#EF4444" stroke-width="1.2"/>
-                <circle cx="115" cy="36" r="3" fill="#F59E0B"/>
-                <circle cx="142" cy="50" r="3" fill="#EF4444"/>
-              </svg>
-            </div>
-            <div class="unit-status-row">
-              <span class="status-dot dot-success"></span> Operational
-            </div>
-            <div>
-              <div class="unit-metric-label">Throughput</div>
-              <div class="unit-metric-value">245 KBPD</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+              High-temperature sulfidation corrosion from Arab Heavy sour crude processing.
             </div>
           </div>
 
-          <!-- Petrochemicals -->
-          <div class="unit-card" onclick="switchTab('petrochemicals')">
-            <div class="unit-title">Petrochemicals</div>
-            <div class="unit-preview-box">
-              <svg viewBox="0 0 160 70" width="100%" height="100%">
-                <ellipse cx="40" cy="35" rx="18" ry="24" fill="#1C2438" stroke="#10B981" stroke-width="1.2"/>
-                <ellipse cx="110" cy="35" rx="16" ry="20" fill="#1C2438" stroke="#818CF8" stroke-width="1.2"/>
-                <path d="M 58 25 C 75 16, 85 16, 94 25" fill="none" stroke="#10B981" stroke-width="1.2" stroke-dasharray="3 2"/>
-                <path d="M 94 45 C 85 54, 75 54, 58 45" fill="none" stroke="#818CF8" stroke-width="1.2" stroke-dasharray="3 2"/>
-                <line x1="40" y1="11" x2="40" y2="4" stroke="#10B981" stroke-width="1.2"/>
-                <line x1="110" y1="15" x2="110" y2="8" stroke="#818CF8" stroke-width="1.2"/>
-              </svg>
-            </div>
-            <div class="unit-status-row">
-              <span class="status-dot dot-success"></span> Operational
-            </div>
-            <div>
-              <div class="unit-metric-label">Production</div>
-              <div class="unit-metric-value">145 TPD</div>
-            </div>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>CML Point</th>
+                  <th>Location / Elev</th>
+                  <th>Nominal</th>
+                  <th>Measured</th>
+                  <th>API 510 Min</th>
+                  <th>Deficit</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>UT-01</code></td>
+                  <td>Bottom Shell (+4.2m)</td>
+                  <td>14.0 mm</td>
+                  <td style="color: #EF4444; font-weight: 700;">4.18 mm</td>
+                  <td>6.00 mm</td>
+                  <td style="color: #EF4444; font-weight: 700;">-1.82 mm</td>
+                  <td><span class="status-badge-red">In-Situ Overlay</span></td>
+                </tr>
+                <tr>
+                  <td><code>UT-02</code></td>
+                  <td>Flash Zone (+4.8m)</td>
+                  <td>14.0 mm</td>
+                  <td style="color: #EF4444; font-weight: 700;">4.60 mm</td>
+                  <td>6.00 mm</td>
+                  <td style="color: #EF4444; font-weight: 700;">-1.40 mm</td>
+                  <td><span class="status-badge-red">In-Situ Overlay</span></td>
+                </tr>
+                <tr>
+                  <td><code>UT-03</code></td>
+                  <td>HGO Draw (+5.5m)</td>
+                  <td>14.0 mm</td>
+                  <td style="color: #10B981; font-weight: 700;">7.10 mm</td>
+                  <td>6.00 mm</td>
+                  <td style="color: #10B981; font-weight: 700;">+1.10 mm</td>
+                  <td><span class="status-badge-green">Acceptable</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
-          <!-- Aromatics Complex -->
-          <div class="unit-card" onclick="switchTab('aromatics')">
-            <div class="unit-title">Aromatics Complex</div>
-            <div class="unit-preview-box">
-              <svg viewBox="0 0 160 70" width="100%" height="100%">
-                <polygon points="45,18 62,28 62,48 45,58 28,48 28,28" fill="#1C2438" stroke="#F59E0B" stroke-width="1.2"/>
-                <circle cx="45" cy="38" r="7" fill="none" stroke="#F59E0B" stroke-width="1" stroke-dasharray="2 2"/>
-                <line x1="62" y1="38" x2="95" y2="38" stroke="#38BDF8" stroke-width="1.2"/>
-                <rect x="95" y="18" width="20" height="40" rx="2" fill="#1C2438" stroke="#38BDF8" stroke-width="1.2"/>
-                <line x1="115" y1="26" x2="140" y2="26" stroke="#10B981" stroke-width="1.2"/>
-                <line x1="115" y1="46" x2="140" y2="46" stroke="#F59E0B" stroke-width="1.2"/>
-              </svg>
-            </div>
-            <div class="unit-status-row">
-              <span class="status-dot dot-success"></span> Operational
-            </div>
-            <div>
-              <div class="unit-metric-label">Production</div>
-              <div class="unit-metric-value">210 TPD</div>
-            </div>
-          </div>
-
-          <!-- Offsites & Utilities -->
-          <div class="unit-card" onclick="switchTab('utilities')">
-            <div class="unit-title">Offsites &amp; Utilities</div>
-            <div class="unit-preview-box">
-              <svg viewBox="0 0 160 70" width="100%" height="100%">
-                <circle cx="40" cy="35" r="18" fill="#1C2438" stroke="#A855F7" stroke-width="1.2"/>
-                <path d="M 32 35 L 48 35 M 40 27 L 40 43" stroke="#A855F7" stroke-width="1.2"/>
-                <line x1="58" y1="35" x2="88" y2="35" stroke="#38BDF8" stroke-width="1.5"/>
-                <rect x="88" y="22" width="34" height="26" rx="2" fill="#1C2438" stroke="#38BDF8" stroke-width="1.2"/>
-                <line x1="122" y1="30" x2="145" y2="30" stroke="#10B981" stroke-width="1.2"/>
-                <line x1="122" y1="40" x2="145" y2="40" stroke="#38BDF8" stroke-width="1.2"/>
-              </svg>
-            </div>
-            <div class="unit-status-row">
-              <span class="status-dot dot-success"></span> Operational
-            </div>
-            <div>
-              <div class="unit-metric-label">Power Generated</div>
-              <div class="unit-metric-value">72 MW</div>
-            </div>
+          <div style="margin-top: 12px; font-size: 11px; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between;">
+            <span>Source: data/real_cdu_ultrasonic_thickness_scan.pdf</span>
+            <a class="card-link" onclick="switchTab('main-refinery')">Full Inspection Dossier &rarr;</a>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ------------------------------------------------------------------
-         TAB 2: MAIN REFINERY
+     <!-- ------------------------------------------------------------------
+         TAB 2: MAIN REFINERY (CDU/VDU, REAL ASSAYS & 12-POINT CML SURVEY)
          ------------------------------------------------------------------ -->
     <section class="tab-content" id="tab-main-refinery">
+      <!-- Top Card: Interactive Crude Assay & Distillation Cut Breakdown -->
       <div class="dash-card">
         <div class="card-header">
-          <div class="card-title">CDU Column-04 Diagnostics</div>
-          <span class="status-badge-red">API 510 CML Audit Required</span>
+          <div>
+            <div class="card-title">Crude Distillation Unit (CDU-1/2/3) &amp; Assay Cut Slate</div>
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+              Dynamic True Boiling Point (TBP) distillation yields from verified assays (data/real_crude_oil_assays.csv)
+            </div>
+          </div>
+          <span class="status-badge-green">16.77 MMT Operating Base</span>
         </div>
 
-        <div class="grid-2" style="margin-top: 10px;">
-          <div class="alert-row">
-            <div>
-              <div class="alert-unit">Equipment Tag</div>
-              <div class="alert-desc">CDU-Col-04 (Atmospheric Distillation Column)</div>
-            </div>
-            <span class="status-badge-red">CRITICAL</span>
+        <!-- Crude Selector Buttons -->
+        <div class="assay-toggle-row">
+          <span style="font-size: 11px; font-weight: 600; color: var(--text-muted); align-self: center; margin-right: 4px;">Active Crude Assay:</span>
+          <button class="assay-toggle-btn active" id="btn-assay-arab-light" onclick="switchCrudeAssay('Arabian Light')">Arabian Light (Saudi)</button>
+          <button class="assay-toggle-btn" id="btn-assay-arab-heavy" onclick="switchCrudeAssay('Arabian Heavy')">Arabian Heavy (Saudi)</button>
+          <button class="assay-toggle-btn" id="btn-assay-brent" onclick="switchCrudeAssay('Brent Blend')">Brent Blend (North Sea)</button>
+          <button class="assay-toggle-btn" id="btn-assay-maya" onclick="switchCrudeAssay('Maya Heavy')">Maya Heavy (Mexico)</button>
+          <button class="assay-toggle-btn" id="btn-assay-mangala" onclick="switchCrudeAssay('Mangala')">Mangala (Rajasthan, India)</button>
+        </div>
+
+        <!-- Assay Physical Properties Bar -->
+        <div class="grid-4" style="margin: 12px 0 10px 0; gap: 8px;">
+          <div class="kpi-hero-card" style="padding: 10px;">
+            <div class="kpi-hero-label">API Gravity / Density</div>
+            <div class="kpi-hero-value" id="assay-prop-api" style="font-size: 16px;">32.8° API</div>
+            <div class="kpi-hero-sub" id="assay-prop-density" style="color: var(--text-dim); font-size: 10px;">861.2 kg/m³ @ 15°C</div>
           </div>
-          <div class="alert-row">
-            <div>
-              <div class="alert-unit">Wall Thickness</div>
-              <div class="alert-desc">UT-01 Point: 4.2 mm (API 510 limit: 6.0 mm)</div>
-            </div>
-            <span class="status-badge-red">-1.8 mm DEFICIT</span>
+          <div class="kpi-hero-card" style="padding: 10px;">
+            <div class="kpi-hero-label">Sulfur Content (wt%)</div>
+            <div class="kpi-hero-value" id="assay-prop-sulfur" style="font-size: 16px; color: var(--color-warning);">1.97 wt%</div>
+            <div class="kpi-hero-sub" style="color: var(--text-dim); font-size: 10px;">Sour Distillate Service</div>
+          </div>
+          <div class="kpi-hero-card" style="padding: 10px;">
+            <div class="kpi-hero-label">Total Acid Number (TAN)</div>
+            <div class="kpi-hero-value" id="assay-prop-tan" style="font-size: 16px; color: var(--color-info);">0.12 mg KOH/g</div>
+            <div class="kpi-hero-sub" style="color: var(--text-dim); font-size: 10px;">Naphthenic Low Acid</div>
+          </div>
+          <div class="kpi-hero-card" style="padding: 10px;">
+            <div class="kpi-hero-label">Viscosity / Pour Point</div>
+            <div class="kpi-hero-value" id="assay-prop-visc" style="font-size: 16px;">5.30 cSt</div>
+            <div class="kpi-hero-sub" id="assay-prop-pour" style="color: var(--text-dim); font-size: 10px;">Pour Point: -21.0°C</div>
           </div>
         </div>
 
-        <div style="margin-top: 14px;">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Inspection Point</th>
-                <th>Elevation</th>
-                <th>Nominal</th>
-                <th>Measured</th>
-                <th>API 510 Min</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>UT-01</code></td>
-                <td>Elev +4.2m</td>
-                <td>14.0 mm</td>
-                <td style="color: #EF4444; font-weight: 700;">4.2 mm</td>
-                <td>6.0 mm</td>
-                <td><span class="status-badge-red">FAILED</span></td>
-              </tr>
-              <tr>
-                <td><code>UT-02</code></td>
-                <td>Elev +4.8m</td>
-                <td>14.0 mm</td>
-                <td style="color: #EF4444; font-weight: 700;">4.6 mm</td>
-                <td>6.0 mm</td>
-                <td><span class="status-badge-red">FAILED</span></td>
-              </tr>
-              <tr>
-                <td><code>UT-03</code></td>
-                <td>Elev +5.5m</td>
-                <td>14.0 mm</td>
-                <td>7.1 mm</td>
-                <td>6.0 mm</td>
-                <td><span class="status-badge-yellow">WARNING</span></td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Distillation Visual Bar -->
+        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 6px;">
+          <span>Atmospheric &amp; Vacuum Distillation Yield Fractions</span>
+          <span id="assay-cut-total-label">100.0% Mass Volume Balance</span>
+        </div>
+        <div class="cut-bar-container" id="assay-cut-bar">
+          <div class="cut-segment cut-lpg" style="width: 2.4%;" title="LPG: 2.4%">LPG 2.4%</div>
+          <div class="cut-segment cut-naphtha" style="width: 19.4%;" title="Naphtha: 19.4%">Naphtha 19.4%</div>
+          <div class="cut-segment cut-atf" style="width: 12.3%;" title="ATF/Kero: 12.3%">ATF 12.3%</div>
+          <div class="cut-segment cut-diesel" style="width: 21.5%;" title="Diesel: 21.5%">Diesel 21.5%</div>
+          <div class="cut-segment cut-vgo" style="width: 30.3%;" title="VGO: 30.3%">VGO 30.3%</div>
+          <div class="cut-segment cut-residue" style="width: 14.1%;" title="Residue: 14.1%">Residue 14.1%</div>
+        </div>
+
+        <!-- Cut Details Table -->
+        <table class="data-table" style="margin-top: 4px;">
+          <thead>
+            <tr>
+              <th>Fraction Name</th>
+              <th>True Boiling Range (°C)</th>
+              <th>Yield (Vol %)</th>
+              <th>Primary Disposition / Processing Unit</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="assay-cut-table-body">
+            <!-- Populated dynamically by switchCrudeAssay() -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Bottom Card: CDU Column-04 Diagnostics & 12-point Ultrasonic Survey -->
+      <div class="dash-card" style="margin-top: 16px;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Atmospheric Column CDU-Col-04 Shell Integrity Survey</div>
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+              Ultrasonic NDT Report Ref: MRPL/NDT/CDU-01/2026/0488 | Olympus Epoch 650 (ASME Sec V Art 5)
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="copilot-query-btn" onclick="sendMessage('Analyze CDU Column-04 API 510 deficit and recommend Inconel-625 weld overlay specifications', ['data/real_cdu_ultrasonic_thickness_scan.pdf'])">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Copilot: Inconel Overlay</span>
+            </button>
+            <a href="/api/download/real_cdu_ultrasonic_thickness_scan.pdf" class="copilot-query-btn" download style="text-decoration: none;">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Download NDT PDF</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="grid-4" style="margin: 12px 0 14px 0; gap: 8px;">
+          <div class="kpi-hero-card" style="padding: 10px;">
+            <div class="kpi-hero-label">Operating Conditions</div>
+            <div class="kpi-hero-value" style="font-size: 15px;">384°C / 4.8 barg</div>
+            <div class="kpi-hero-sub" style="color: var(--text-dim); font-size: 10px;">Feed: Arab Heavy Blend</div>
+          </div>
+          <div class="kpi-hero-card" style="padding: 10px;">
+            <div class="kpi-hero-label">Shell Base Metallurgy</div>
+            <div class="kpi-hero-value" style="font-size: 15px;">ASTM A516 Gr 70</div>
+            <div class="kpi-hero-sub" style="color: var(--text-dim); font-size: 10px;">Killed Carbon Steel (Low Si)</div>
+          </div>
+          <div class="kpi-hero-card" style="padding: 10px;">
+            <div class="kpi-hero-label">3-Yr Corrosion Rate</div>
+            <div class="kpi-hero-value" style="font-size: 15px; color: var(--color-danger);">0.873 mm / yr</div>
+            <div class="kpi-hero-sub" style="color: var(--text-dim); font-size: 10px;">Sulfidation / Naphthenic Attack</div>
+          </div>
+          <div class="kpi-hero-card" style="padding: 10px;">
+            <div class="kpi-hero-label">API 510 Remaining Life</div>
+            <div class="kpi-hero-value" style="font-size: 15px; color: var(--color-danger);">EXPIRED (Negative)</div>
+            <div class="kpi-hero-sub" style="color: var(--text-dim); font-size: 10px;">t_min: 6.00 mm (UG-27)</div>
+          </div>
+        </div>
+
+        <!-- Full 12-Point Ultrasonic CML Table -->
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>CML Point</th>
+              <th>Shell Elevation</th>
+              <th>Orientation</th>
+              <th>Nominal</th>
+              <th>Measured (UT)</th>
+              <th>API 510 Min</th>
+              <th>Deficit / Margin</th>
+              <th>Statutory Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>CML 01-A</code></td>
+              <td>Elev +4.2m (Bottom Ring)</td>
+              <td>North (0°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">4.20 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">-1.80 mm</td>
+              <td><span class="status-badge-red">CRITICAL RETIREMENT</span></td>
+            </tr>
+            <tr>
+              <td><code>CML 01-B</code></td>
+              <td>Elev +4.2m (Bottom Ring)</td>
+              <td>East (90°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">4.35 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">-1.65 mm</td>
+              <td><span class="status-badge-red">CRITICAL RETIREMENT</span></td>
+            </tr>
+            <tr style="background: rgba(239, 68, 68, 0.08);">
+              <td><code>CML 01-C</code></td>
+              <td>Elev +4.2m (Bottom Ring)</td>
+              <td>South (180°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #EF4444; font-weight: 800;">4.18 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #EF4444; font-weight: 800;">-1.82 mm (Max Deficit)</td>
+              <td><span class="status-badge-red">CRITICAL RETIREMENT</span></td>
+            </tr>
+            <tr>
+              <td><code>CML 01-D</code></td>
+              <td>Elev +4.2m (Bottom Ring)</td>
+              <td>West (270°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">4.25 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">-1.75 mm</td>
+              <td><span class="status-badge-red">CRITICAL RETIREMENT</span></td>
+            </tr>
+            <tr>
+              <td><code>CML 02-A</code></td>
+              <td>Elev +4.8m (Mid-Bottom)</td>
+              <td>North (0°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">4.62 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">-1.38 mm</td>
+              <td><span class="status-badge-red">CRITICAL RETIREMENT</span></td>
+            </tr>
+            <tr>
+              <td><code>CML 02-B</code></td>
+              <td>Elev +4.8m (Mid-Bottom)</td>
+              <td>East (90°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">4.70 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">-1.30 mm</td>
+              <td><span class="status-badge-red">CRITICAL RETIREMENT</span></td>
+            </tr>
+            <tr>
+              <td><code>CML 02-C</code></td>
+              <td>Elev +4.8m (Mid-Bottom)</td>
+              <td>South (180°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">4.58 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">-1.42 mm</td>
+              <td><span class="status-badge-red">CRITICAL RETIREMENT</span></td>
+            </tr>
+            <tr>
+              <td><code>CML 02-D</code></td>
+              <td>Elev +4.8m (Mid-Bottom)</td>
+              <td>West (270°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">4.65 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #EF4444; font-weight: 700;">-1.35 mm</td>
+              <td><span class="status-badge-red">CRITICAL RETIREMENT</span></td>
+            </tr>
+            <tr>
+              <td><code>CML 03-A</code></td>
+              <td>Elev +5.5m (Stripping Section)</td>
+              <td>North (0°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #FBBF24; font-weight: 600;">7.10 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #FBBF24; font-weight: 600;">+1.10 mm</td>
+              <td><span class="status-badge-yellow">HIGH CORROSION</span></td>
+            </tr>
+            <tr>
+              <td><code>CML 03-B</code></td>
+              <td>Elev +5.5m (Stripping Section)</td>
+              <td>East (90°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #FBBF24; font-weight: 600;">7.25 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #FBBF24; font-weight: 600;">+1.25 mm</td>
+              <td><span class="status-badge-yellow">HIGH CORROSION</span></td>
+            </tr>
+            <tr>
+              <td><code>CML 03-C</code></td>
+              <td>Elev +5.5m (Stripping Section)</td>
+              <td>South (180°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #FBBF24; font-weight: 600;">6.95 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #FBBF24; font-weight: 600;">+0.95 mm</td>
+              <td><span class="status-badge-yellow">MONITOR CLOSELY</span></td>
+            </tr>
+            <tr>
+              <td><code>CML 03-D</code></td>
+              <td>Elev +5.5m (Stripping Section)</td>
+              <td>West (270°)</td>
+              <td>14.00 mm</td>
+              <td style="color: #FBBF24; font-weight: 600;">7.05 mm</td>
+              <td>6.00 mm</td>
+              <td style="color: #FBBF24; font-weight: 600;">+1.05 mm</td>
+              <td><span class="status-badge-yellow">HIGH CORROSION</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Inspector Sign-off & Statutory Directive -->
+        <div style="margin-top: 14px; padding: 12px; background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; font-size: 11px; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <strong style="color: #EF4444;">MANDATORY STATUTORY ACTION (OISD-STD-129 / API 510):</strong>
+            <span style="color: var(--text-main); margin-left: 6px;">
+              Immediate in-situ weld overlay cladding using Inconel 625 alloy (AWS A5.14 ERNiCrMo-3, min 3.0 mm deposit) or shell plate replacement is required before restarting operations.
+            </span>
+          </div>
+          <div style="text-align: right; color: var(--text-dim); white-space: nowrap; margin-left: 16px;">
+            <div><strong>Inspector:</strong> S. N. Rao, Level III (API 510 #48291)</div>
+            <div>Approved: Chief Manager (Asset Integrity), MRPL</div>
+          </div>
         </div>
       </div>
     </section>
@@ -527,19 +699,125 @@
     </section>
 
     <!-- ------------------------------------------------------------------
-         TAB 4: CODE SANDBOX & ANALYTICS
+         TAB 4: CODE SANDBOX & ANALYTICS (DARCY-WEISBACH CALCULATOR & RUNTIME)
          ------------------------------------------------------------------ -->
     <section class="tab-content" id="tab-analytics">
+      <!-- Interactive Fluid Mechanics Calculator -->
+      <div class="dash-card" style="margin-bottom: 16px;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Interactive Hydrodynamic Calculator (Darcy-Weisbach &amp; Swamee-Jain)</div>
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+              Live pipeline friction drop evaluation across refinery transfer pipelines and offsite lines
+            </div>
+          </div>
+          <span class="status-badge-green">Instant Client Evaluation</span>
+        </div>
+
+        <!-- Quick Presets -->
+        <div style="display: flex; gap: 8px; margin: 10px 0 14px 0; align-items: center; flex-wrap: wrap;">
+          <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Refinery Presets:</span>
+          <button class="assay-toggle-btn active" id="btn-preset-crude" onclick="applyDarcyPreset('crude')">12" Crude Transfer Line (450 m³/h)</button>
+          <button class="assay-toggle-btn" id="btn-preset-diesel" onclick="applyDarcyPreset('diesel')">8" HSD Product Line (220 m³/h)</button>
+          <button class="assay-toggle-btn" id="btn-preset-cw" onclick="applyDarcyPreset('cw')">16" Cooling Water Loop (1,200 m³/h)</button>
+        </div>
+
+        <div class="grid-2" style="gap: 14px;">
+          <!-- User Editable Form -->
+          <div class="interactive-calc-box">
+            <div style="font-size: 11px; font-weight: 600; color: var(--text-heading); margin-bottom: 10px;">Pipeline &amp; Fluid Parameters</div>
+            <div class="calc-input-row">
+              <div class="calc-field-group">
+                <label>Pipeline Length \(L\) (m):</label>
+                <input type="number" step="10" id="darcy-input-length" class="calc-input" value="500.0">
+              </div>
+              <div class="calc-field-group">
+                <label>Pipe Inner Diameter \(D\) (m):</label>
+                <input type="number" step="0.001" id="darcy-input-diameter" class="calc-input" value="0.3048">
+              </div>
+            </div>
+            <div class="calc-input-row">
+              <div class="calc-field-group">
+                <label>Volumetric Flow \(Q\) (m³/h):</label>
+                <input type="number" step="5" id="darcy-input-flow" class="calc-input" value="450.0">
+              </div>
+              <div class="calc-field-group">
+                <label>Fluid Density \(\rho\) (kg/m³):</label>
+                <input type="number" step="1" id="darcy-input-density" class="calc-input" value="875.0">
+              </div>
+            </div>
+            <div class="calc-input-row">
+              <div class="calc-field-group">
+                <label>Kinematic Viscosity \(\nu\) (cSt):</label>
+                <input type="number" step="0.1" id="darcy-input-viscosity" class="calc-input" value="15.0">
+              </div>
+              <div class="calc-field-group">
+                <label>Roughness \(\epsilon\) (mm):</label>
+                <input type="number" step="0.005" id="darcy-input-roughness" class="calc-input" value="0.045" title="Commercial Carbon Steel = 0.045 mm">
+              </div>
+            </div>
+
+            <button class="calc-exec-btn" onclick="executeInteractiveDarcy()">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Calculate Darcy-Weisbach Drop</span>
+            </button>
+          </div>
+
+          <!-- Computed Results Grid -->
+          <div class="interactive-calc-box" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 11px; font-weight: 600; color: var(--text-heading);">Computed Hydrodynamic Results</span>
+              <span id="darcy-res-regime" class="status-badge-green">Turbulent Flow</span>
+            </div>
+
+            <div class="grid-2" style="margin: 8px 0; gap: 8px;">
+              <div class="kpi-hero-card" style="padding: 8px;">
+                <div class="kpi-hero-label">Flow Velocity (\(v\))</div>
+                <div class="kpi-hero-value" id="darcy-res-velocity" style="font-size: 16px;">1.71 m/s</div>
+                <div class="kpi-hero-sub" style="color: var(--text-dim); font-size: 9.5px;">Recommended: 1.5 - 2.5 m/s</div>
+              </div>
+              <div class="kpi-hero-card" style="padding: 8px;">
+                <div class="kpi-hero-label">Reynolds Number (\(Re\))</div>
+                <div class="kpi-hero-value" id="darcy-res-reynolds" style="font-size: 16px;">34,811</div>
+                <div class="kpi-hero-sub" style="color: var(--text-dim); font-size: 9.5px;">Re &gt; 4,000 (Turbulent)</div>
+              </div>
+              <div class="kpi-hero-card" style="padding: 8px;">
+                <div class="kpi-hero-label">Darcy Friction Factor (\(f\))</div>
+                <div class="kpi-hero-value" id="darcy-res-friction" style="font-size: 16px;">0.02305</div>
+                <div class="kpi-hero-sub" style="color: var(--text-dim); font-size: 9.5px;">Swamee-Jain Formula</div>
+              </div>
+              <div class="kpi-hero-card" style="padding: 8px;">
+                <div class="kpi-hero-label">Hydraulic Gradient</div>
+                <div class="kpi-hero-value" id="darcy-res-gradient" style="font-size: 16px;">11.32 m / km</div>
+                <div class="kpi-hero-sub" style="color: var(--text-dim); font-size: 9.5px;">Head Loss per km</div>
+              </div>
+            </div>
+
+            <div style="padding: 8px 12px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 11px; font-weight: 600; color: #38BDF8;">Total Pressure Drop (\(\Delta P\)):</span>
+              <span id="darcy-res-deltap" style="font-size: 15px; font-weight: 800; font-family: var(--font-mono); color: #FFFFFF;">0.486 bar (48.6 kPa)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Python Code Execution Sandbox & Interactive Hydraulic Gradient Chart -->
       <div class="dash-card">
         <div class="card-header">
-          <div class="card-title">Python Code Execution Sandbox</div>
+          <div class="card-title">Python Code Execution Sandbox &amp; Dynamic Hydraulic Gradient</div>
           <span class="status-badge-green">Runtime Ready</span>
         </div>
         
         <div class="grid-2" style="margin-top: 12px;">
           <div>
-            <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Script: Darcy-Weisbach Pipeline Drop</div>
-            <pre style="background: #080B12; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; font-size: 11px; color: #93C5FD; overflow-x: auto; height: 230px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Active Script: scripts/hydraulic_gradient_calc.py</div>
+              <button class="copilot-query-btn" onclick="runServerSandboxCode()" title="Execute script in Python Sandbox worker">
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Run Sandbox Worker</span>
+              </button>
+            </div>
+            <pre style="background: #080B12; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; font-size: 11px; color: #93C5FD; overflow-x: auto; height: 230px;" id="darcy-script-code">
 length_m = 500.0          # Pipeline length (m)
 diameter_m = 0.3048       # 12-inch pipe ID
 flow_rate_m3_h = 450.0    # Transfer rate (m3/h)
@@ -548,7 +826,7 @@ viscosity_cSt = 15.0      # Kinematic viscosity
 
 velocity_m_s = (flow_rate_m3_h / 3600.0) / (3.14159 * (diameter_m**2) / 4.0)
 reynolds = (velocity_m_s * diameter_m) / (viscosity_cSt * 1e-6)
-f = 0.02324 # Swamee-Jain friction factor
+f = 0.02305 # Swamee-Jain friction factor
 delta_p_bar = (f * (length_m/diameter_m) * 0.5 * density_kg_m3 * (velocity_m_s**2)) / 100000.0
 print(f"Total Pressure Drop: {delta_p_bar:.3f} bar")
             </pre>
@@ -559,15 +837,72 @@ Flow Velocity: 1.71 m/s<br>
 Reynolds Number: 34,811 (Turbulent Flow)<br>
 Darcy Friction Factor: 0.02305<br>
 Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
-[Exit Code: 0 | Execution Time: 2.65s]
+[Exit Code: 0 | Execution Time: 0.12s]
             </div>
           </div>
 
           <div>
-            <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Generated Hydraulic Gradient Plot</div>
-            <div style="background: #080B12; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center;">
-              <img id="sandbox-plot-img" src="/api/download/pipeline_pressure_gradient.png?source=sandbox" alt="Pipeline Pressure Gradient" style="max-width: 100%; height: auto; border-radius: 4px;" onerror="this.src='/static/placeholder_plot.png'">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Dynamic Hydraulic Pressure Gradient (Interactive Canvas)</span>
+              <span style="font-size: 10px; color: #38BDF8; font-family: var(--font-mono);" id="darcy-chart-hover-val">Hover to inspect</span>
             </div>
+            <div class="chart-canvas-wrapper" style="height: 230px; position: relative;">
+              <canvas id="darcy-canvas-chart" width="480" height="230" style="display: block; width: 100%; height: 100%; cursor: crosshair;"></canvas>
+              <div id="darcy-chart-tooltip" class="canvas-chart-tooltip"></div>
+            </div>
+            <div class="chart-legend-row" style="margin-top: 8px; font-size: 10.5px;">
+              <div class="chart-legend-item">
+                <div class="chart-legend-dot" style="background: #38BDF8;"></div>
+                <span>Static Pressure Gradient \(P(x)\)</span>
+              </div>
+              <div class="chart-legend-item">
+                <div class="chart-legend-dot" style="background: #EF4444; height: 2px;"></div>
+                <span>Min Delivery Limit (10.5 bar)</span>
+              </div>
+              <div class="chart-legend-item">
+                <span style="color: var(--text-dim); font-size: 9.5px;">Inlet: 12.0 bar &rarr; Outlet: <span id="darcy-outlet-legend" style="color: #38BDF8; font-weight: 700;">11.51 bar</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real Government PPAC Datasets Interactive Visualizer -->
+      <div class="dash-card" style="margin-top: 16px;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Official PPAC &amp; MoPNG Government Datasets — Interactive Visualizer</div>
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+              Real datasets queried directly from Petroleum Planning &amp; Analysis Cell (PPAC), Ministry of Petroleum &amp; Natural Gas
+            </div>
+          </div>
+          <span class="status-badge-green" id="gov-chart-engine-badge">DuckDB SQL In-Memory | 100% Real Govt Data</span>
+        </div>
+
+        <!-- Dataset Selection Tabs -->
+        <div class="assay-toggle-row" style="margin-top: 10px;">
+          <span style="font-size: 11px; font-weight: 600; color: var(--text-muted); align-self: center; margin-right: 4px;">Select Dataset:</span>
+          <button class="assay-toggle-btn active" id="btn-gov-monthly" onclick="switchGovDataset('monthly')">PPAC Monthly Crude Throughput (16 Months)</button>
+          <button class="assay-toggle-btn" id="btn-gov-benchmark" onclick="switchGovDataset('benchmark')">PSU Refineries Comparative Benchmark</button>
+          <button class="assay-toggle-btn" id="btn-gov-slate" onclick="switchGovDataset('slate')">Finished Petroleum Products Slate</button>
+          <button class="assay-toggle-btn" id="btn-gov-assays" onclick="switchGovDataset('assays')">Crude Assay Distillation Curves</button>
+        </div>
+
+        <!-- Interactive Government Chart Canvas -->
+        <div style="margin-top: 12px;">
+          <div class="chart-canvas-wrapper" style="height: 290px; position: relative; padding: 6px;">
+            <canvas id="gov-dataset-chart" width="960" height="290" style="display: block; width: 100%; height: 100%; cursor: pointer;"></canvas>
+            <div id="gov-chart-tooltip" class="canvas-chart-tooltip"></div>
+          </div>
+        </div>
+
+        <!-- Dynamic Chart Legend & Description -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 8px;">
+          <div class="chart-legend-row" id="gov-chart-legend" style="margin-top: 0;">
+            <!-- Dynamically populated by switchGovDataset() -->
+          </div>
+          <div style="font-size: 11px; color: var(--text-dim);" id="gov-chart-meta">
+            Source: data/ppac_mrpl_monthly_crude_processing.csv | PPAC Ready Reckoner (MoPNG)
           </div>
         </div>
       </div>
@@ -591,6 +926,25 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
               <th>Status</th>
             </tr>
           </thead>
+          <tbody>
+            <tr>
+              <td><code>ppac_mrpl_monthly_crude_processing.csv</code></td>
+              <td>MoPNG / PPAC Ready Reckoner (MRPL Monthly Crude Processing FY 24-26)</td>
+              <td>DuckDB</td>
+              <td><span class="status-badge-green">Active</span></td>
+            </tr>
+            <tr>
+              <td><code>ppac_mrpl_petroleum_production_slate.csv</code></td>
+              <td>MoPNG / PPAC Finished Products Slate (HSD, MS, ATF, LPG, PP)</td>
+              <td>DuckDB</td>
+              <td><span class="status-badge-green">Active</span></td>
+            </tr>
+            <tr>
+              <td><code>ppac_psu_refineries_benchmark.csv</code></td>
+              <td>PPAC PSU Refineries Comparative Benchmark (MRPL vs IOCL/BPCL/HPCL)</td>
+              <td>DuckDB</td>
+              <td><span class="status-badge-green">Active</span></td>
+            </tr>
             <tr>
               <td><code>pid_sample_open_dataset.png</code></td>
               <td>Open P&amp;ID Dataset (Piping &amp; Instrumentation Diagram)</td>
@@ -692,107 +1046,578 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
       </div>
     </section>
 
-    <!-- Additional Tabs -->
+    <!-- ------------------------------------------------------------------
+         TAB: PETROCHEMICALS (440 KTPA POLYOLEFINS & NOVOLEN PROCESS)
+         ------------------------------------------------------------------ -->
     <section class="tab-content" id="tab-petrochemicals">
+      <!-- Polypropylene Loop Reactor Telemetry -->
       <div class="dash-card">
-        <div class="card-header"><div class="card-title">Petrochemicals Telemetry</div></div>
-        <div class="grid-2">
-          <div class="alert-row">
-            <div>
-              <div class="alert-unit">Polypropylene Reactor Loop</div>
-              <div class="alert-desc">Pressure: 32 bar | Slurry density: 480 kg/m3</div>
+        <div class="card-header">
+          <div>
+            <div class="card-title">440 KTPA Novolen Gas-Phase Polypropylene (PP) Telemetry</div>
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+              Continuous polymer reaction loop and pelletizing system (MRPL Petrochemicals Unit)
             </div>
-            <span class="status-badge-green">Normal</span>
           </div>
-          <div class="alert-row">
-            <div>
-              <div class="alert-unit">Catalyst Feed System</div>
-              <div class="alert-desc">Feed rate: 1.8 kg/h</div>
-            </div>
-            <span class="status-badge-green">Normal</span>
+          <span class="status-badge-green">PPAC: 36.5 TMT / month (438 KTPA)</span>
+        </div>
+
+        <div class="grid-4" style="margin: 12px 0 14px 0;">
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Primary Reactor R-101</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">32.4 bar</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Temp: 72.5°C | Density: 485 kg/m³</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">Circulation: 1,420 m³/h</span></div>
           </div>
+
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Secondary Reactor R-102</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">30.8 bar</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Temp: 69.2°C | Rate: 52.4 t/h</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">Propylene Purity: 99.65%</span></div>
+          </div>
+
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Z-N Catalyst Dosing</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">1.82 kg / h</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">TEAL Co-catalyst: 0.45 kg/h</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">Donor: Diisobutyl 0.12 kg/h</span></div>
+          </div>
+
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Pelletizing Train Z-201</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">228°C Melt</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Die Head: 182 bar | 1,850 RPM</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">Main Drive: 3,200 kW</span></div>
+          </div>
+        </div>
+
+        <!-- Finished Polymer Slate Table -->
+        <div style="margin-top: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-heading);">Finished Polymer Production Slate &amp; Technical Specifications</div>
+            <button class="copilot-query-btn" onclick="sendMessage('Analyze Novolen PP catalytic selectivity, MFI response to hydrogen dosing, and production efficiency', ['data/ppac_mrpl_petroleum_production_slate.csv'])">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Copilot: Polymer Optimization</span>
+            </button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Grade Code</th>
+                <th>Polymer Classification</th>
+                <th>Melt Flow Index (MFI)</th>
+                <th>Mechanical Spec</th>
+                <th>Monthly Output</th>
+                <th>Target Market &amp; Applications</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>M110</code></td>
+                <td>Homopolymer (PP-H)</td>
+                <td>11.0 g / 10 min (230°C/2.16kg)</td>
+                <td>Tensile: 34 MPa | Flex: 1,500 MPa</td>
+                <td style="font-weight: 700;">14.2 TMT</td>
+                <td>Woven Sacks, FIBC Bags, Raffia Tapes, Geotextiles</td>
+                <td><span class="status-badge-green">Active Run</span></td>
+              </tr>
+              <tr>
+                <td><code>H030SG</code></td>
+                <td>Homopolymer (BOPP Grade)</td>
+                <td>3.2 g / 10 min (230°C/2.16kg)</td>
+                <td>Flexural Modulus: 1,450 MPa</td>
+                <td style="font-weight: 700;">8.5 TMT</td>
+                <td>Biaxially Oriented Film, Food Packaging, Tape Base</td>
+                <td><span class="status-badge-blue">Scheduled</span></td>
+              </tr>
+              <tr>
+                <td><code>MI3530</code></td>
+                <td>Impact Copolymer (PP-ICP)</td>
+                <td>30.0 g / 10 min (230°C/2.16kg)</td>
+                <td>Notched Izod: 8.5 kJ/m² @ 23°C</td>
+                <td style="font-weight: 700;">9.4 TMT</td>
+                <td>Automotive Bumpers, Battery Containers, Thin-Wall Pails</td>
+                <td><span class="status-badge-green">Active Run</span></td>
+              </tr>
+              <tr>
+                <td><code>HM012</code></td>
+                <td>High Mol. Weight Homopolymer</td>
+                <td>0.25 g / 10 min (230°C/2.16kg)</td>
+                <td>ESCR > 500 hrs | High Toughness</td>
+                <td style="font-weight: 700;">4.4 TMT</td>
+                <td>Pressure Pipes, Corrugated Conduit, Thermoforming Sheets</td>
+                <td><span class="status-badge-yellow">Standby</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Feedstock Mass Balance -->
+        <div style="margin-top: 14px; padding: 10px 14px; background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: space-between; font-size: 11px;">
+          <div>
+            <span style="color: var(--text-muted); font-weight: 600;">Feedstock Sourcing:</span>
+            <span style="color: var(--text-main); margin-left: 6px;">Petrochemical FCCU (PFCCU) Propylene Splitter provides 42.0 t/h polymer-grade monomer (99.7% C3=); C3 recovery unit 2.1 t/h.</span>
+          </div>
+          <span class="status-badge-green">100% In-house Sourced</span>
         </div>
       </div>
     </section>
 
+    <!-- ------------------------------------------------------------------
+         TAB: AROMATICS COMPLEX (900 KTPA OMPL AROMATICS CHAIN)
+         ------------------------------------------------------------------ -->
     <section class="tab-content" id="tab-aromatics">
       <div class="dash-card">
-        <div class="card-header"><div class="card-title">Aromatics Complex Telemetry</div></div>
-        <div class="grid-2">
-          <div class="alert-row">
-            <div>
-              <div class="alert-unit">CCR Platformer Unit</div>
-              <div class="alert-desc">Bed Temp: 518°C | RON: 102.4</div>
+        <div class="card-header">
+          <div>
+            <div class="card-title">900 KTPA ONGC Mangalore Petrochemicals (OMPL) Complex</div>
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+              Continuous catalytic reforming, simulated moving bed (Parex) adsorption, and isomerization chain
             </div>
-            <span class="status-badge-green">Normal</span>
           </div>
-          <div class="alert-row">
-            <div>
-              <div class="alert-unit">Paraxylene Crystallizer</div>
-              <div class="alert-desc">Separator temp: -12°C | Purity: 99.82%</div>
-            </div>
-            <span class="status-badge-green">Normal</span>
+          <span class="status-badge-green">900 KTPA Paraxylene | 270 KTPA Benzene</span>
+        </div>
+
+        <!-- 4 Process Train Units -->
+        <div class="grid-4" style="margin: 12px 0 14px 0;">
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">CCR Platformer Unit</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">RON 102.4</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Inlet: 518°C | Press: 4.2 bar</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">Circulation: 680 kg/h</span></div>
           </div>
+
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Parex Adsorption Unit</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">99.82% PX</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Desorbent: 1,420 m³/h PDEB</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">Recovery: 97.4%</span></div>
+          </div>
+
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Isomar Unit (Isomerization)</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">392°C / 18.5 bar</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">H2/HC Ratio: 3.8 : 1</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">EB Conversion: 34.2%</span></div>
+          </div>
+
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Tatoray Transalkylation</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">425°C / 28.0 bar</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Feed: 145 t/h Toluene + C9</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">Xylenes Yield: 46.5%</span></div>
+          </div>
+        </div>
+
+        <!-- Certified Product Quality & Assay Specifications -->
+        <div style="margin-top: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-heading);">Certified High-Purity Aromatics Slate &amp; Lab Quality Controls</div>
+            <button class="copilot-query-btn" onclick="sendMessage('Review OMPL Aromatics Complex Parex unit adsorbent selectivity, desorbent ratio, and benzene purity assays', ['data/ppac_mrpl_petroleum_production_slate.csv'])">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Copilot: Aromatics Yield</span>
+            </button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>Annual Capacity</th>
+                <th>Monthly Output</th>
+                <th>Laboratory Purity</th>
+                <th>Critical Quality Specification</th>
+                <th>Customer / Dispatch Infrastructure</th>
+                <th>Compliance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>Paraxylene (PX)</code></td>
+                <td>900 KTPA</td>
+                <td style="font-weight: 700;">75.0 TMT</td>
+                <td style="color: #10B981; font-weight: 700;">99.82 wt%</td>
+                <td>Meta-xylene &lt; 0.08% | Saybolt Color +30</td>
+                <td>PTA Manufacturers / Dedicated Tankers (NMPT Jetty 8)</td>
+                <td><span class="status-badge-green">PASSED</span></td>
+              </tr>
+              <tr>
+                <td><code>Benzene</code></td>
+                <td>270 KTPA</td>
+                <td style="font-weight: 700;">22.5 TMT</td>
+                <td style="color: #10B981; font-weight: 700;">99.94 wt%</td>
+                <td>Solidification Pt 5.49°C | Thiophene &lt; 0.5 ppm</td>
+                <td>Ethylbenzene &amp; Caprolactam / Dedicated Jetty Berth 8</td>
+                <td><span class="status-badge-green">PASSED</span></td>
+              </tr>
+              <tr>
+                <td><code>Heavy Aromatics (C9+)</code></td>
+                <td>45 KTPA</td>
+                <td style="font-weight: 700;">3.8 TMT</td>
+                <td>Mixed C9-C10</td>
+                <td>Flash Point &gt; 62°C | Specific Gravity 0.890</td>
+                <td>High-Boiling Industrial Solvents / Road Gantry</td>
+                <td><span class="status-badge-green">PASSED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Feedstock Inflow Pipeline -->
+        <div style="margin-top: 14px; padding: 10px 14px; background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: space-between; font-size: 11px;">
+          <div>
+            <span style="color: var(--text-muted); font-weight: 600;">Feedstock Inflow:</span>
+            <span style="color: var(--text-main); margin-left: 6px;">Petrochemical Naphtha direct pipeline from MRPL CDU/NHT: 98.2 TMT/month (1,178.4 TMT/yr).</span>
+          </div>
+          <span class="status-badge-green">Dedicated PMHBL Connection</span>
         </div>
       </div>
     </section>
 
+    <!-- ------------------------------------------------------------------
+         TAB: OFFSITES & UTILITIES (120 MW CPP, STEAM & CEMS EMISSIONS)
+         ------------------------------------------------------------------ -->
     <section class="tab-content" id="tab-utilities">
+      <!-- 120 MW Captive Power Plant -->
       <div class="dash-card">
-        <div class="card-header"><div class="card-title">Offsites &amp; Utilities Telemetry</div></div>
-        <div class="grid-2">
-          <div class="alert-row">
-            <div>
-              <div class="alert-unit">Gas Turbine GTG-2</div>
-              <div class="alert-desc">Output: 36.2 MW | Freq: 50.02 Hz</div>
+        <div class="card-header">
+          <div>
+            <div class="card-title">120 MW Captive Power Plant (CPP) Electrical Grid</div>
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+              Islanded co-generation power grid with synchronous grid interconnection to KPTCL
             </div>
-            <span class="status-badge-green">Normal</span>
           </div>
-          <div class="alert-row">
-            <div>
-              <div class="alert-unit">Demineralized Water Unit</div>
-              <div class="alert-desc">Conductivity: 0.08 µS/cm</div>
+          <span class="status-badge-green">Captive Output: 121.0 MW | Export: +12.6 MW</span>
+        </div>
+
+        <div class="grid-4" style="margin: 12px 0 14px 0;">
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Gas Turbine GTG-1 (Frame 6)</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">34.8 MW</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Freq: 50.01 Hz | Exhaust: 538°C</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">Fuel: Mixed Gas</span></div>
+          </div>
+
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Gas Turbine GTG-2 (Frame 6)</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">36.2 MW</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Freq: 50.02 Hz | Exhaust: 532°C</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">Fuel: Dual Fuel</span></div>
+          </div>
+
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Gas Turbine GTG-3 (Frame 6)</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">35.5 MW</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Freq: 50.00 Hz | Current: 1,840 A</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">Base Loaded</span></div>
+          </div>
+
+          <div class="dash-card" style="background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 10px;">
+            <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Steam Turbine STG-1</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">14.5 MW</div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">42 bar / 395°C | Vacuum 0.08 bar</div>
+            <div style="margin-top: 6px;"><span class="status-badge-green">Extraction-Condensing</span></div>
+          </div>
+        </div>
+
+        <!-- 3-Tier Steam Network and Water Treatment -->
+        <div class="grid-2" style="margin-top: 14px;">
+          <div style="background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">3-Tier Steam Balance Network</div>
+            <table class="data-table" style="margin-top: 0; font-size: 11px;">
+              <thead>
+                <tr>
+                  <th>Header Level</th>
+                  <th>Pressure / Temp</th>
+                  <th>Flow Rate</th>
+                  <th>Primary Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>HP Steam</code></td>
+                  <td>105.0 bar / 510°C</td>
+                  <td style="font-weight: 700;">480 t/h</td>
+                  <td>HRSG-1/2/3 &rarr; STG Drives &amp; Letdown</td>
+                </tr>
+                <tr>
+                  <td><code>MP Steam</code></td>
+                  <td>42.0 bar / 395°C</td>
+                  <td style="font-weight: 700;">310 t/h</td>
+                  <td>Hydrogen Unit, FCC Preheater, Reboilers</td>
+                </tr>
+                <tr>
+                  <td><code>LP Steam</code></td>
+                  <td>4.5 bar / 168°C</td>
+                  <td style="font-weight: 700;">225 t/h</td>
+                  <td>Deaerators, Crude Tank Heating, Tracing</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Desalination &amp; Demineralized Water (SWRO)</div>
+            <table class="data-table" style="margin-top: 0; font-size: 11px;">
+              <thead>
+                <tr>
+                  <th>Treatment Stage</th>
+                  <th>Capacity / Throughput</th>
+                  <th>Conductivity Spec</th>
+                  <th>Operational Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>SWRO Seawater Intake</code></td>
+                  <td>36,000 m³ / day</td>
+                  <td>Arabian Sea Intake</td>
+                  <td><span class="status-badge-green">Normal</span></td>
+                </tr>
+                <tr>
+                  <td><code>RO Permeate Output</code></td>
+                  <td>18,500 m³ / day</td>
+                  <td>&lt; 250 µS/cm</td>
+                  <td><span class="status-badge-green">Normal</span></td>
+                </tr>
+                <tr>
+                  <td><code>Mixed Bed DM Water</code></td>
+                  <td>420 m³ / h</td>
+                  <td>0.06 µS/cm | Silica &lt; 0.01 mg/l</td>
+                  <td><span class="status-badge-green">Boiler Quality</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CPCB Environmental Continuous Emissions (CEMS) -->
+        <div style="margin-top: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-heading);">CPCB Continuous Emission Monitoring System (CEMS) Telemetry</div>
+            <button class="copilot-query-btn" onclick="sendMessage('Analyze MRPL captive power plant steam balance, boiler stack CEMS emissions, and thermal efficiency', ['data/ppac_mrpl_petroleum_production_slate.csv'])">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Copilot: Cogeneration Audit</span>
+            </button>
+          </div>
+
+          <div class="grid-4" style="gap: 8px;">
+            <div class="cems-meter-card">
+              <div class="cems-meter-top">
+                <span style="color: var(--text-muted); font-weight: 600;">Stack SO2</span>
+                <span class="cems-meter-val">142 mg/Nm³</span>
+              </div>
+              <div class="cems-track"><div class="cems-fill" style="width: 47.3%; background: #10B981;"></div></div>
+              <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
+                <span>CPCB Limit: 300 mg/Nm³</span>
+                <span style="color: #10B981; font-weight: 600;">47.3% Load (OK)</span>
+              </div>
             </div>
-            <span class="status-badge-green">Normal</span>
+
+            <div class="cems-meter-card">
+              <div class="cems-meter-top">
+                <span style="color: var(--text-muted); font-weight: 600;">Stack NOx</span>
+                <span class="cems-meter-val">185 mg/Nm³</span>
+              </div>
+              <div class="cems-track"><div class="cems-fill" style="width: 52.8%; background: #10B981;"></div></div>
+              <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
+                <span>CPCB Limit: 350 mg/Nm³</span>
+                <span style="color: #10B981; font-weight: 600;">52.8% Load (OK)</span>
+              </div>
+            </div>
+
+            <div class="cems-meter-card">
+              <div class="cems-meter-top">
+                <span style="color: var(--text-muted); font-weight: 600;">Particulate (PM)</span>
+                <span class="cems-meter-val">28 mg/Nm³</span>
+              </div>
+              <div class="cems-track"><div class="cems-fill" style="width: 56.0%; background: #10B981;"></div></div>
+              <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
+                <span>CPCB Limit: 50 mg/Nm³</span>
+                <span style="color: #10B981; font-weight: 600;">56.0% Load (OK)</span>
+              </div>
+            </div>
+
+            <div class="cems-meter-card">
+              <div class="cems-meter-top">
+                <span style="color: var(--text-muted); font-weight: 600;">ETP Effluent COD</span>
+                <span class="cems-meter-val">48 mg/l</span>
+              </div>
+              <div class="cems-track"><div class="cems-fill" style="width: 38.4%; background: #10B981;"></div></div>
+              <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
+                <span>Statutory Limit: 125 mg/l</span>
+                <span style="color: #10B981; font-weight: 600;">38.4% Load (OK)</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- ------------------------------------------------------------------
+         TAB: STATUTORY AUDITS & ASSET INTEGRITY REGISTER
+         ------------------------------------------------------------------ -->
     <section class="tab-content" id="tab-alerts">
       <div class="dash-card">
-        <div class="card-header"><div class="card-title">Operational Alerts</div></div>
-        <div class="alert-list" style="margin-top: 10px;">
-          <div class="alert-row">
-            <div class="alert-main">
-              <svg viewBox="0 0 24 24" width="18" height="18" stroke="#EF4444" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
-              <div>
-                <div class="alert-unit text-danger">Hydrocracker Unit</div>
-                <div class="alert-desc">Exothermic excursion in reactor bed 2 | 412°C</div>
-              </div>
+        <div class="card-header">
+          <div>
+            <div class="card-title">Statutory Asset Integrity &amp; Regulatory Compliance Register</div>
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+              Grounded in statutory inspection codes (OISD-STD-129, API 510/570, PESO SMPV Rules, CPCB Directives)
             </div>
-            <div class="alert-time text-danger">2 min ago</div>
           </div>
-          <div class="alert-row">
-            <div class="alert-main">
-              <svg viewBox="0 0 24 24" width="18" height="18" stroke="#EF4444" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
-              <div>
-                <div class="alert-unit text-danger">CDU Column-04 Bottom Shell</div>
-                <div class="alert-desc">Remaining wall thickness (4.2mm) below API 510 limit (6.0mm)</div>
-              </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="copilot-query-btn" onclick="sendMessage('Generate formal statutory remediation note for OISD and API 510 inspection findings', ['data/real_cdu_ultrasonic_thickness_scan.pdf'])">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Copilot: Draft OISD Note</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Statutory Compliance Audit Register Table -->
+        <div style="margin-top: 12px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Standard / Code</th>
+                <th>Equipment Tag &amp; Location</th>
+                <th>Observed Condition &amp; Diagnostic Metric</th>
+                <th>Statutory Requirement</th>
+                <th>Mandatory Action</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background: rgba(239, 68, 68, 0.08);">
+                <td><code>API 510 / OISD-129</code></td>
+                <td><strong>CDU-Col-04</strong> (Bottom Shell Elev +4.2m)</td>
+                <td>Measured thickness 4.18 mm (Deficit: -1.82 mm below t_min 6.00 mm)</td>
+                <td>Pressure vessel retirement or structural weld reinforcement</td>
+                <td>Mandatory in-situ Inconel-625 weld overlay cladding (min 3.0 mm)</td>
+                <td><span class="status-badge-red">CRITICAL DEFICIT</span></td>
+              </tr>
+              <tr>
+                <td><code>API 570 / CSB-R32</code></td>
+                <td><strong>Crude Heater Transfer Line</strong> (CDU-1)</td>
+                <td>ASTM A106 Gr B carbon steel in 384°C sour crude service</td>
+                <td>PMI silicon verification (Si &ge; 0.10 wt% to resist sulfidation)</td>
+                <td>Schedule positive material identification and ultrasonic baseline mapping</td>
+                <td><span class="status-badge-yellow">PRIORITY 1 AUDIT</span></td>
+              </tr>
+              <tr>
+                <td><code>PESO SMPV Rules</code></td>
+                <td><strong>Mounded LPG Bullets</strong> (TK-101 to TK-104)</td>
+                <td>4x 1,200 m³ pressurized bullets, hydraulic relief valves certified</td>
+                <td>5-year hydrostatic test &amp; acoustic emission examination</td>
+                <td>Routine operational inspection log; next statutory overhaul: Nov 2027</td>
+                <td><span class="status-badge-green">FULLY COMPLIANT</span></td>
+              </tr>
+              <tr>
+                <td><code>OISD-STD-117</code></td>
+                <td><strong>Fire Protection Network</strong> (Storage Tank Farm)</td>
+                <td>Medium expansion foam pourers &amp; deluge system flow testing</td>
+                <td>Monthly functional run &amp; pressure test (9.5 barg header pressure)</td>
+                <td>Deluge test executed at Berth 8 &amp; Naphtha gantry; all nozzles cleared</td>
+                <td><span class="status-badge-green">VERIFIED PASSED</span></td>
+              </tr>
+              <tr>
+                <td><code>CPCB / SPCB</code></td>
+                <td><strong>CAAQMS Station 1 &amp; 2</strong> (Perimeter Fence)</td>
+                <td>Continuous ambient PM2.5, SO2, NOx analyzers (99.2% uptime)</td>
+                <td>Quarterly calibration against certified span gas cylinders</td>
+                <td>Zero and span drift check completed; data transmitted to CPCB portal</td>
+                <td><span class="status-badge-green">CERTIFIED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Critical Spares & Procurement Allocation (from refinery_equipment_spares_catalog.csv) -->
+        <div style="margin-top: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div>
+              <div style="font-size: 12px; font-weight: 600; color: var(--text-heading);">Critical Equipment Spares &amp; Procurement Allocation</div>
+              <div style="font-size: 11px; color: var(--text-dim);">Live inventory tracked against data/refinery_equipment_spares_catalog.csv</div>
             </div>
-            <div class="alert-time text-danger">10 min ago</div>
+            <button class="copilot-query-btn" onclick="sendMessage('Check critical spares stock deficit for CDU Column-04 Inconel weld overlay and draft SAP purchase requisition', ['data/refinery_equipment_spares_catalog.csv'])">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Copilot: Generate PO Requisition</span>
+            </button>
           </div>
-          <div class="alert-row">
-            <div class="alert-main">
-              <svg viewBox="0 0 24 24" width="18" height="18" stroke="#F59E0B" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
-              <div>
-                <div class="alert-unit text-warning">Cooling Water Header B</div>
-                <div class="alert-desc">Flow rate below normal (1,240 m3/h)</div>
-              </div>
-            </div>
-            <div class="alert-time text-warning">12 min ago</div>
-          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Part Number</th>
+                <th>Description</th>
+                <th>Equipment Tag</th>
+                <th>Material Spec</th>
+                <th>Stock on Hand</th>
+                <th>Min Reorder</th>
+                <th>Lead Time</th>
+                <th>Unit Cost (INR)</th>
+                <th>Procurement Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background: rgba(239, 68, 68, 0.08);">
+                <td><code>INC-625-WELD-ROD</code></td>
+                <td>Inconel 625 TIG Welding Wire 2.4mm</td>
+                <td>CDU-COL-04-REPAIR</td>
+                <td>ERNiCrMo-3 (UNS N06625)</td>
+                <td style="color: #EF4444; font-weight: 700;">12 kg</td>
+                <td>50 kg</td>
+                <td>15 days</td>
+                <td>₹6,800 / kg</td>
+                <td><span class="status-badge-red">URGENT DEFICIT (-38 kg)</span></td>
+              </tr>
+              <tr>
+                <td><code>FSH-ED-6-600</code></td>
+                <td>Balanced Plug Control Valve 6-inch CL600</td>
+                <td>PV-CDU-201</td>
+                <td>ASTM A217 WC9 / Stellite</td>
+                <td style="color: #FBBF24; font-weight: 700;">1 unit</td>
+                <td>2 units</td>
+                <td>60 days</td>
+                <td>₹8,50,000</td>
+                <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
+              </tr>
+              <tr>
+                <td><code>JC-8648-80</code></td>
+                <td>High Temp Metal Bellows Seal 80mm</td>
+                <td>P-CDU-BOTTOM</td>
+                <td>Inconel 718 / Carbon</td>
+                <td style="color: #FBBF24; font-weight: 700;">2 units</td>
+                <td>4 units</td>
+                <td>40 days</td>
+                <td>₹4,10,000</td>
+                <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
+              </tr>
+              <tr>
+                <td><code>FSH-ET-2-300</code></td>
+                <td>Control Valve Globe 2-inch CL300</td>
+                <td>FV-CDU-104</td>
+                <td>ASTM A216 WCC / 316 Trim</td>
+                <td style="color: #FBBF24; font-weight: 700;">2 units</td>
+                <td>4 units</td>
+                <td>45 days</td>
+                <td>₹3,85,000</td>
+                <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
+              </tr>
+              <tr>
+                <td><code>GSK-SPW-12-300</code></td>
+                <td>Spiral Wound Gasket 12-inch CL300</td>
+                <td>FLG-12-300</td>
+                <td>316L Windings / FG Filler</td>
+                <td style="color: #FBBF24; font-weight: 700;">14 units</td>
+                <td>50 units</td>
+                <td>7 days</td>
+                <td>₹3,800</td>
+                <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -819,23 +1644,23 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
     <!-- Chat Stream -->
     <div class="chat-container" id="chat-container">
       <div class="chat-bubble chat-bot">
-        <div><strong>Hello! I am your MRPL AI Assistant.</strong></div>
-        <div style="margin-top: 4px;">Ask me anything about plant operations, equipment status, reports, or any operational guidance.</div>
-        <div style="margin-top: 8px;">How can I help you today?</div>
+        <div><strong>Hello! I am DRISHTI-MRPL.</strong></div>
+        <div style="margin-top: 4px;">Your sovereign operations copilot for plant telemetry, PPAC analytics, statutory compliance, and process engineering.</div>
+        <div style="margin-top: 8px;">How can I assist your shift today?</div>
         
-        <!-- Clean, uncluttered suggestion buttons matching reference image -->
+        <!-- Real Government and Statutory Data Quick-Action Pills -->
         <div class="chips-container">
-          <div class="suggestion-chip" onclick="sendMessage('Show refinery performance summary')">
-            Show refinery performance summary
+          <div class="suggestion-chip" onclick="sendMessage('Analyze PPAC monthly crude throughput and capacity utilization for MRPL', ['data/ppac_mrpl_monthly_crude_processing.csv'])">
+            PPAC Crude Throughput &amp; Util
           </div>
-          <div class="suggestion-chip" onclick="sendMessage('Why is hydrocracker temperature high?')">
-            Why is hydrocracker temperature high?
+          <div class="suggestion-chip" onclick="sendMessage('Compare Arabian Light vs Maya crude assay sulfur, TAN, and distillation yields in DuckDB', ['data/real_crude_oil_assays.csv'])">
+            Crude Assay Comparison
           </div>
-          <div class="suggestion-chip" onclick="sendMessage('Process CDU Column-04 inspection report and draft approval note', ['data/mrpl_cdu_inspection_report.png'])">
-            Process CDU Column-04 inspection report
+          <div class="suggestion-chip" onclick="sendMessage('Process CDU Column-04 inspection report and evaluate API 510 deficit', ['data/real_cdu_ultrasonic_thickness_scan.pdf'])">
+            API 510 NDT Audit
           </div>
           <div class="suggestion-chip" onclick="sendMessage('Which spare parts in inventory are below their reorder threshold and what is replenishment cost?', ['data/refinery_equipment_spares_catalog.csv'])">
-            Inventory replenishment analysis (DuckDB)
+            OEM Spares Inventory
           </div>
         </div>
       </div>
@@ -843,8 +1668,26 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
 
     <!-- Chat Input Area -->
     <div class="chat-input-area">
+      <!-- Model Router Selector -->
+      <div class="model-selector-bar">
+        <div class="model-selector-left">
+          <svg viewBox="0 0 24 24" width="11" height="11" stroke="var(--accent-purple)" stroke-width="2" fill="none"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+          <span class="model-selector-label">ROUTER:</span>
+        </div>
+        <select id="model-profile-select" class="model-select-dropdown" onchange="onModelProfileChange()">
+          <option value="auto">Auto-Route (Smart Intent Selection)</option>
+          <option value="code">Code &amp; Hydraulics (qwen2.5-coder:7b)</option>
+          <option value="reasoning">Root-Cause Diagnostics (deepseek-r1:1.5b)</option>
+          <option value="general">PSU Notes &amp; Memos (qwen2.5:7b)</option>
+          <option value="vision">Multimodal Vision (qwen2.5vl:3b)</option>
+        </select>
+      </div>
+
       <div class="input-row">
-        <input type="text" class="chat-input" id="chat-input" placeholder="Ask anything about MRPL..." onkeydown="if(event.key==='Enter') sendMessage()">
+        <input type="text" class="chat-input" id="chat-input" placeholder="Ask anything about MRPL operations..." onkeydown="if(event.key==='Enter') sendMessage()">
+        <button class="attach-btn" onclick="document.getElementById('file-upload-input').click()" title="Attach Engineering Drawing / NDT Scan / CSV">
+          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        </button>
         <button class="send-button" onclick="sendMessage()" title="Send">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="#FFFFFF">
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
@@ -853,44 +1696,153 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
       </div>
     </div>
 
-    <!-- Upload Files & Images Card -->
-    <div class="copilot-upload-card">
-      <div class="card-header" style="margin-bottom: 8px;">
-        <div class="card-title" style="font-size: 12px;">Upload Files &amp; Images</div>
-      </div>
-      <div class="dropzone-box" onclick="document.getElementById('file-upload-input').click()">
-        <div class="dropzone-icon">
-          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.8" fill="none">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-        </div>
-        <div class="dropzone-title">Drag &amp; drop files here</div>
-        <div class="dropzone-sub">or click to browse</div>
-        <div class="dropzone-meta">Supports: PDF, DOCX, XLSX, CSV, PNG, JPG (Max 10MB)</div>
-        <input type="file" id="file-upload-input" style="display: none;" onchange="handleFileUpload(this.files)">
-      </div>
+    <!-- Sleek Compact Attachment Bar -->
+    <div class="compact-attach-bar dropzone-box" onclick="document.getElementById('file-upload-input').click()" title="Drag &amp; drop or click to attach files">
+      <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span>Attach Drawing / NDT Scan / CSV (Drop or Click)</span>
+      <input type="file" id="file-upload-input" style="display: none;" onchange="handleFileUpload(this.files)">
     </div>
 
-    <!-- Generated Results Drawer -->
-    <div class="copilot-results-card">
-      <div class="card-header" style="margin-bottom: 8px;">
-        <div class="card-title" style="font-size: 12px;">Generated Results</div>
+    <!-- Collapsible Generated Deliverables Drawer -->
+    <div class="copilot-results-drawer" id="copilot-results-drawer">
+      <div class="results-drawer-header" onclick="document.getElementById('copilot-results-drawer').classList.toggle('expanded')">
+        <span style="display: flex; align-items: center; gap: 6px;">
+          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <strong>Generated Deliverables</strong>
+        </span>
+        <span class="drawer-toggle-arrow">▾</span>
       </div>
-      <div id="results-drawer-list">
+      <div id="results-drawer-list" class="results-drawer-body">
         <div class="empty-results">
-          <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--text-dim)" stroke-width="1.8" fill="none">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-          </svg>
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Your generated reports and charts will appear here.</div>
-          <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Ask the AI to generate analysis, reports or charts.</div>
+          <div style="font-size: 11px; color: var(--text-muted);">No reports generated yet.</div>
+          <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Ask the AI to generate analysis, notes, or charts.</div>
         </div>
       </div>
     </div>
   </aside>
 
+</div>
+
+<!-- ====================================================================
+     MODEL REGISTRY & HARDWARE MODAL
+     ==================================================================== -->
+<div id="model-modal" class="modal-backdrop" onclick="if(event.target===this) closeModelRegistryModal()">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title-left">
+        <div class="modal-icon-badge">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+            <rect x="2" y="2" width="20" height="8" rx="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+        </div>
+        <div>
+          <div class="modal-heading">Local Model Registry &amp; Hardware Budget</div>
+          <div class="modal-subheading">100% On-Premises Air-Gapped Inference &bull; NVIDIA RTX 3050 (6GB VRAM) &bull; Zero External WAN</div>
+        </div>
+      </div>
+      <button class="modal-close-button" onclick="closeModelRegistryModal()" title="Close (Esc)">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Live Real-Time Hardware Analytics (CPU, RAM, GPU, ROM) -->
+      <div class="modal-section-header">
+        <div class="modal-section-title">Host Hardware &amp; Telemetry</div>
+        <span id="modal-os-badge" class="hw-os-pill">Detecting OS...</span>
+      </div>
+
+      <div class="live-hardware-grid">
+        <!-- 1. CPU -->
+        <div class="hw-meter-card">
+          <div class="hw-meter-top">
+            <div class="hw-meter-title">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+              <span>Processor (CPU)</span>
+            </div>
+            <span class="hw-meter-percent" id="hw-cpu-pct">--%</span>
+          </div>
+          <div class="meter-bar-track">
+            <div class="meter-bar-fill fill-info" id="hw-cpu-bar" style="width: 0%;"></div>
+          </div>
+          <div class="hw-meter-sub" id="hw-cpu-name">Detecting processor...</div>
+          <div class="hw-meter-footer">
+            <span id="hw-cpu-cores">-- Cores</span>
+            <span class="hw-sub-pill" id="hw-cpu-freq">-- MHz</span>
+          </div>
+        </div>
+
+        <!-- 2. RAM -->
+        <div class="hw-meter-card">
+          <div class="hw-meter-top">
+            <div class="hw-meter-title">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M2 2h20v20H2z"/><path d="M7 2v20M17 2v20M2 12h20"/></svg>
+              <span>System Memory (RAM)</span>
+            </div>
+            <span class="hw-meter-percent" id="hw-ram-pct">--%</span>
+          </div>
+          <div class="meter-bar-track">
+            <div class="meter-bar-fill fill-success" id="hw-ram-bar" style="width: 0%;"></div>
+          </div>
+          <div class="hw-meter-sub" id="hw-ram-usage">-- / -- GB Allocated</div>
+          <div class="hw-meter-footer">
+            <span id="hw-ram-avail">-- GB Free</span>
+            <span class="hw-status-dot-text"><span class="status-dot dot-success"></span> Nominal</span>
+          </div>
+        </div>
+
+        <!-- 3. GPU / VRAM -->
+        <div class="hw-meter-card">
+          <div class="hw-meter-top">
+            <div class="hw-meter-title">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="12" r="2"/><path d="M12 8v8"/></svg>
+              <span>Graphics &amp; VRAM (GPU)</span>
+            </div>
+            <span class="hw-meter-percent" id="hw-gpu-pct">--%</span>
+          </div>
+          <div class="meter-bar-track">
+            <div class="meter-bar-fill fill-purple" id="hw-gpu-bar" style="width: 0%;"></div>
+          </div>
+          <div class="hw-meter-sub" id="hw-gpu-name">Detecting GPU accelerator...</div>
+          <div class="hw-meter-footer">
+            <span id="hw-gpu-vram">-- / -- MB VRAM</span>
+            <span class="hw-sub-pill" id="hw-gpu-temp">-- &deg;C</span>
+          </div>
+        </div>
+
+        <!-- 4. Storage / ROM -->
+        <div class="hw-meter-card">
+          <div class="hw-meter-top">
+            <div class="hw-meter-title">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              <span>Local Storage (Disk Pool)</span>
+            </div>
+            <span class="hw-meter-percent" id="hw-rom-pct">--%</span>
+          </div>
+          <div class="meter-bar-track">
+            <div class="meter-bar-fill fill-warning" id="hw-rom-bar" style="width: 0%;"></div>
+          </div>
+          <div class="hw-meter-sub" id="hw-rom-usage">-- / -- GB Allocated</div>
+          <div class="hw-meter-footer">
+            <span id="hw-rom-free">-- GB Free</span>
+            <span class="hw-status-dot-text"><span class="status-dot dot-success"></span> Mounted</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profiles Grid Header -->
+      <div class="modal-section-header" style="margin-top: 18px;">
+        <div class="modal-section-title">Registered Domain-Specialized Models</div>
+        <span class="hw-os-pill">6 Open-Weight Local Engines &bull; 0% Cloud Dependency</span>
+      </div>
+      <div id="modal-model-grid" class="modal-model-grid">
+        <!-- Dynamically populated from /api/models -->
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="/static/app.js"></script>

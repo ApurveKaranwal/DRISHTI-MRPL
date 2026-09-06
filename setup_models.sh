@@ -23,8 +23,8 @@ echo "[1/4] Pulling Coding Model: Qwen 2.5 Coder 7B..."
 ollama pull qwen2.5-coder:7b || ollama pull qwen2.5-coder:3b
 
 echo ""
-echo "[2/4] Pulling Reasoning Model: DeepSeek-R1-Distill-Qwen 7B..."
-ollama pull deepseek-r1-distill-qwen:7b || ollama pull deepseek-r1-distill-qwen:1.5b
+echo "[2/4] Pulling Reasoning Model: DeepSeek-R1 7B / 1.5B..."
+ollama pull deepseek-r1:7b || ollama pull deepseek-r1:1.5b
 
 echo ""
 echo "[3/4] Pulling General & PSU Note Drafting Model: Qwen 2.5 7B..."
