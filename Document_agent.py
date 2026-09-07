@@ -20,7 +20,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import pandas as pd
 import pymupdf as fitz  # PyMuPDF for reliable local PDF extraction
 
 try:
@@ -41,8 +40,6 @@ try:
 except ImportError:
     _QDRANT_AVAILABLE = False
 
-CSV_SUFFIXES = {".csv", ".tsv"}
-
 
 @dataclass(frozen=True)
 class Settings:
@@ -54,7 +51,6 @@ class Settings:
     rerank_model_name: str = os.getenv("RERANK_MODEL", "BAAI/bge-reranker-v2-m3")
     chunk_size: int = 1200
     chunk_overlap: int = 180
-    csv_rows_per_chunk: int = 30
     candidate_limit: int = 20
 
 
@@ -244,19 +240,6 @@ class RetrievalWorker:
             start = end - self.settings.chunk_overlap
         return [chunk for chunk in chunks if chunk]
 
-    def _csv_chunks(self, file_path: Path) -> list[str]:
-        separator = "\t" if file_path.suffix.lower() == ".tsv" else ","
-        df = pd.read_csv(file_path, sep=separator, dtype=str, keep_default_na=False)
-        header = " | ".join(df.columns.astype(str))
-        rows_per_chunk = max(1, self.settings.csv_rows_per_chunk)
-        chunks: list[str] = []
-        for start in range(0, len(df), rows_per_chunk):
-            group = df.iloc[start:start + rows_per_chunk]
-            row_lines = [" | ".join(row.astype(str)) for _, row in group.iterrows()]
-            chunk_text = f"Columns: {header}\nRows {start}-{start + len(group) - 1}:\n" + "\n".join(row_lines)
-            chunks.append(chunk_text)
-        return chunks
-
     # ------------------------------------------------------------------ #
     # Ingestion
     # ------------------------------------------------------------------ #
@@ -281,18 +264,14 @@ class RetrievalWorker:
         if name_match:
             self._delete_file_records(name_match["id"])
 
-        is_csv = path.suffix.lower() in CSV_SUFFIXES
-        if is_csv:
-            chunks = self._csv_chunks(path)
-        else:
-            text = self._extract_text(path)
-            chunks = self._text_chunks(text)
+        text = self._extract_text(path)
+        chunks = self._text_chunks(text)
 
         if not chunks:
             raise RuntimeError(f"No searchable content in {source_name}")
 
         file_id = str(uuid.uuid4())
-        m_type = media_type or ("csv" if is_csv else "document")
+        m_type = media_type or "document"
 
         # 1. Always store chunks into SQLite for local durability & fallback search
         with self._connection() as connection:
