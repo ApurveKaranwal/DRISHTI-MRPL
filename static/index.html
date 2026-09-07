@@ -2507,23 +2507,7 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
 
       <!-- Unified Pro Copilot Composer -->
       <div class="copilot-composer">
-        <!-- Composer Top Bar: Model Router Capsule + Sovereign Security Badge -->
-        <div class="composer-top-bar">
-          <div class="composer-router-capsule">
-            <svg viewBox="0 0 24 24" width="11" height="11" stroke="#FF9E2C" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <select id="model-profile-select" class="composer-model-select" onchange="onModelProfileChange()">
-              <option value="auto">Auto-Route (Smart Selection)</option>
-              <option value="code">Code &amp; Hydraulics (qwen2.5-coder:7b)</option>
-              <option value="reasoning">Root-Cause Diagnostics (deepseek-r1:1.5b)</option>
-              <option value="general">PSU Notes &amp; Memos (qwen2.5:7b)</option>
-              <option value="vision">Multimodal Vision (qwen2.5vl:3b)</option>
-            </select>
-          </div>
-          <div class="composer-sovereign-tag">
-            <svg viewBox="0 0 24 24" width="10" height="10" stroke="#10B981" stroke-width="2.5" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span>Air-Gapped</span>
-          </div>
-        </div>
+
 
         <!-- Composer Middle: Text Input Area -->
         <div class="composer-input-row">
@@ -2539,6 +2523,10 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
             </button>
             <input type="file" id="file-upload-input" style="display: none;" onchange="handleFileUpload(this.files)">
             <span class="composer-drop-hint">or drop files</span>
+            <div class="composer-sovereign-tag" style="margin-left: 6px;">
+              <svg viewBox="0 0 24 24" width="10" height="10" stroke="#10B981" stroke-width="2.5" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>Air-Gapped</span>
+            </div>
           </div>
           <button class="composer-send-btn" onclick="sendMessage()" title="Send Message (Enter)">
             <span>Send</span>

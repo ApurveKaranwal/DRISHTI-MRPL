@@ -504,9 +504,6 @@ async function sendMessage(overrideText = null, attachedFiles = []) {
       message: text,
       files: filesToSend,
     };
-    if (selectedModelProfile && selectedModelProfile !== "auto") {
-      payload.profile = selectedModelProfile;
-    }
 
     const response = await fetch("/api/chat", {
       method: "POST",
@@ -575,7 +572,7 @@ function appendBotLoading(id) {
       <div class="orchestration-header-row">
         <div class="orchestration-title">
           <svg viewBox="0 0 24 24" width="13" height="13" stroke="var(--accent-purple)" stroke-width="2" fill="none"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
-          <span>Live Orchestration (${escapeHtml(targetLabel)})</span>
+          <span>Live Autonomous Orchestration</span>
         </div>
         <span class="orchestration-elapsed" id="${id}-timer">0.0s</span>
       </div>

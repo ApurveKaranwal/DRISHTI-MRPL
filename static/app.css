@@ -1195,41 +1195,6 @@ code {
   box-shadow: 0 0 16px rgba(255, 122, 0, 0.25);
 }
 
-.composer-top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 5px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.composer-router-capsule {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 5px;
-  padding: 2px 6px;
-}
-
-.composer-model-select {
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 9.5px;
-  font-weight: 600;
-  color: var(--text-heading);
-  cursor: pointer;
-  max-width: 190px;
-}
-
-.composer-model-select option {
-  background: #0B111C;
-  color: #FFFFFF;
-}
-
 .composer-sovereign-tag {
   display: flex;
   align-items: center;
