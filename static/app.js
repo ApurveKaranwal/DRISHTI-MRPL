@@ -19,6 +19,7 @@ const TAB_TITLES = {
 let activeAttachedFiles = [];
 let selectedModelProfile = "auto";
 let loadingIntervals = {};
+let loadingTimeouts = {};
 let availableModelRegistry = null;
 let cachedRefineryData = null;
 let currentGovDataset = "monthly";
@@ -554,43 +555,57 @@ function appendUserMessage(text, files) {
   container.scrollTop = container.scrollHeight;
 }
 
+const THINKING_PHASES = [
+  { verb: "Thinking", thought: "Analyzing operational query & prompt context..." },
+  { verb: "Contemplating", thought: "Contemplating refinery process parameters & dynamics..." },
+  { verb: "Evaluating", thought: "Evaluating CDU-3 distillation column kinematics & tray hydraulics..." },
+  { verb: "Pondering", thought: "Cross-referencing ultrasonic thickness logs with API 510 corrosion rates..." },
+  { verb: "Reasoning", thought: "Computing Darcy-Weisbach hydraulic head loss & line friction factors..." },
+  { verb: "Deliberating", thought: "Auditing OISD-129 safety relief interlocks & statutory operating limits..." },
+  { verb: "Synthesizing", thought: "Synthesizing crude assay yield curves & hydrocarbon cut-points..." },
+  { verb: "Mulling", thought: "Calibrating safe operating envelope setpoints & flow parameters..." },
+  { verb: "Reflecting", thought: "Verifying sovereign air-gap isolation & local VRAM context..." },
+  { verb: "Formulating", thought: "Formulating deterministic engineering mitigations & control steps..." },
+  { verb: "Structuring", thought: "Structuring actionable technical recommendations for plant engineers..." },
+  { verb: "Polishing", thought: "Finalizing sovereign refinery intelligence response..." }
+];
+
 function appendBotLoading(id) {
   const container = document.getElementById("chat-container");
   const bubble = document.createElement("div");
   bubble.className = "chat-bubble chat-bot";
   bubble.id = id;
 
-  const targetLabel = selectedModelProfile === "auto" 
-    ? "Auto-Router (Dynamic Dispatch)" 
-    : selectedModelProfile.toUpperCase() + " Mode";
+  const initialPhase = THINKING_PHASES[0];
 
   bubble.innerHTML = `
-    <div class="orchestration-loading-card">
-      <div class="orchestration-header-row">
-        <div class="orchestration-title">
-          <svg viewBox="0 0 24 24" width="13" height="13" stroke="var(--accent-purple)" stroke-width="2" fill="none"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
-          <span>Live Autonomous Orchestration</span>
+    <div class="claude-thinking-card">
+      <div class="thinking-header-row">
+        <div class="thinking-status-group">
+          <div class="thinking-sparkle-orb">
+            <span class="thinking-sparkle-glow"></span>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14"/>
+              <circle cx="12" cy="12" r="2.2" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="thinking-verb-container">
+            <span class="thinking-verb-text" id="${id}-verb">${initialPhase.verb}</span>
+            <span class="thinking-dots-anim">
+              <span>.</span><span>.</span><span>.</span>
+            </span>
+          </div>
         </div>
-        <span class="orchestration-elapsed" id="${id}-timer">0.0s</span>
+        <span class="thinking-timer-badge" id="${id}-timer">0.0s</span>
       </div>
 
-      <div class="orchestration-steps-list">
-        <div class="orchestration-step-line active" id="${id}-step-1">
-          <span class="step-indicator-dot"></span>
-          <span>Routing domain intent &amp; selecting specialized model...</span>
-        </div>
-        <div class="orchestration-step-line" id="${id}-step-2">
-          <span class="step-indicator-dot"></span>
-          <span>Targeting RTX 3050 VRAM &amp; preparing model context...</span>
-        </div>
-        <div class="orchestration-step-line" id="${id}-step-3">
-          <span class="step-indicator-dot"></span>
-          <span>Supervisor orchestrating atomic worker execution...</span>
-        </div>
-        <div class="orchestration-step-line" id="${id}-step-4">
-          <span class="step-indicator-dot"></span>
-          <span>Auditor verifying zero WAN egress &amp; certifying air-gap...</span>
-        </div>
+      <div class="thinking-subthought-box">
+        <span class="thinking-subthought-pulse"></span>
+        <span class="thinking-phrase-text" id="${id}-phrase">${initialPhase.thought}</span>
+      </div>
+
+      <div class="thinking-shimmer-track">
+        <div class="thinking-shimmer-bar"></div>
       </div>
     </div>
   `;
@@ -598,27 +613,49 @@ function appendBotLoading(id) {
   container.scrollTop = container.scrollHeight;
 
   const startTime = Date.now();
+  let currentPhaseIndex = 0;
+  const phaseDuration = 2.0; // Rotate phrase every 2 seconds
+
   const timer = setInterval(() => {
-    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    const elapsedSeconds = (Date.now() - startTime) / 1000;
     const timerEl = document.getElementById(`${id}-timer`);
-    if (timerEl) timerEl.textContent = `${elapsed}s`;
+    if (timerEl) timerEl.textContent = `${elapsedSeconds.toFixed(1)}s`;
 
-    const s1 = document.getElementById(`${id}-step-1`);
-    const s2 = document.getElementById(`${id}-step-2`);
-    const s3 = document.getElementById(`${id}-step-3`);
-    const s4 = document.getElementById(`${id}-step-4`);
+    const rawIndex = Math.floor(elapsedSeconds / phaseDuration);
+    // Cycle progressively through thoughts; wrap around cleanly if inference takes longer
+    const phaseIndex = rawIndex < THINKING_PHASES.length
+      ? rawIndex
+      : 3 + ((rawIndex - THINKING_PHASES.length) % (THINKING_PHASES.length - 3));
 
-    if (elapsed > 1.2 && s1 && s2) {
-      s1.className = "orchestration-step-line done";
-      s2.className = "orchestration-step-line active";
-    }
-    if (elapsed > 2.8 && s2 && s3) {
-      s2.className = "orchestration-step-line done";
-      s3.className = "orchestration-step-line active";
-    }
-    if (elapsed > 4.5 && s3 && s4) {
-      s3.className = "orchestration-step-line done";
-      s4.className = "orchestration-step-line active";
+    if (phaseIndex !== currentPhaseIndex) {
+      currentPhaseIndex = phaseIndex;
+      const targetPhase = THINKING_PHASES[phaseIndex];
+      const verbEl = document.getElementById(`${id}-verb`);
+      const phraseEl = document.getElementById(`${id}-phrase`);
+
+      if (verbEl && phraseEl) {
+        verbEl.classList.add("thinking-fading-out");
+        phraseEl.classList.add("thinking-fading-out");
+
+        const tOut = setTimeout(() => {
+          if (!document.getElementById(id)) return;
+          verbEl.textContent = targetPhase.verb;
+          phraseEl.textContent = targetPhase.thought;
+          verbEl.classList.remove("thinking-fading-out");
+          phraseEl.classList.remove("thinking-fading-out");
+          verbEl.classList.add("thinking-fading-in");
+          phraseEl.classList.add("thinking-fading-in");
+
+          setTimeout(() => {
+            const curVerb = document.getElementById(`${id}-verb`);
+            const curPhrase = document.getElementById(`${id}-phrase`);
+            if (curVerb) curVerb.classList.remove("thinking-fading-in");
+            if (curPhrase) curPhrase.classList.remove("thinking-fading-in");
+          }, 200);
+        }, 180);
+
+        loadingTimeouts[id] = tOut;
+      }
     }
   }, 100);
 
@@ -629,6 +666,10 @@ function removeLoading(id) {
   if (loadingIntervals[id]) {
     clearInterval(loadingIntervals[id]);
     delete loadingIntervals[id];
+  }
+  if (loadingTimeouts[id]) {
+    clearTimeout(loadingTimeouts[id]);
+    delete loadingTimeouts[id];
   }
   const el = document.getElementById(id);
   if (el) el.remove();
