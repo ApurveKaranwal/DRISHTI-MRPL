@@ -151,6 +151,9 @@
           <span class="hw-sep">|</span>
           <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">RAM</span>
           <span class="ticker-val" id="ticker-ram-val">--/-- GB</span>
+          <span class="hw-sep">|</span>
+          <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">ROM</span>
+          <span class="ticker-val" id="ticker-rom-val">--/-- GB</span>
           <span class="model-count-tag" id="header-model-label">Ollama Active</span>
           <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" style="opacity: 0.6; margin-left: 2px;"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
@@ -1637,7 +1640,7 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
         <span>AI COPILOT</span>
       </div>
       <div class="llm-badge">
-        <span class="status-dot dot-success"></span> Offline LLM Active
+        <span class="status-dot dot-success"></span> <span id="copilot-badge-text">Offline LLM Active</span>
       </div>
     </div>
 
@@ -1740,7 +1743,7 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
         </div>
         <div>
           <div class="modal-heading">Local Model Registry &amp; Hardware Budget</div>
-          <div class="modal-subheading">100% On-Premises Air-Gapped Inference &bull; NVIDIA RTX 3050 (6GB VRAM) &bull; Zero External WAN</div>
+          <div class="modal-subheading"><span id="hw-backend-status">100% On-Premises Air-Gapped Inference</span> &bull; <span id="hw-target-name">NVIDIA RTX 3050 (6GB VRAM)</span> &bull; Zero External WAN</div>
         </div>
       </div>
       <button class="modal-close-button" onclick="closeModelRegistryModal()" title="Close (Esc)">

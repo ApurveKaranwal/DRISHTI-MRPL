@@ -2413,27 +2413,27 @@ function syncAgentParameters(params) {
   if (!params) return;
 
   if (params.length !== undefined) {
-    const el = document.getElementById("darcy-length");
+    const el = document.getElementById("darcy-input-length");
     if (el) el.value = params.length;
   }
   if (params.diameter !== undefined) {
-    const el = document.getElementById("darcy-diameter");
+    const el = document.getElementById("darcy-input-diameter");
     if (el) el.value = params.diameter;
   }
   if (params.flow !== undefined) {
-    const el = document.getElementById("darcy-flow");
+    const el = document.getElementById("darcy-input-flow");
     if (el) el.value = params.flow;
   }
   if (params.density !== undefined) {
-    const el = document.getElementById("darcy-density");
+    const el = document.getElementById("darcy-input-density");
     if (el) el.value = params.density;
   }
   if (params.viscosity !== undefined) {
-    const el = document.getElementById("darcy-viscosity");
+    const el = document.getElementById("darcy-input-viscosity");
     if (el) el.value = params.viscosity;
   }
   if (params.roughness !== undefined) {
-    const el = document.getElementById("darcy-roughness");
+    const el = document.getElementById("darcy-input-roughness");
     if (el) el.value = params.roughness;
   }
 
