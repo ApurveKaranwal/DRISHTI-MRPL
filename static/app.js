@@ -1738,7 +1738,7 @@ function renderGovDatasetChart(datasetKey = "monthly", hoverIdx = null) {
     if (legendEl) {
       legendEl.innerHTML = `
         <div class="chart-legend-item">
-          <div class="chart-legend-dot" style="background: #6366F1;"></div>
+          <div class="chart-legend-dot" style="background: #FF7A00;"></div>
           <span>Domestic Dispatches (TMT)</span>
         </div>
         <div class="chart-legend-item">
@@ -2063,8 +2063,8 @@ function drawGovProductSlateChart(ctx, w, h, records, hoverIdx) {
 
     const isHovered = hoverIdx === i;
 
-    // Domestic Dispatches (Indigo)
-    ctx.fillStyle = isHovered ? "#818CF8" : "#6366F1";
+    // Domestic Dispatches (Amber)
+    ctx.fillStyle = isHovered ? "#FF9E2C" : "#FF7A00";
     ctx.fillRect(xDom, yDom, barWidth, yBottom - yDom);
 
     // Export Shipments (Rose)
@@ -2343,7 +2343,7 @@ function setupGovChartEvents() {
           <div style="font-weight:700; color:#38BDF8; font-size:11.5px; margin-bottom:2px;">${hitBar.product}</div>
           <div style="font-size:10px; color:#94A3B8; margin-bottom:3px;">Category: ${hitBar.category}</div>
           <div>Monthly Production: <strong>${hitBar.monthly.toFixed(1)} TMT</strong></div>
-          <div>Domestic Market: <span style="color:#6366F1; font-weight:600;">${hitBar.domestic.toFixed(1)} TMT</span> (${((hitBar.domestic/hitBar.monthly)*100).toFixed(1)}%)</div>
+          <div>Domestic Market: <span style="color:#FF9E2C; font-weight:600;">${hitBar.domestic.toFixed(1)} TMT</span> (${((hitBar.domestic/hitBar.monthly)*100).toFixed(1)}%)</div>
           <div>Export Cargoes: <span style="color:#F43F5E; font-weight:600;">${hitBar.export.toFixed(1)} TMT</span> (${((hitBar.export/hitBar.monthly)*100).toFixed(1)}%)</div>
           <div style="font-size:9.5px; color:#94A3B8; margin-top:2px;">Dispatch Mode: ${hitBar.dispatch}</div>
         `;

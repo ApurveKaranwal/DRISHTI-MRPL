@@ -11,6 +11,14 @@
 <div class="app-container">
 
   <!-- ====================================================================
+       GLOBAL ATMOSPHERIC INDUSTRIAL HUD BACKDROP (UNIFIED ACROSS ENTIRE UI)
+       ==================================================================== -->
+  <div class="hud-backdrop">
+    <img src="/static/images/refinery_hero_bg.jpg" class="hud-bg-img" alt="Refinery Distillation Complex" />
+    <div class="hud-scrim"></div>
+  </div>
+
+  <!-- ====================================================================
        LEFT SIDEBAR NAVIGATION (MATCHES REFERENCE IMAGE)
        ==================================================================== -->
   <aside class="sidebar">
@@ -21,7 +29,7 @@
             <linearGradient id="drishti-grad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#10B981" />
               <stop offset="50%" stop-color="#06B6D4" />
-              <stop offset="100%" stop-color="#6366F1" />
+              <stop offset="100%" stop-color="#FF7A00" />
             </linearGradient>
           </defs>
           <!-- Outer Shield / Hexagonal Ring -->
@@ -34,7 +42,7 @@
           <circle cx="18" cy="18" r="1.8" fill="#10B981" />
           <!-- Aperture Precision Guides -->
           <line x1="18" y1="6" x2="18" y2="8.5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" />
-          <line x1="18" y1="27.5" x2="18" y2="30" stroke="#6366F1" stroke-width="1.5" stroke-linecap="round" />
+          <line x1="18" y1="27.5" x2="18" y2="30" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round" />
         </svg>
       </div>
       <div>
@@ -142,7 +150,7 @@
       <div class="header-right">
         <!-- Unified System Telemetry & Model Pill -->
         <div class="header-telemetry-pill" onclick="openModelRegistryModal()" title="Live System Analytics: Click for Hardware Diagnostics & Ollama Models">
-          <span class="status-dot dot-purple"></span>
+          <span class="status-dot dot-cyan"></span>
           <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">GPU</span>
           <span class="ticker-val" id="ticker-gpu-val">--/-- GB</span>
           <span class="hw-sep">|</span>
@@ -199,12 +207,6 @@
          ------------------------------------------------------------------ -->
     <section class="tab-content active" id="tab-overview">
       <div class="hud-overview-container">
-        <!-- Background Layer -->
-        <div class="hud-backdrop">
-          <img src="/static/images/refinery_hero_bg.jpg" class="hud-bg-img" alt="Refinery Distillation Complex" />
-          <div class="hud-scrim"></div>
-        </div>
-
         <!-- HUD Stage Layer -->
         <div class="hud-stage">
           <!-- Left Column: Status Capsule, Asset HUD Ring, Hero Title & Segmented Progress -->
