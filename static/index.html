@@ -11,6 +11,14 @@
 <div class="app-container">
 
   <!-- ====================================================================
+       GLOBAL ATMOSPHERIC INDUSTRIAL HUD BACKDROP (UNIFIED ACROSS ENTIRE UI)
+       ==================================================================== -->
+  <div class="hud-backdrop">
+    <img src="/static/images/refinery_hero_bg.jpg" class="hud-bg-img" alt="Refinery Distillation Complex" />
+    <div class="hud-scrim"></div>
+  </div>
+
+  <!-- ====================================================================
        LEFT SIDEBAR NAVIGATION (MATCHES REFERENCE IMAGE)
        ==================================================================== -->
   <aside class="sidebar">
@@ -21,7 +29,7 @@
             <linearGradient id="drishti-grad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#10B981" />
               <stop offset="50%" stop-color="#06B6D4" />
-              <stop offset="100%" stop-color="#6366F1" />
+              <stop offset="100%" stop-color="#FF7A00" />
             </linearGradient>
           </defs>
           <!-- Outer Shield / Hexagonal Ring -->
@@ -34,7 +42,7 @@
           <circle cx="18" cy="18" r="1.8" fill="#10B981" />
           <!-- Aperture Precision Guides -->
           <line x1="18" y1="6" x2="18" y2="8.5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" />
-          <line x1="18" y1="27.5" x2="18" y2="30" stroke="#6366F1" stroke-width="1.5" stroke-linecap="round" />
+          <line x1="18" y1="27.5" x2="18" y2="30" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round" />
         </svg>
       </div>
       <div>
@@ -142,7 +150,7 @@
       <div class="header-right">
         <!-- Unified System Telemetry & Model Pill -->
         <div class="header-telemetry-pill" onclick="openModelRegistryModal()" title="Live System Analytics: Click for Hardware Diagnostics & Ollama Models">
-          <span class="status-dot dot-purple"></span>
+          <span class="status-dot dot-cyan"></span>
           <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">GPU</span>
           <span class="ticker-val" id="ticker-gpu-val">--/-- GB</span>
           <span class="hw-sep">|</span>
@@ -151,15 +159,19 @@
           <span class="hw-sep">|</span>
           <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">RAM</span>
           <span class="ticker-val" id="ticker-ram-val">--/-- GB</span>
+          <span class="hw-sep">|</span>
+          <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">ROM</span>
+          <span class="ticker-val" id="ticker-rom-val">--/-- GB</span>
           <span class="model-count-tag" id="header-model-label">Ollama Active</span>
           <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" style="opacity: 0.6; margin-left: 2px;"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
 
-        <!-- PPAC Govt. Verified Badge -->
-        <div class="status-tag verified-badge" title="Verified against Petroleum Planning & Analysis Cell (PPAC), MoPNG, Govt. of India">
-          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span>PPAC Verified</span>
-        </div>
+        <!-- Copilot Assistant Toggle Button -->
+        <button class="copilot-toggle-pill" id="copilot-toggle-btn" onclick="toggleCopilotDrawer()" title="Toggle AI Copilot Assistant">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>AI Copilot</span>
+          <span class="status-dot dot-success"></span>
+        </button>
 
         <!-- Day / Night Mode Toggle -->
         <button class="icon-button theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle Night/Day Mode">
@@ -194,197 +206,298 @@
          TAB 1: OVERVIEW (CLEAN EXECUTIVE SCADA - GROUNDED IN PPAC & API 510)
          ------------------------------------------------------------------ -->
     <section class="tab-content active" id="tab-overview">
-      <!-- 1. Top Hero KPI Bar: 4 Core Non-Redundant Operational Pillars -->
-      <div class="grid-4" style="margin-bottom: 16px;">
-        <!-- Pillar 1: Annual Throughput -->
-        <div class="dash-card kpi-hero-card">
-          <div class="kpi-hero-label">Annual Crude Throughput</div>
-          <div class="kpi-hero-value" id="kpi-annual-throughput">16.77 MMT</div>
-          <div class="kpi-hero-sub">
-            <span class="status-badge-green" id="kpi-capacity-util">111.8% Util</span>
-            <span style="color: var(--text-dim); font-size: 10px;">PPAC Certified (16,774 TMT)</span>
-          </div>
-        </div>
-
-        <!-- Pillar 2: Crude Basket Split -->
-        <div class="dash-card kpi-hero-card">
-          <div class="kpi-hero-label">Crude Basket Diet</div>
-          <div class="kpi-hero-value" style="color: var(--color-info);">82.4% / 17.6%</div>
-          <div class="kpi-hero-sub">
-            <span class="status-badge-blue">Import vs Local</span>
-            <span style="color: var(--text-dim); font-size: 10px;">Arab Heavy / Mangala</span>
-          </div>
-        </div>
-
-        <!-- Pillar 3: Finished Products Slate -->
-        <div class="dash-card kpi-hero-card">
-          <div class="kpi-hero-label">Finished Product Slate</div>
-          <div class="kpi-hero-value">615.4 <span style="font-size: 13px; font-weight: 500; color: var(--text-muted);">TMT / mo</span></div>
-          <div class="kpi-hero-sub">
-            <span class="status-badge-green">HSD Diesel BS-VI</span>
-            <span style="color: var(--text-dim); font-size: 10px;">Coastal / Pipeline Fleet</span>
-          </div>
-        </div>
-
-        <!-- Pillar 4: Statutory Asset Integrity -->
-        <div class="dash-card kpi-hero-card">
-          <div class="kpi-hero-label">Statutory Asset Health</div>
-          <div class="kpi-hero-value" style="color: var(--color-danger); font-size: 18px;">API 510 Deficit</div>
-          <div class="kpi-hero-sub">
-            <span class="status-badge-red">-1.82 mm CML</span>
-            <span style="color: var(--text-dim); font-size: 10px;">CDU-Col-04 Overlay Req.</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. Main Operations Grid: PPAC Processing & Statutory Asset Integrity -->
-      <div class="grid-2">
-        <!-- Panel A: PPAC Official Monthly Crude Processing -->
-        <div class="dash-card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">PPAC Official Crude Processing Performance</div>
-              <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
-                Petroleum Planning &amp; Analysis Cell (PPAC), MoPNG, Govt. of India (Ready Reckoner)
+      <div class="hud-overview-container">
+        <!-- HUD Stage Layer -->
+        <div class="hud-stage">
+          <!-- Left Column: Status Capsule, Asset HUD Ring, Hero Title & Segmented Progress -->
+          <div class="hud-col-left">
+            <!-- 1. Floating Status Capsule (Top Left) -->
+            <div class="hud-glass-card hud-status-capsule">
+              <div class="hud-card-header">
+                <span class="hud-capsule-title">Unit Status</span>
+                <span class="status-pill-orange">Active</span>
+              </div>
+              <div class="hud-status-rows">
+                <div class="hud-status-row">
+                  <span class="hud-row-label">Crude Feed</span>
+                  <span class="hud-row-val">Continuous 24x7</span>
+                </div>
+                <div class="hud-status-row">
+                  <span class="hud-row-label">Crude Basket</span>
+                  <span class="hud-row-val">82.4% Imp / 17.6% Ind</span>
+                </div>
+                <div class="hud-status-row">
+                  <span class="hud-row-label">Inference AI</span>
+                  <span class="hud-row-val">100% Air-Gapped / Qwen-7B</span>
+                </div>
+                <div class="hud-status-row">
+                  <span class="hud-row-label">Asset Health</span>
+                  <span class="hud-row-val">OISD-129 / API 510</span>
+                </div>
               </div>
             </div>
-            <span class="status-badge-green">15.00 MMTPA Capacity</span>
+
+            <!-- 2. Physical Asset HUD Dial Overlay (Over CDU Column-04) -->
+            <div class="hud-asset-dial-box">
+              <div class="hud-dial-graphic">
+                <svg viewBox="0 0 200 200" class="hud-dial-svg">
+                  <!-- Outer coordinate tick circle -->
+                  <circle cx="100" cy="100" r="76" class="hud-dial-track" />
+                  <!-- Arc with graduation -->
+                  <path d="M 100 24 A 76 76 0 0 1 172 76" class="hud-dial-arc" />
+                  <circle cx="172" cy="76" r="4.5" class="hud-dial-dot" />
+                </svg>
+                <div class="hud-dial-ticks">
+                  <span class="hud-tick tick-80">80</span>
+                  <span class="hud-tick tick-70 active">70</span>
+                  <span class="hud-tick tick-60">60</span>
+                  <span class="hud-tick tick-50">50</span>
+                  <span class="hud-tick tick-40">40</span>
+                  <span class="hud-tick tick-30">30</span>
+                  <span class="hud-tick tick-20">20</span>
+                  <span class="hud-tick tick-10">10</span>
+                </div>
+                <div class="hud-dial-inner-hub">
+                  <div class="hud-hub-center-dot"></div>
+                  <div class="hud-hub-tag" id="hud-unit-tag">CDU-Col-04</div>
+                  <div class="hud-hub-sub">Flash Zone 4.60mm</div>
+                </div>
+              </div>
+
+              <!-- Horizontal Interactive Unit Switcher '< >' -->
+              <div class="hud-axis-selector">
+                <div class="hud-axis-line"></div>
+                <button class="hud-axis-btn" onclick="cycleHudUnit(-1)" title="Previous Unit">&lt;</button>
+                <div class="hud-axis-label" id="hud-active-unit-label">Atmospheric Tower #1</div>
+                <button class="hud-axis-btn" onclick="cycleHudUnit(1)" title="Next Unit">&gt;</button>
+                <div class="hud-axis-line"></div>
+              </div>
+            </div>
+
+            <!-- 3. Hero Typography & Segmented Bar (Bottom Left) -->
+            <div class="hud-hero-block">
+              <h1 class="hud-hero-heading">Atmospheric Distillation Complex</h1>
+              <p class="hud-hero-description">
+                Sovereign industrial intelligence orchestrating crude distillation, real-time PPAC statutory yields, and API 510 ultrasonic asset integrity.
+              </p>
+
+              <!-- Segmented Progress Bar (40 vertical glowing ticks) -->
+              <div class="hud-segmented-track" id="hud-segmented-track">
+                <!-- 40 ticks dynamically populated -->
+              </div>
+
+              <div class="hud-hero-stats-row">
+                <div class="hud-hero-stat-item">
+                  <div class="stat-main-num">15,000 <span class="stat-mini-unit">TMT</span></div>
+                  <div class="stat-main-label">Target Capacity</div>
+                </div>
+                <div class="hud-hero-stat-item">
+                  <div class="stat-main-num" id="kpi-annual-throughput">16.77 MMT</div>
+                  <div class="stat-main-label">Annual Crude Processed</div>
+                </div>
+                <div class="hud-hero-stat-item">
+                  <div class="stat-main-num" id="kpi-capacity-util" style="color: #FF9E2C;">111.8%</div>
+                  <div class="stat-main-label">Degree of Completion</div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Clean, High-Contrast Monthly Table -->
-          <div style="overflow-x: auto; margin-top: 6px;">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Month</th>
-                  <th>Indigenous (TMT)</th>
-                  <th>Imported (TMT)</th>
-                  <th>Total Processed</th>
-                  <th>PPAC Target</th>
-                  <th>Utilization</th>
-                </tr>
-              </thead>
-              <tbody id="ppac-monthly-tbody">
-                <tr>
-                  <td><code>July 2026</code></td>
-                  <td>258.2</td>
-                  <td>1240.1</td>
-                  <td><strong style="color: var(--text-heading);">1498.3 TMT</strong></td>
-                  <td>1280.0</td>
-                  <td><span class="status-badge-green">119.9%</span></td>
-                </tr>
-                <tr>
-                  <td><code>June 2026</code></td>
-                  <td>251.8</td>
-                  <td>1224.2</td>
-                  <td><strong style="color: var(--text-heading);">1476.0 TMT</strong></td>
-                  <td>1280.0</td>
-                  <td><span class="status-badge-green">118.1%</span></td>
-                </tr>
-                <tr>
-                  <td><code>May 2026</code></td>
-                  <td>255.4</td>
-                  <td>1235.8</td>
-                  <td><strong style="color: var(--text-heading);">1491.2 TMT</strong></td>
-                  <td>1280.0</td>
-                  <td><span class="status-badge-green">119.3%</span></td>
-                </tr>
-                <tr>
-                  <td><code>April 2026</code></td>
-                  <td>249.0</td>
-                  <td>1218.4</td>
-                  <td><strong style="color: var(--text-heading);">1467.4 TMT</strong></td>
-                  <td>1280.0</td>
-                  <td><span class="status-badge-green">117.4%</span></td>
-                </tr>
-                <tr>
-                  <td><code>March 2026</code></td>
-                  <td>275.2</td>
-                  <td>1425.3</td>
-                  <td><strong style="color: var(--text-heading);">1700.5 TMT</strong></td>
-                  <td>1350.0</td>
-                  <td><span class="status-badge-green">136.0%</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <!-- Right Column: Equalizer Card, Temperatures Card, Mini Stats + Speedometer Dial -->
+          <div class="hud-col-right">
+            <!-- 1. Top Right Frosted Equalizer Card (Throughput Slate) -->
+            <div class="hud-glass-card hud-equalizer-card">
+              <div class="hud-card-header">
+                <div>
+                  <div class="hud-card-title">PPAC Crude Throughput Slate</div>
+                  <div class="hud-card-sub">Monthly Refinery Ingestion</div>
+                </div>
+                <div class="hud-legend-chips">
+                  <span class="legend-chip"><span class="chip-dot dot-orange"></span> Imported</span>
+                  <span class="legend-chip"><span class="chip-dot dot-white"></span> Indigenous</span>
+                </div>
+              </div>
+              <div class="hud-equalizer-wrap">
+                <div class="hud-eq-val-top">17 <span class="eq-sub">MMT/yr</span></div>
+                <div class="hud-eq-bars" id="hud-equalizer-bars">
+                  <!-- Populated via JS -->
+                </div>
+                <div class="hud-eq-val-bottom">0 <span class="eq-sub">baseline</span></div>
+              </div>
+            </div>
 
-          <div style="margin-top: 12px; font-size: 11px; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between;">
-            <span>Source: data/ppac_mrpl_monthly_crude_processing.csv</span>
-            <a class="card-link" onclick="switchTab('documents')">Inspect Raw PPAC Datasets &rarr;</a>
+            <!-- 2. Middle Right Frosted Temperatures & Thickness Card -->
+            <div class="hud-glass-card hud-temperatures-card">
+              <div class="hud-card-header">
+                <div class="hud-card-title">Tower Thermal &amp; Thickness Profile</div>
+                <span class="hud-card-badge">API 510 CML</span>
+              </div>
+              <div class="hud-columns-grid">
+                <div class="hud-col-gauge">
+                  <div class="gauge-temp-val">365 °C</div>
+                  <div class="gauge-bar-track">
+                    <div class="gauge-bar-fill fill-cyan" style="height: 72%;"></div>
+                  </div>
+                  <div class="gauge-col-name">Flash Zone</div>
+                  <div class="gauge-col-sub">4.60 mm</div>
+                </div>
+                <div class="hud-col-gauge">
+                  <div class="gauge-temp-val" style="color: #FF7A00;">345 °C</div>
+                  <div class="gauge-bar-track">
+                    <div class="gauge-bar-fill fill-orange" style="height: 48%;"></div>
+                  </div>
+                  <div class="gauge-col-name">Bottom Shell</div>
+                  <div class="gauge-col-sub" style="color: #EF4444;">-1.82 mm</div>
+                </div>
+                <div class="hud-col-gauge">
+                  <div class="gauge-temp-val">290 °C</div>
+                  <div class="gauge-bar-track">
+                    <div class="gauge-bar-fill fill-cyan" style="height: 64%;"></div>
+                  </div>
+                  <div class="gauge-col-name">Heavy Gas Oil</div>
+                  <div class="gauge-col-sub">7.10 mm</div>
+                </div>
+                <div class="hud-col-gauge">
+                  <div class="gauge-temp-val">125 °C</div>
+                  <div class="gauge-bar-track">
+                    <div class="gauge-bar-fill fill-orange" style="height: 38%;"></div>
+                  </div>
+                  <div class="gauge-col-name">Overhead</div>
+                  <div class="gauge-col-sub">9.20 mm</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Bottom Right Cluster: Mini Cards + Large High-Contrast Speedometer -->
+            <div class="hud-bottom-cluster">
+              <div class="hud-mini-column">
+                <div class="hud-glass-card hud-mini-card">
+                  <div class="mini-card-label">Total Crude Processed</div>
+                  <div class="mini-card-value">16.77 <span class="mini-card-unit">MMT</span></div>
+                </div>
+                <div class="hud-glass-card hud-mini-card">
+                  <div class="mini-card-label">Furnace Feed Rate</div>
+                  <div class="mini-card-value">450.0 <span class="mini-card-unit">m³/h</span></div>
+                </div>
+              </div>
+
+              <!-- Large High-Contrast Speedometer Card -->
+              <div class="hud-speedometer-card">
+                <div class="speedo-svg-wrap">
+                  <svg viewBox="0 0 200 130" class="speedo-svg">
+                    <!-- Background Arc -->
+                    <path d="M 28 115 A 72 72 0 0 1 172 115" fill="none" stroke="#E2E8F0" stroke-width="12" stroke-linecap="round" />
+                    <!-- Orange Value Arc -->
+                    <path d="M 28 115 A 72 72 0 0 1 158 64" fill="none" stroke="url(#hud-speedo-gradient)" stroke-width="12" stroke-linecap="round" />
+                    <!-- Needle -->
+                    <line x1="100" y1="115" x2="148" y2="52" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
+                    <circle cx="100" cy="115" r="5" fill="#0F172A" />
+                    <defs>
+                      <linearGradient id="hud-speedo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#FF9E2C" />
+                        <stop offset="100%" stop-color="#FF5722" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div class="speedo-number-box">
+                    <div class="speedo-big-val" id="hud-speedo-val">111.8</div>
+                    <div class="speedo-unit-label">% UTIL</div>
+                  </div>
+                </div>
+
+                <div class="speedo-deltas-row">
+                  <div class="speedo-delta-badge">
+                    <span class="delta-num">0.14 wt%</span>
+                    <span class="delta-arrow">▲</span>
+                    <span class="delta-sub">Sulfur Sweet</span>
+                  </div>
+                  <div class="speedo-delta-badge">
+                    <span class="delta-num">32.8°</span>
+                    <span class="delta-arrow">▲</span>
+                    <span class="delta-sub">API Gravity</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Panel B: Statutory Asset Integrity & Inspection Log -->
-        <div class="dash-card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Statutory Asset Integrity Audits</div>
-              <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
-                API 510 Pressure Vessel Code &amp; OISD-STD-129 Ultrasonic Survey
+        <!-- Collapsible Detailed PPAC Table Drawer for Operators who want granular figures -->
+        <div class="hud-collapsible-drawer">
+          <button class="hud-drawer-toggle" onclick="toggleDetailedPpacTable()">
+            <span style="display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>View Certified PPAC Monthly Tables &amp; CML Inspection Dossier</span>
+            </span>
+            <span class="drawer-arrow" id="ppac-drawer-arrow">▾</span>
+          </button>
+          <div class="hud-drawer-content" id="hud-ppac-drawer-content" style="display: none;">
+            <div class="grid-2" style="margin-top: 14px;">
+              <div class="dash-card">
+                <div class="card-title">PPAC Official Monthly Processing Data</div>
+                <div style="overflow-x: auto; margin-top: 8px;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Month</th>
+                        <th>Indigenous (TMT)</th>
+                        <th>Imported (TMT)</th>
+                        <th>Total Processed</th>
+                        <th>PPAC Target</th>
+                        <th>Utilization</th>
+                      </tr>
+                    </thead>
+                    <tbody id="ppac-monthly-tbody">
+                      <!-- Dynamic rows from app.js -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="dash-card">
+                <div class="card-title">CDU Column-04 Ultrasonic Thickness Scan</div>
+                <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">Report: MRPL/NDT/CDU-01/2026/0488 (API 510)</div>
+                <div style="overflow-x: auto; margin-top: 8px;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>CML Point</th>
+                        <th>Location</th>
+                        <th>Measured</th>
+                        <th>API 510 Min</th>
+                        <th>Deficit</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><code>UT-01</code></td>
+                        <td>Bottom Shell (+4.2m)</td>
+                        <td style="color: #EF4444; font-weight: 700;">4.18 mm</td>
+                        <td>6.00 mm</td>
+                        <td style="color: #EF4444; font-weight: 700;">-1.82 mm</td>
+                        <td><span class="status-badge-red">Overlay Req.</span></td>
+                      </tr>
+                      <tr>
+                        <td><code>UT-02</code></td>
+                        <td>Flash Zone (+4.8m)</td>
+                        <td style="color: #EF4444; font-weight: 700;">4.60 mm</td>
+                        <td>6.00 mm</td>
+                        <td style="color: #EF4444; font-weight: 700;">-1.40 mm</td>
+                        <td><span class="status-badge-red">Overlay Req.</span></td>
+                      </tr>
+                      <tr>
+                        <td><code>UT-03</code></td>
+                        <td>Heavy Gas Oil (+5.5m)</td>
+                        <td style="color: #10B981; font-weight: 700;">7.10 mm</td>
+                        <td>6.00 mm</td>
+                        <td style="color: #10B981; font-weight: 700;">+1.10 mm</td>
+                        <td><span class="status-badge-green">Acceptable</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
-            <span class="status-badge-orange">Action Required</span>
-          </div>
-
-          <div style="margin: 8px 0 10px 0; background: var(--bg-card-sub); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-weight: 600; font-size: 12px; color: var(--text-heading);">Asset: CDU Column-04 (Atmospheric Distillation Bottom Shell)</span>
-              <span style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted);">Report: MRPL/NDT/CDU-01/2026/0488</span>
-            </div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-              High-temperature sulfidation corrosion from Arab Heavy sour crude processing.
-            </div>
-          </div>
-
-          <div style="overflow-x: auto;">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>CML Point</th>
-                  <th>Location / Elev</th>
-                  <th>Nominal</th>
-                  <th>Measured</th>
-                  <th>API 510 Min</th>
-                  <th>Deficit</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><code>UT-01</code></td>
-                  <td>Bottom Shell (+4.2m)</td>
-                  <td>14.0 mm</td>
-                  <td style="color: #EF4444; font-weight: 700;">4.18 mm</td>
-                  <td>6.00 mm</td>
-                  <td style="color: #EF4444; font-weight: 700;">-1.82 mm</td>
-                  <td><span class="status-badge-red">In-Situ Overlay</span></td>
-                </tr>
-                <tr>
-                  <td><code>UT-02</code></td>
-                  <td>Flash Zone (+4.8m)</td>
-                  <td>14.0 mm</td>
-                  <td style="color: #EF4444; font-weight: 700;">4.60 mm</td>
-                  <td>6.00 mm</td>
-                  <td style="color: #EF4444; font-weight: 700;">-1.40 mm</td>
-                  <td><span class="status-badge-red">In-Situ Overlay</span></td>
-                </tr>
-                <tr>
-                  <td><code>UT-03</code></td>
-                  <td>HGO Draw (+5.5m)</td>
-                  <td>14.0 mm</td>
-                  <td style="color: #10B981; font-weight: 700;">7.10 mm</td>
-                  <td>6.00 mm</td>
-                  <td style="color: #10B981; font-weight: 700;">+1.10 mm</td>
-                  <td><span class="status-badge-green">Acceptable</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div style="margin-top: 12px; font-size: 11px; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between;">
-            <span>Source: data/real_cdu_ultrasonic_thickness_scan.pdf</span>
-            <a class="card-link" onclick="switchTab('main-refinery')">Full Inspection Dossier &rarr;</a>
           </div>
         </div>
       </div>
@@ -1636,8 +1749,13 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
         </svg>
         <span>AI COPILOT</span>
       </div>
-      <div class="llm-badge">
-        <span class="status-dot dot-success"></span> Offline LLM Active
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="llm-badge">
+          <span class="status-dot dot-success"></span> <span id="copilot-badge-text">Offline LLM Active</span>
+        </div>
+        <button class="copilot-close-btn" onclick="toggleCopilotDrawer()" title="Close Copilot Panel">
+          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
     </div>
 
@@ -1740,7 +1858,7 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
         </div>
         <div>
           <div class="modal-heading">Local Model Registry &amp; Hardware Budget</div>
-          <div class="modal-subheading">100% On-Premises Air-Gapped Inference &bull; NVIDIA RTX 3050 (6GB VRAM) &bull; Zero External WAN</div>
+          <div class="modal-subheading"><span id="hw-backend-status">100% On-Premises Air-Gapped Inference</span> &bull; <span id="hw-target-name">NVIDIA RTX 3050 (6GB VRAM)</span> &bull; Zero External WAN</div>
         </div>
       </div>
       <button class="modal-close-button" onclick="closeModelRegistryModal()" title="Close (Esc)">

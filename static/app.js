@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchModelRegistry();
   fetchSystemTelemetry();
   fetchRefineryOverview();
+  initHudOverview();
   switchCrudeAssay("Arabian Light");
   executeInteractiveDarcy();
   renderGovDatasetChart("monthly");
@@ -389,7 +390,10 @@ async function fetchRefineryOverview() {
 
       const capUtil = document.getElementById("kpi-capacity-util");
       if (capUtil && s.capacity_utilization_pct !== undefined) {
-        capUtil.textContent = `${s.capacity_utilization_pct}% Util`;
+        capUtil.textContent = `${s.capacity_utilization_pct}%`;
+        renderHudSegmentedBar(s.capacity_utilization_pct);
+        const speedo = document.getElementById("hud-speedo-val");
+        if (speedo) speedo.textContent = Number(s.capacity_utilization_pct).toFixed(1);
       }
 
       const assays = document.getElementById("kpi-crude-assays");
@@ -443,6 +447,11 @@ async function sendMessage(overrideText = null, attachedFiles = []) {
   const inputEl = document.getElementById("chat-input");
   const text = (overrideText || inputEl.value).trim();
   if (!text) return;
+
+  const copilotPanel = document.querySelector(".copilot-panel");
+  if (copilotPanel && copilotPanel.classList.contains("collapsed")) {
+    copilotPanel.classList.remove("collapsed");
+  }
 
   if (!overrideText) inputEl.value = "";
 
@@ -1729,7 +1738,7 @@ function renderGovDatasetChart(datasetKey = "monthly", hoverIdx = null) {
     if (legendEl) {
       legendEl.innerHTML = `
         <div class="chart-legend-item">
-          <div class="chart-legend-dot" style="background: #6366F1;"></div>
+          <div class="chart-legend-dot" style="background: #FF7A00;"></div>
           <span>Domestic Dispatches (TMT)</span>
         </div>
         <div class="chart-legend-item">
@@ -2054,8 +2063,8 @@ function drawGovProductSlateChart(ctx, w, h, records, hoverIdx) {
 
     const isHovered = hoverIdx === i;
 
-    // Domestic Dispatches (Indigo)
-    ctx.fillStyle = isHovered ? "#818CF8" : "#6366F1";
+    // Domestic Dispatches (Amber)
+    ctx.fillStyle = isHovered ? "#FF9E2C" : "#FF7A00";
     ctx.fillRect(xDom, yDom, barWidth, yBottom - yDom);
 
     // Export Shipments (Rose)
@@ -2334,7 +2343,7 @@ function setupGovChartEvents() {
           <div style="font-weight:700; color:#38BDF8; font-size:11.5px; margin-bottom:2px;">${hitBar.product}</div>
           <div style="font-size:10px; color:#94A3B8; margin-bottom:3px;">Category: ${hitBar.category}</div>
           <div>Monthly Production: <strong>${hitBar.monthly.toFixed(1)} TMT</strong></div>
-          <div>Domestic Market: <span style="color:#6366F1; font-weight:600;">${hitBar.domestic.toFixed(1)} TMT</span> (${((hitBar.domestic/hitBar.monthly)*100).toFixed(1)}%)</div>
+          <div>Domestic Market: <span style="color:#FF9E2C; font-weight:600;">${hitBar.domestic.toFixed(1)} TMT</span> (${((hitBar.domestic/hitBar.monthly)*100).toFixed(1)}%)</div>
           <div>Export Cargoes: <span style="color:#F43F5E; font-weight:600;">${hitBar.export.toFixed(1)} TMT</span> (${((hitBar.export/hitBar.monthly)*100).toFixed(1)}%)</div>
           <div style="font-size:9.5px; color:#94A3B8; margin-top:2px;">Dispatch Mode: ${hitBar.dispatch}</div>
         `;
@@ -2413,27 +2422,27 @@ function syncAgentParameters(params) {
   if (!params) return;
 
   if (params.length !== undefined) {
-    const el = document.getElementById("darcy-length");
+    const el = document.getElementById("darcy-input-length");
     if (el) el.value = params.length;
   }
   if (params.diameter !== undefined) {
-    const el = document.getElementById("darcy-diameter");
+    const el = document.getElementById("darcy-input-diameter");
     if (el) el.value = params.diameter;
   }
   if (params.flow !== undefined) {
-    const el = document.getElementById("darcy-flow");
+    const el = document.getElementById("darcy-input-flow");
     if (el) el.value = params.flow;
   }
   if (params.density !== undefined) {
-    const el = document.getElementById("darcy-density");
+    const el = document.getElementById("darcy-input-density");
     if (el) el.value = params.density;
   }
   if (params.viscosity !== undefined) {
-    const el = document.getElementById("darcy-viscosity");
+    const el = document.getElementById("darcy-input-viscosity");
     if (el) el.value = params.viscosity;
   }
   if (params.roughness !== undefined) {
-    const el = document.getElementById("darcy-roughness");
+    const el = document.getElementById("darcy-input-roughness");
     if (el) el.value = params.roughness;
   }
 
@@ -2453,4 +2462,81 @@ window.addEventListener("resize", () => {
     renderGovDatasetChart(currentGovDataset || "monthly");
   }, 100);
 });
+
+// -----------------------------------------------------------------------------
+// Cinematic Industrial HUD Controller (Reference UI Implementation)
+// -----------------------------------------------------------------------------
+const HUD_UNITS = [
+  { tag: "CDU-Col-04", name: "Atmospheric Tower #1", sub: "Flash Zone 4.60mm", tick: 70 },
+  { tag: "VDU-Col-02", name: "Vacuum Distillation #2", sub: "Bottom Shell 5.20mm", tick: 60 },
+  { tag: "PFCCU-R-01", name: "Petro FCC Reactor", sub: "Riser Pipe 8.40mm", tick: 75 },
+  { tag: "HCU-RX-03", name: "Hydrocracker Unit #3", sub: "High-P Wall 16.5mm", tick: 80 },
+];
+let currentHudUnitIndex = 0;
+
+function initHudOverview() {
+  renderHudSegmentedBar(111.8);
+  renderHudEqualizerBars();
+}
+
+function renderHudSegmentedBar(utilizationPct = 111.8) {
+  const track = document.getElementById("hud-segmented-track");
+  if (!track) return;
+  track.innerHTML = "";
+  const totalTicks = 42;
+  const activeCount = Math.min(totalTicks, Math.max(1, Math.round((utilizationPct / 125.0) * totalTicks)));
+  for (let i = 0; i < totalTicks; i++) {
+    const tick = document.createElement("div");
+    tick.className = "seg-tick" + (i < activeCount ? " active" : "");
+    track.appendChild(tick);
+  }
+}
+
+function renderHudEqualizerBars() {
+  const container = document.getElementById("hud-equalizer-bars");
+  if (!container) return;
+  container.innerHTML = "";
+  const heights = [28, 44, 38, 54, 48, 62, 58, 52, 46, 60, 50, 42];
+  heights.forEach((h, idx) => {
+    const bar = document.createElement("div");
+    bar.className = "eq-bar active";
+    bar.style.height = `${h}px`;
+    bar.title = `Month ${idx + 1}: ${Math.round(h * 27)} TMT`;
+    container.appendChild(bar);
+  });
+}
+
+function cycleHudUnit(dir) {
+  currentHudUnitIndex = (currentHudUnitIndex + dir + HUD_UNITS.length) % HUD_UNITS.length;
+  const unit = HUD_UNITS[currentHudUnitIndex];
+  const tagEl = document.getElementById("hud-unit-tag");
+  const labelEl = document.getElementById("hud-active-unit-label");
+  const subEl = document.querySelector(".hud-hub-sub");
+  if (tagEl) tagEl.textContent = unit.tag;
+  if (labelEl) labelEl.textContent = unit.name;
+  if (subEl) subEl.textContent = unit.sub;
+
+  document.querySelectorAll(".hud-tick").forEach(t => t.classList.remove("active"));
+  const activeTick = document.querySelector(`.hud-tick.tick-${unit.tick}`);
+  if (activeTick) activeTick.classList.add("active");
+}
+
+function toggleDetailedPpacTable() {
+  const content = document.getElementById("hud-ppac-drawer-content");
+  const arrow = document.getElementById("ppac-drawer-arrow");
+  if (!content) return;
+  const isOpen = content.style.display !== "none";
+  content.style.display = isOpen ? "none" : "block";
+  if (arrow) arrow.textContent = isOpen ? "▾" : "▴";
+}
+
+function toggleCopilotDrawer() {
+  const panel = document.querySelector(".copilot-panel");
+  const btn = document.getElementById("copilot-toggle-btn");
+  if (!panel) return;
+  panel.classList.toggle("collapsed");
+  if (btn) {
+    btn.style.opacity = panel.classList.contains("collapsed") ? "0.7" : "1";
+  }
+}
 

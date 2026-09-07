@@ -431,6 +431,7 @@ async def get_refinery_overview():
 
 
 @app.post("/api/duckdb-query")
+@app.post("/api/query/duckdb")
 async def handle_duckdb_query(req: DuckDBQueryRequest):
     """Executes read-only SQL queries directly against authentic refinery DuckDB tables."""
     sql = req.sql.strip()
@@ -487,6 +488,7 @@ async def handle_run_sandbox(req: SandboxRunRequest):
 
 
 @app.post("/api/simulate-scenario")
+@app.post("/api/scenario/simulate")
 async def handle_simulate_scenario(req: ScenarioSimulationRequest):
     """Allows agents to run sensitivity scenarios against real PPAC baseline metrics."""
     base_throughput_mmt = 16.774
