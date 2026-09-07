@@ -23,8 +23,9 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+import requests
+
 from Supervisor_agent import SupervisorAgent
-from Model_router import ModelRouter
 from Sovereign_monitor import SovereignNetworkAuditor
 
 app = FastAPI(
@@ -56,8 +57,7 @@ for directory in [UPLOADS_DIR, REPORTS_DIR, SANDBOX_DIR, STATIC_DIR]:
 
 # Shared Supervisor and Auditor instances
 auditor = SovereignNetworkAuditor(REPORTS_DIR)
-router = ModelRouter()
-supervisor = SupervisorAgent(router=router, auditor=auditor)
+supervisor = SupervisorAgent(auditor=auditor)
 
 # Pre-seed authentic engineering datasets into analytical workers
 for csv_file in DATA_DIR.glob("*.csv"):
@@ -110,23 +110,9 @@ async def handle_chat(payload: ChatRequest):
 
     try:
         # Run supervisor handle
-        routing_override = None
-        if payload.profile and payload.profile in router.profiles:
-            p = router.profiles[payload.profile]
-            from Model_router import RoutingDecision
-            routing_override = RoutingDecision(
-                profile=payload.profile,
-                model_id=p.model_id,
-                vram_estimate_gb=p.vram_estimate_gb,
-                reason=f"Manually selected profile: {payload.profile}",
-                temperature=p.temperature,
-                context_window=p.context_window,
-            )
-
         result = supervisor.handle(
             payload.message,
             payload.files or [],
-            routing_override=routing_override,
         )
         
         # Scan for newly generated deliverables
@@ -272,7 +258,20 @@ async def get_refinery_overview():
         res = data_worker.query(
             'SELECT Month, Financial_Year, Indigenous_Crude_TMT, Imported_Crude_TMT, Total_Crude_Processed_TMT, PPAC_Target_TMT, Capacity_Utilization_Pct, Operating_Days, Source FROM "ppac_mrpl_monthly_crude_processing" ORDER BY Total_Crude_Processed_TMT DESC'
         )
-        monthly_records = res.get("rows", [])
+        raw_rows = res.get("rows", [])
+        for r in raw_rows:
+            monthly_records.append({
+                **r,
+                "Month": r.get("month"),
+                "Financial_Year": r.get("financial_year"),
+                "Indigenous_Crude_TMT": r.get("indigenous_crude_tmt"),
+                "Imported_Crude_TMT": r.get("imported_crude_tmt"),
+                "Total_Crude_Processed_TMT": r.get("total_crude_processed_tmt"),
+                "PPAC_Target_TMT": r.get("ppac_target_tmt"),
+                "Capacity_Utilization_Pct": r.get("capacity_utilization_pct"),
+                "Operating_Days": r.get("operating_days"),
+                "Source": r.get("source"),
+            })
     except Exception:
         try:
             df = pd.read_csv(DATA_DIR / "ppac_mrpl_monthly_crude_processing.csv")
@@ -286,7 +285,26 @@ async def get_refinery_overview():
         res = data_worker.query(
             'SELECT Product_Category, Product_Name, Specification, Monthly_Production_TMT, Annual_Production_TMT, Domestic_Dispatches_TMT, Export_TMT, Primary_Dispatch_Mode, Source FROM "ppac_mrpl_petroleum_production_slate"'
         )
-        product_records = res.get("rows", [])
+        raw_rows = res.get("rows", [])
+        for r in raw_rows:
+            product_records.append({
+                **r,
+                "Product_Category": r.get("product_category"),
+                "Product_Name": r.get("product_name"),
+                "product": r.get("product_name"),
+                "Specification": r.get("specification"),
+                "Monthly_Production_TMT": r.get("monthly_production_tmt"),
+                "monthly": r.get("monthly_production_tmt"),
+                "Annual_Production_TMT": r.get("annual_production_tmt"),
+                "annual": r.get("annual_production_tmt"),
+                "Domestic_Dispatches_TMT": r.get("domestic_dispatches_tmt"),
+                "domestic": r.get("domestic_dispatches_tmt"),
+                "Export_TMT": r.get("export_tmt"),
+                "export": r.get("export_tmt"),
+                "Primary_Dispatch_Mode": r.get("primary_dispatch_mode"),
+                "dispatch": r.get("primary_dispatch_mode"),
+                "Source": r.get("source"),
+            })
     except Exception:
         try:
             df = pd.read_csv(DATA_DIR / "ppac_mrpl_petroleum_production_slate.csv")
@@ -300,7 +318,26 @@ async def get_refinery_overview():
         res = data_worker.query(
             'SELECT Refinery_Name, PSU_Parent, Location, State, Installed_Capacity_MMTPA, Annual_Crude_Processed_MMT, Capacity_Utilization_Pct, Nelson_Complexity_Index, Source FROM "ppac_psu_refineries_benchmark"'
         )
-        benchmark_records = res.get("rows", [])
+        raw_rows = res.get("rows", [])
+        for r in raw_rows:
+            benchmark_records.append({
+                **r,
+                "Refinery_Name": r.get("refinery_name"),
+                "refinery": r.get("refinery_name"),
+                "PSU_Parent": r.get("psu_parent"),
+                "parent": r.get("psu_parent"),
+                "Location": r.get("location"),
+                "State": r.get("state"),
+                "Installed_Capacity_MMTPA": r.get("installed_capacity_mmtpa"),
+                "capacity": r.get("installed_capacity_mmtpa"),
+                "Annual_Crude_Processed_MMT": r.get("annual_crude_processed_mmt"),
+                "processed": r.get("annual_crude_processed_mmt"),
+                "Capacity_Utilization_Pct": r.get("capacity_utilization_pct"),
+                "util": r.get("capacity_utilization_pct"),
+                "Nelson_Complexity_Index": r.get("nelson_complexity_index"),
+                "nci": r.get("nelson_complexity_index"),
+                "Source": r.get("source"),
+            })
     except Exception:
         try:
             df = pd.read_csv(DATA_DIR / "ppac_psu_refineries_benchmark.csv")
@@ -627,17 +664,30 @@ async def list_documents():
 @app.get("/api/models")
 async def list_models():
     """Returns the model registry and active hardware VRAM budget."""
-    ollama_ok, available = router.check_ollama(force_refresh=True)
-    profiles_data = []
-    for name, p in router.profiles.items():
-        profiles_data.append({
-            "name": name,
-            "model_id": p.model_id,
-            "fallback_id": p.fallback_model_id,
-            "vram_estimate_gb": p.vram_estimate_gb,
-            "description": p.description,
-            "is_installed": p.model_id in available or any(p.model_id.split(":")[0] in m for m in available),
-        })
+    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+    ollama_ok = False
+    available = []
+    try:
+        resp = requests.get(f"{ollama_url}/api/tags", timeout=1.5)
+        if resp.status_code == 200:
+            ollama_ok = True
+            available = [m.get("name", "") for m in resp.json().get("models", [])]
+    except Exception:
+        pass
+
+    supervisor_model = supervisor.LLM_MODEL
+    is_installed = supervisor_model in available or any(supervisor_model.split(":")[0] in m for m in available)
+
+    profiles_data = [
+        {
+            "name": "supervisor",
+            "model_id": supervisor_model,
+            "fallback_id": "deterministic_keyword_fallback",
+            "vram_estimate_gb": 5.0,
+            "description": "Supervisor LLM for workflow planning and result synthesis across refinery workers.",
+            "is_installed": is_installed,
+        }
+    ]
 
     return {
         "ollama_available": ollama_ok,
@@ -645,7 +695,7 @@ async def list_models():
         "profiles": profiles_data,
         "vram_budget_gb": 6.0,
         "target_hardware": "HP Victus RTX 3050 6GB / Apple M2 16GB",
-        "current_mode": "Production Ollama" if ollama_ok else "Sovereign Dev Simulation (Offline Mode Active)",
+        "current_mode": "Production Ollama" if ollama_ok else "Sovereign Offline Mode (Deterministic Fallback Active)",
     }
 
 

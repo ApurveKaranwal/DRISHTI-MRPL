@@ -29,7 +29,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import ollama
+import requests
 
 from Data_agent import DataAnalysisWorker, DuplicateFileError
 from Document_agent import RetrievalWorker
@@ -467,6 +467,7 @@ class SupervisorAgent:
     """Routes user requests to local workers and synthesizes grounded results."""
 
     LLM_MODEL = "qwen3:8b"
+    OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 
     def __init__(
         self,
@@ -478,6 +479,7 @@ class SupervisorAgent:
         sandbox_worker: CodeSandboxWorker | None = None,
         template_worker: DeliverablesWorker | None = None,
         auditor: SovereignNetworkAuditor | None = None,
+        **kwargs: Any,
     ) -> None:
 
         self.settings = settings or SupervisorSettings()
@@ -512,32 +514,38 @@ class SupervisorAgent:
         messages: list[dict[str, str]],
         json_mode: bool = False,
     ) -> str:
-        """Call the fixed local Supervisor LLM through Ollama."""
+        """Call the local Supervisor LLM through Ollama HTTP API."""
 
-        kwargs: dict[str, Any] = {
+        payload: dict[str, Any] = {
             "model": self.LLM_MODEL,
             "messages": messages,
+            "stream": False,
         }
 
         if json_mode:
-            kwargs["format"] = "json"
+            payload["format"] = "json"
 
-        response = ollama.chat(**kwargs)
-
-        return response["message"]["content"]
+        timeout_sec = float(os.getenv("LLM_TIMEOUT", "90.0"))
+        response = requests.post(
+            f"{self.OLLAMA_URL}/api/chat",
+            json=payload,
+            timeout=timeout_sec,
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data.get("message", {}).get("content", "")
 
     def _llm_available(self) -> bool:
         """
         Lightweight local health check.
 
-        Uses the Ollama Python client rather than contacting any external
-        service. Returns False when the local Ollama service/model cannot
-        be reached.
+        Pings the local Ollama service directly via loopback HTTP.
+        Returns False when the local Ollama service cannot be reached.
         """
 
         try:
-            ollama.list()
-            return True
+            resp = requests.get(f"{self.OLLAMA_URL}/api/tags", timeout=1.5)
+            return resp.status_code == 200
         except Exception:
             return False
 
@@ -660,6 +668,18 @@ class SupervisorAgent:
             "localhost",
             f"Using fixed Supervisor LLM '{self.LLM_MODEL}'"
         )
+
+        # Check local Ollama health first: if offline, bypass to deterministic keyword fallback planner
+        if not self._llm_available():
+            self.auditor.log_event(
+                "PLANNING_FALLBACK",
+                "localhost",
+                f"Local LLM is offline or unreachable at {self.OLLAMA_URL}. Using deterministic keyword fallback planner."
+            )
+            return self._generate_fallback_plan(
+                request,
+                files or []
+            )
 
         base_prompt = f"""
 {AGENT_CONTEXT}
@@ -2190,6 +2210,18 @@ Files explicitly supplied: {files or []}
             ensure_ascii=False
         )
 
+        # Check local Ollama health: if offline, return direct deterministic worker outputs
+        if not self._llm_available():
+            self.auditor.log_event(
+                "RESPONSE_FALLBACK",
+                "localhost",
+                f"Local LLM is offline or unreachable at {self.OLLAMA_URL}. Building direct structured worker-result response."
+            )
+            return self._build_fallback_response(
+                request,
+                results
+            )
+
         try:
 
             return self._llm_chat(
@@ -2317,6 +2349,7 @@ Files explicitly supplied: {files or []}
         self,
         request: str,
         files: list[str] | None = None,
+        **kwargs: Any,
     ) -> dict[str, Any]:
         """
         One-call public API:
@@ -2326,11 +2359,12 @@ Files explicitly supplied: {files or []}
         Normal mode:
             LLM-powered planning + LLM response synthesis.
 
-        Failure mode:
+        Failure / Offline mode:
             Deterministic routing + deterministic response.
         """
 
         files = files or []
+        llm_online = self._llm_available()
 
         # ---------------------------------------------------------------
         # PLAN
@@ -2379,6 +2413,15 @@ Files explicitly supplied: {files or []}
             "answer": answer,
             "report_path": report_path,
             "telemetry": telemetry,
+            "routing": {
+                "mode": "llm_orchestrated" if llm_online else "deterministic_offline_fallback",
+                "model_id": self.LLM_MODEL if llm_online else "keyword_heuristic_planner",
+                "reason": (
+                    f"Ollama is online: LLM '{self.LLM_MODEL}' generated the plan and synthesized the grounded response."
+                    if llm_online
+                    else "Ollama is offline: Deterministic fallback matched keywords to execute agents and returned direct outputs."
+                )
+            }
         }
 
 
