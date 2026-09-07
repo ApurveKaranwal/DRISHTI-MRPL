@@ -2837,10 +2837,20 @@ code {
 
 .hud-equalizer-wrap {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 20px;
+}
+
+.hud-eq-val-top {
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+.hud-eq-val-bottom {
+  align-self: flex-end;
+  margin-bottom: 16px;
 }
 
 .hud-eq-val-top,
@@ -2861,24 +2871,49 @@ code {
 
 .hud-eq-bars {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 12px;
   flex: 1;
-  height: 64px;
+  height: 76px;
+}
+
+.hud-eq-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.hud-eq-label {
+  font-size: 9.5px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  margin-top: 6px;
+  white-space: nowrap;
 }
 
 .eq-bar {
-  width: 5px;
+  width: 6px;
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.15);
   position: relative;
-  transition: height 0.3s ease;
+  transition: height 0.3s ease, transform 0.2s ease, filter 0.2s ease;
+  transform-origin: bottom center;
+}
+
+.hud-eq-col .eq-bar {
+  width: 22px;
+  max-width: 26px;
+  border-radius: 4px 4px 2px 2px;
 }
 
 .eq-bar.active {
   background: linear-gradient(to top, #FF5722, #FF9E2C);
-  box-shadow: 0 0 8px rgba(255, 122, 0, 0.5);
+  box-shadow: 0 0 10px rgba(255, 122, 0, 0.45);
 }
 
 /* 5. Temperatures Card (4 vertical gauges) */
@@ -3374,13 +3409,14 @@ code {
 /* Interactive Equalizer Bars */
 .eq-bar {
   cursor: pointer;
+  transform-origin: bottom center;
 }
 
 .eq-bar:hover,
 .eq-bar.active-touch {
-  transform: scaleY(1.15);
-  background: linear-gradient(to top, #00F5D4, #0096C7) !important;
-  box-shadow: 0 0 14px rgba(0, 245, 212, 0.85) !important;
+  transform: scaleY(1.08);
+  filter: brightness(1.2);
+  box-shadow: 0 0 14px rgba(255, 122, 0, 0.6) !important;
 }
 
 /* Smooth Accordion Drawer Transitions */

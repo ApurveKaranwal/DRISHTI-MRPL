@@ -7,6 +7,7 @@ and real-time air-gap sovereign network telemetry.
 
 from __future__ import annotations
 
+import asyncio
 import math
 import mimetypes
 import os
@@ -116,8 +117,9 @@ async def handle_chat(payload: ChatRequest):
         raise HTTPException(status_code=400, detail="Message cannot be empty.")
 
     try:
-        # Run supervisor handle
-        result = supervisor.handle(
+        # Run supervisor handle in worker thread to keep event loop fully non-blocking
+        result = await asyncio.to_thread(
+            supervisor.handle,
             payload.message,
             payload.files or [],
         )
@@ -468,14 +470,14 @@ async def handle_run_sandbox(req: SandboxRunRequest):
     start_time = time.time()
     try:
         sandbox_worker = supervisor._sandbox()
-        res = sandbox_worker.execute_code(code, script_name=req.script_name or "hydraulic_calc.py")
+        res = await asyncio.to_thread(sandbox_worker.execute_code, code, req.script_name or "hydraulic_calc.py")
         duration = time.time() - start_time
         return {
             "success": True,
             "stdout": res.get("stdout", ""),
             "stderr": res.get("stderr", ""),
             "returncode": res.get("returncode", 0),
-            "artifacts": [str(p) for p in res.get("artifacts", [])],
+            "artifacts": [str(p) for p in (res.get("generated_files") or res.get("artifacts") or [])],
             "duration_s": round(duration, 3)
         }
     except Exception as exc:
@@ -559,8 +561,14 @@ async def list_deliverables():
 
 @app.get("/api/download/{filename}")
 async def download_file(filename: str, source: str = "reports"):
-    """Securely serves a generated file from reports or sandbox."""
-    base = REPORTS_DIR if source == "reports" else SANDBOX_DIR
+    """Securely serves a file from reports, sandbox, data, or uploads."""
+    source_map = {
+        "reports": REPORTS_DIR,
+        "sandbox": SANDBOX_DIR,
+        "data": DATA_DIR,
+        "uploads": UPLOADS_DIR,
+    }
+    base = source_map.get(source, REPORTS_DIR)
     target = (base / filename).resolve()
     
     if not str(target).startswith(str(base.resolve())):
@@ -685,17 +693,52 @@ async def list_models():
         pass
 
     supervisor_model = supervisor.LLM_MODEL
-    is_installed = supervisor_model in available or any(supervisor_model.split(":")[0] in m for m in available)
+    
+    def check_installed(target_id: str) -> bool:
+        prefix = target_id.split(":")[0].lower()
+        return target_id in available or any(prefix in m.lower() for m in available)
 
     profiles_data = [
         {
-            "name": "supervisor",
+            "name": "general",
             "model_id": supervisor_model,
             "fallback_id": "deterministic_keyword_fallback",
-            "vram_estimate_gb": 5.0,
-            "description": "Supervisor LLM for workflow planning and result synthesis across refinery workers.",
-            "is_installed": is_installed,
-        }
+            "vram_estimate_gb": 4.8,
+            "description": "Supervisor LLM for workflow planning, PSU memorandums, and result synthesis across refinery workers.",
+            "is_installed": check_installed(supervisor_model),
+        },
+        {
+            "name": "vision",
+            "model_id": "qwen3-vl:8b",
+            "fallback_id": "tesseract_ocr_local",
+            "vram_estimate_gb": 4.8,
+            "description": "Multimodal visual inspection model for ultrasonic NDT scans, corrosion defect mapping, and P&ID diagrams.",
+            "is_installed": check_installed("qwen3-vl:8b"),
+        },
+        {
+            "name": "code",
+            "model_id": "qwen2.5-coder:7b",
+            "fallback_id": "python_sandbox_local",
+            "vram_estimate_gb": 4.2,
+            "description": "Specialized code generation engine for process calculations, Darcy-Weisbach hydraulics, and NumPy/Matplotlib scripts.",
+            "is_installed": check_installed("qwen2.5-coder:7b"),
+        },
+        {
+            "name": "reasoning",
+            "model_id": "deepseek-r1:1.5b",
+            "fallback_id": "rule_based_rca",
+            "vram_estimate_gb": 1.5,
+            "description": "Distilled reasoning model for Root-Cause Analysis (RCA) and equipment failure investigation.",
+            "is_installed": check_installed("deepseek-r1:1.5b"),
+        },
+        {
+            "name": "embedding",
+            "model_id": "bge-m3:latest",
+            "fallback_id": "sqlite_bm25_local",
+            "vram_estimate_gb": 0.6,
+            "description": "Dense semantic vector retrieval engine for standards (OISD, API 510) and P&ID engineering schematics.",
+            "is_installed": check_installed("bge-m3:latest") or check_installed("nomic-embed-text"),
+        },
     ]
 
     return {

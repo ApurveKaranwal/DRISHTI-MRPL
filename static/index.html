@@ -1119,7 +1119,7 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
                 <th>Status</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="documents-tbody">
               <tr>
                 <td><code>ppac_mrpl_monthly_crude_processing.csv</code></td>
                 <td>MoPNG / PPAC Ready Reckoner (MRPL Monthly Crude Processing FY 24-26)</td>
@@ -1342,22 +1342,22 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
 
               <div class="hud-equalizer-wrap">
                 <div class="hud-eq-val-top">15 <span class="eq-sub">TMT</span></div>
-                <div class="hud-eq-bars" style="height: 56px; display: flex; align-items: flex-end; gap: 10px;">
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 54px;" title="M110: 14.2 TMT"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">M110</span>
+                <div class="hud-eq-bars">
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 54px;" title="M110: 14.2 TMT"></div>
+                    <span class="hud-eq-label">M110</span>
                   </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 38px;" title="MI3530: 9.4 TMT"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">MI3530</span>
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 38px;" title="MI3530: 9.4 TMT"></div>
+                    <span class="hud-eq-label">MI3530</span>
                   </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 34px;" title="H030: 8.5 TMT"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">H030</span>
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 34px;" title="H030: 8.5 TMT"></div>
+                    <span class="hud-eq-label">H030</span>
                   </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 20px;" title="HM012: 4.4 TMT"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">HM012</span>
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 20px;" title="HM012: 4.4 TMT"></div>
+                    <span class="hud-eq-label">HM012</span>
                   </div>
                 </div>
                 <div class="hud-eq-val-bottom">0 <span class="eq-sub">baseline</span></div>
@@ -1619,18 +1619,18 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
 
               <div class="hud-equalizer-wrap">
                 <div class="hud-eq-val-top">80 <span class="eq-sub">TMT</span></div>
-                <div class="hud-eq-bars" style="height: 56px; display: flex; align-items: flex-end; gap: 12px;">
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 54px;" title="PX: 75.0 TMT"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">PX (75T)</span>
+                <div class="hud-eq-bars">
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 54px;" title="PX: 75.0 TMT"></div>
+                    <span class="hud-eq-label">PX (75T)</span>
                   </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 36px;" title="BZ: 22.5 TMT"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">BZ (22.5T)</span>
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 36px;" title="BZ: 22.5 TMT"></div>
+                    <span class="hud-eq-label">BZ (22.5T)</span>
                   </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 16px;" title="C9+: 3.8 TMT"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">C9+ (3.8T)</span>
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 16px;" title="C9+: 3.8 TMT"></div>
+                    <span class="hud-eq-label">C9+ (3.8T)</span>
                   </div>
                 </div>
                 <div class="hud-eq-val-bottom">0 <span class="eq-sub">baseline</span></div>
@@ -1883,18 +1883,18 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
 
               <div class="hud-equalizer-wrap">
                 <div class="hud-eq-val-top">500 <span class="eq-sub">t/h</span></div>
-                <div class="hud-eq-bars" style="height: 56px; display: flex; align-items: flex-end; gap: 12px;">
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 54px;" title="HP Steam: 480 t/h"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">HP (480t)</span>
+                <div class="hud-eq-bars">
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 54px;" title="HP Steam: 480 t/h"></div>
+                    <span class="hud-eq-label">HP (480t)</span>
                   </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 36px;" title="MP Steam: 310 t/h"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">MP (310t)</span>
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 36px;" title="MP Steam: 310 t/h"></div>
+                    <span class="hud-eq-label">MP (310t)</span>
                   </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 26px;" title="LP Steam: 225 t/h"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">LP (225t)</span>
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 26px;" title="LP Steam: 225 t/h"></div>
+                    <span class="hud-eq-label">LP (225t)</span>
                   </div>
                 </div>
                 <div class="hud-eq-val-bottom">0 <span class="eq-sub">baseline</span></div>
@@ -2192,22 +2192,22 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
 
               <div class="hud-equalizer-wrap">
                 <div class="hud-eq-val-top">100 <span class="eq-sub">%</span></div>
-                <div class="hud-eq-bars" style="height: 56px; display: flex; align-items: flex-end; gap: 10px;">
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 50px;" title="API 510: 18 Units"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">API 510</span>
+                <div class="hud-eq-bars">
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 50px;" title="API 510: 18 Units"></div>
+                    <span class="hud-eq-label">API 510</span>
                   </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 42px;" title="API 570: 42 Circuits"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">API 570</span>
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 42px;" title="API 570: 42 Circuits"></div>
+                    <span class="hud-eq-label">API 570</span>
                   </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 56px;" title="PESO: 100%"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">PESO</span>
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 56px;" title="PESO: 100%"></div>
+                    <span class="hud-eq-label">PESO</span>
                   </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                    <div class="eq-bar active" style="width: 100%; height: 58px;" title="CPCB: 99.2%"></div>
-                    <span style="font-size: 9px; color: var(--text-dim);">CPCB</span>
+                  <div class="hud-eq-col">
+                    <div class="eq-bar active" style="height: 58px;" title="CPCB: 99.2%"></div>
+                    <span class="hud-eq-label">CPCB</span>
                   </div>
                 </div>
                 <div class="hud-eq-val-bottom">0 <span class="eq-sub">baseline</span></div>

@@ -149,5 +149,6 @@ class CodeSandboxWorker:
             "stderr": stderr.strip(),
             "script_path": str(script_file.resolve()),
             "generated_files": new_files,
+            "artifacts": new_files,
             "run_id": run_id,
         }

@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupNavigation();
   setupDropzone();
   fetchDeliverables();
+  fetchDocuments();
   fetchModelRegistry();
   fetchSystemTelemetry();
   fetchRefineryOverview();
@@ -61,6 +62,13 @@ document.addEventListener("DOMContentLoaded", () => {
   renderGovDatasetChart("monthly");
   initTouchAndMicroInteractions();
   setInterval(fetchSystemTelemetry, 2500);
+
+  const initialTab = (window.location.hash ? window.location.hash.replace("#", "") : null);
+  if (initialTab) switchTab(initialTab);
+  window.addEventListener("hashchange", () => {
+    const hash = window.location.hash.replace("#", "");
+    if (hash) switchTab(hash);
+  });
 });
 
 // -----------------------------------------------------------------------------
@@ -112,6 +120,7 @@ function switchTab(tabId) {
     renderTrack("hud-alerts-segmented-track", 42, 41);
   }
   if (tabId === "reports") fetchDeliverables();
+  if (tabId === "documents") fetchDocuments();
   if (tabId === "analytics") {
     setTimeout(() => {
       executeInteractiveDarcy();
@@ -726,7 +735,8 @@ function renderBotResponse(data) {
       if (r.worker === "code_sandbox") {
         detailText = r.result && r.result.success ? `Executed script (${r.result.execution_time_seconds}s) | Exit Code: 0` : `Script status: ${r.result ? r.result.stderr || 'Executed' : 'Completed'}`;
       } else if (r.worker === "data_analysis") {
-        detailText = r.result && Array.isArray(r.result.rows) ? `DuckDB SQL returned ${r.result.row_count} rows` : (r.result && r.result.error ? r.result.error : "Query processed");
+        const cnt = r.result ? (r.result.row_count_returned ?? r.result.row_count ?? (Array.isArray(r.result.rows) ? r.result.rows.length : 0)) : 0;
+        detailText = r.result && Array.isArray(r.result.rows) ? `DuckDB SQL returned ${cnt} rows` : (r.result && r.result.error ? r.result.error : "Query processed");
       } else if (r.worker === "vision") {
         detailText = `Processed image (${r.result ? r.result.source || 'image' : 'image'}) via local VLM & OCR`;
       } else if (r.worker === "template_author") {
@@ -797,6 +807,8 @@ function renderBotResponse(data) {
   container.appendChild(bubble);
   container.scrollTop = container.scrollHeight;
 }
+
+const appendBotResponse = renderBotResponse;
 
 // -----------------------------------------------------------------------------
 // Deliverables Fetcher & UI Drawer
@@ -873,6 +885,40 @@ function getFileIcon(ext) {
   if (clean === ".pptx") return '<span style="font-weight: 700; color: #FBBF24; font-size: 10px;">PPTX</span>';
   if (clean === ".png" || clean === ".jpg" || clean === ".jpeg") return '<span style="font-weight: 700; color: #C084FC; font-size: 10px;">PNG</span>';
   return '<span style="font-weight: 700; color: #94A3B8; font-size: 10px;">FILE</span>';
+}
+
+// -----------------------------------------------------------------------------
+// Documents Fetcher & Repository Registry
+// -----------------------------------------------------------------------------
+async function fetchDocuments() {
+  try {
+    const res = await fetch("/api/documents");
+    if (!res.ok) return;
+    const docs = await res.json();
+    const tbody = document.getElementById("documents-tbody");
+    if (!tbody || !Array.isArray(docs)) return;
+
+    tbody.innerHTML = docs.map(d => {
+      const isDuckDB = d.format === "CSV";
+      const isVision = d.format === "PNG" || d.format === "JPG";
+      const engine = isDuckDB ? "DuckDB" : (isVision ? "Vision Cache" : "SQLite BM25 / RAG");
+      const statusClass = d.exists ? "green" : "orange";
+      const statusText = d.exists ? `Active (${d.size_kb} KB)` : "Missing";
+      return `
+        <tr>
+          <td>
+            <code>${escapeHtml(d.name)}</code>
+            <div style="font-size: 10.5px; color: var(--text-dim); margin-top: 3px;">${escapeHtml(d.title || "")}</div>
+          </td>
+          <td>${escapeHtml(d.category || "Dataset")}</td>
+          <td><span style="font-weight: 600; color: #38BDF8;">${engine}</span></td>
+          <td><span class="status-badge-${statusClass}">${statusText}</span></td>
+        </tr>
+      `;
+    }).join("");
+  } catch (err) {
+    console.warn("Could not load /api/documents:", err);
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -3123,8 +3169,6 @@ function initEqualizerInteractions() {
   eqBars.forEach(bar => {
     bar.addEventListener("pointerenter", () => {
       bar.classList.add("active-touch");
-      const origHeight = parseInt(bar.style.height) || 40;
-      bar.style.height = `${Math.min(64, origHeight + 10)}px`;
     });
     bar.addEventListener("pointerleave", () => {
       bar.classList.remove("active-touch");

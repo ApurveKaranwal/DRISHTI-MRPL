@@ -513,6 +513,8 @@ class SupervisorAgent:
         self,
         messages: list[dict[str, str]],
         json_mode: bool = False,
+        max_tokens: int = 512,
+        temperature: float = 0.1,
     ) -> str:
         """Call the local Supervisor LLM through Ollama HTTP API."""
 
@@ -520,6 +522,10 @@ class SupervisorAgent:
             "model": self.LLM_MODEL,
             "messages": messages,
             "stream": False,
+            "options": {
+                "num_predict": max_tokens,
+                "temperature": temperature,
+            },
         }
 
         if json_mode:
@@ -780,7 +786,9 @@ Files explicitly supplied: {files or []}
             try:
                 raw = self._llm_chat(
                     messages,
-                    json_mode=True
+                    json_mode=True,
+                    max_tokens=384,
+                    temperature=0.1,
                 )
 
             except Exception as error:
@@ -2329,7 +2337,9 @@ Files explicitly supplied: {files or []}
                             f"Request: {request}\n"
                             f"Worker results: {evidence}",
                     },
-                ]
+                ],
+                max_tokens=600,
+                temperature=0.15,
             )
 
             cleaned = re.sub(
