@@ -24,30 +24,44 @@
   <aside class="sidebar">
     <div class="brand-header">
       <div class="brand-logo" title="DRISHTI-MRPL Sovereign AI">
-        <svg viewBox="0 0 36 36" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 40 40" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="drishti-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#10B981" />
-              <stop offset="50%" stop-color="#06B6D4" />
-              <stop offset="100%" stop-color="#FF7A00" />
+            <linearGradient id="drishti-logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00F5D4" />
+              <stop offset="45%" stop-color="#38BDF8" />
+              <stop offset="85%" stop-color="#FF9E2C" />
+              <stop offset="100%" stop-color="#FF5722" />
             </linearGradient>
+            <radialGradient id="drishti-jewel-bg" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(14, 165, 233, 0.22)" />
+              <stop offset="100%" stop-color="rgba(15, 23, 42, 0.85)" />
+            </radialGradient>
           </defs>
-          <!-- Outer Shield / Hexagonal Ring -->
-          <rect x="2" y="2" width="32" height="32" rx="8" stroke="url(#drishti-grad)" stroke-width="1.8" fill="rgba(16, 185, 129, 0.08)" />
-          <!-- Optical Eye Contour (Drishti / All-Seeing Intelligence) -->
-          <path d="M7 18C10.5 12 25.5 12 29 18C25.5 24 10.5 24 7 18Z" stroke="url(#drishti-grad)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-          <!-- Iris Ring -->
-          <circle cx="18" cy="18" r="4.2" stroke="#38BDF8" stroke-width="1.4" fill="rgba(6, 182, 212, 0.16)" />
-          <!-- Inner Core Pupil & Catalytic Flame -->
-          <circle cx="18" cy="18" r="1.8" fill="#10B981" />
-          <!-- Aperture Precision Guides -->
-          <line x1="18" y1="6" x2="18" y2="8.5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" />
-          <line x1="18" y1="27.5" x2="18" y2="30" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round" />
+          <!-- Outer Rounded Jewel Base -->
+          <rect x="2" y="2" width="36" height="36" rx="9" fill="url(#drishti-jewel-bg)" stroke="url(#drishti-logo-grad)" stroke-width="1.8" />
+          <!-- Precision Calibrated Diamond Facets -->
+          <path d="M20 6L32 14V26L20 34L8 26V14L20 6Z" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1" stroke-dasharray="2 2" />
+          <!-- Optical Lens Contour (Drishti Eye) -->
+          <path d="M7 20C11 13 29 13 33 20C29 27 11 27 7 20Z" stroke="url(#drishti-logo-grad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          <!-- Iris Focus Ring -->
+          <circle cx="20" cy="20" r="5" stroke="#38BDF8" stroke-width="1.4" fill="rgba(6, 182, 212, 0.2)" />
+          <!-- Catalytic Core Flame Pupil -->
+          <circle cx="20" cy="20" r="2.2" fill="#FF9E2C" />
+          <!-- Calibrated Sight Guides -->
+          <line x1="20" y1="5" x2="20" y2="7.5" stroke="#00F5D4" stroke-width="1.5" stroke-linecap="round" />
+          <line x1="20" y1="32.5" x2="20" y2="35" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round" />
+          <line x1="4" y1="20" x2="6.5" y2="20" stroke="#00F5D4" stroke-width="1.5" stroke-linecap="round" />
+          <line x1="33.5" y1="20" x2="36" y2="20" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round" />
         </svg>
       </div>
-      <div>
-        <div class="brand-title">DRISHTI-MRPL</div>
-        <div class="brand-subtitle">Sovereign Refinery AI &amp;<br>Operations Intelligence</div>
+      <div class="brand-text-block">
+        <div class="brand-title-row">
+          <span class="brand-title-main">DRISHTI</span>
+          <span class="brand-title-divider">-</span>
+          <span class="brand-title-accent">MRPL</span>
+        </div>
+        <div class="brand-signature-script">Sovereign Refinery AI</div>
+        <div class="brand-sub-org">ONGC Group Enterprise</div>
       </div>
     </div>
 
@@ -166,13 +180,6 @@
           <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" style="opacity: 0.6; margin-left: 2px;"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
 
-        <!-- Copilot Assistant Toggle Button -->
-        <button class="copilot-toggle-pill" id="copilot-toggle-btn" onclick="toggleCopilotDrawer()" title="Toggle AI Copilot Assistant">
-          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          <span>AI Copilot</span>
-          <span class="status-dot dot-success"></span>
-        </button>
-
         <!-- Day / Night Mode Toggle -->
         <button class="icon-button theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle Night/Day Mode">
           <svg class="theme-icon sun-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
@@ -198,9 +205,19 @@
             <span class="user-name">Operator</span>
             <span class="user-role">Shift A</span>
           </div>
+          <!-- Header Collapse Toggle Button -->
+          <button class="header-collapse-toggle-btn" id="header-collapse-btn" onclick="toggleHeaderCollapse()" title="Collapse Top Header Bar">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="18 15 12 9 6 15"/></svg>
+          </button>
         </div>
       </div>
     </header>
+    <!-- Floating Expand Pill when Header is Collapsed -->
+    <div class="header-floating-expand-pill" id="header-expand-pill" onclick="toggleHeaderCollapse()" title="Expand Top Header &amp; Telemetry" style="display: none;">
+      <span class="status-dot dot-cyan"></span>
+      <span id="expand-pill-title">MRPL SCADA Telemetry</span>
+      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
 
     <!-- ------------------------------------------------------------------
          TAB 1: OVERVIEW (CLEAN EXECUTIVE SCADA - GROUNDED IN PPAC & API 510)
@@ -506,13 +523,12 @@
     <!-- ------------------------------------------------------------------
          TAB 2: MAIN REFINERY (CLEAN INDUSTRIAL HUD SCADA)
          ------------------------------------------------------------------ -->
-    <section class="tab-content" id="tab-main-refinery">
+                <section class="tab-content" id="tab-main-refinery" style="padding: 0 !important;">
       <div class="hud-overview-container">
-        <!-- HUD Stage Layer -->
         <div class="hud-stage">
-          <!-- Left Column: Status Capsule, Asset HUD Ring, Hero Title & Segmented Progress -->
+          <!-- Left Column -->
           <div class="hud-col-left">
-            <!-- 1. Floating Status Capsule (Top Left) -->
+            <!-- 1. Status Capsule -->
             <div class="hud-glass-card hud-status-capsule">
               <div class="hud-card-header">
                 <span class="hud-capsule-title">Crude Unit Status</span>
@@ -538,52 +554,45 @@
               </div>
             </div>
 
-            <!-- 2. Physical Asset HUD Dial Overlay (CDU Column) -->
-            <div class="hud-asset-dial-box">
-              <div class="hud-dial-graphic">
-                <svg viewBox="0 0 200 200" class="hud-dial-svg">
-                  <circle cx="100" cy="100" r="76" class="hud-dial-track" />
-                  <path d="M 100 24 A 76 76 0 0 1 172 76" class="hud-dial-arc" />
-                  <circle cx="172" cy="76" r="4.5" class="hud-dial-dot" />
-                </svg>
-                <div class="hud-dial-ticks">
-                  <span class="hud-tick tick-80">80</span>
-                  <span class="hud-tick tick-70 active">70</span>
-                  <span class="hud-tick tick-60">60</span>
-                  <span class="hud-tick tick-50">50</span>
-                  <span class="hud-tick tick-40">40</span>
-                  <span class="hud-tick tick-30">30</span>
-                  <span class="hud-tick tick-20">20</span>
-                  <span class="hud-tick tick-10">10</span>
-                </div>
-                <div class="hud-dial-inner-hub">
-                  <div class="hud-hub-center-dot"></div>
-                  <div class="hud-hub-tag" id="hud-main-unit-tag">CDU Col-01</div>
-                  <div class="hud-hub-sub">Atmospheric 48 Trays</div>
-                </div>
+            <!-- 2. Crude Assay Selector Box -->
+            <div class="hud-glass-card" style="padding: 16px 18px;">
+              <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">Active Crude Assay</div>
+              <div class="assay-toggle-row" style="margin-bottom: 10px; gap: 6px;">
+                <button class="assay-toggle-btn active" id="btn-assay-arab-light" onclick="switchCrudeAssay('Arabian Light')">Arab Light</button>
+                <button class="assay-toggle-btn" id="btn-assay-arab-heavy" onclick="switchCrudeAssay('Arabian Heavy')">Arab Heavy</button>
+                <button class="assay-toggle-btn" id="btn-assay-brent" onclick="switchCrudeAssay('Brent Blend')">Brent</button>
+                <button class="assay-toggle-btn" id="btn-assay-maya" onclick="switchCrudeAssay('Maya Heavy')">Maya</button>
+                <button class="assay-toggle-btn" id="btn-assay-mangala" onclick="switchCrudeAssay('Mangala')">Mangala</button>
               </div>
 
-              <!-- Horizontal Interactive Unit Switcher '< >' -->
-              <div class="hud-axis-selector">
-                <div class="hud-axis-line"></div>
-                <button class="hud-axis-btn" onclick="cycleMainRefineryUnit(-1)" title="Previous Unit">&lt;</button>
-                <div class="hud-axis-label" id="hud-main-active-unit-label">CDU-1 Atmospheric Column</div>
-                <button class="hud-axis-btn" onclick="cycleMainRefineryUnit(1)" title="Next Unit">&gt;</button>
-                <div class="hud-axis-line"></div>
+              <div class="grid-4" style="gap: 6px;">
+                <div style="background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; text-align: center;">
+                  <div style="font-size: 9px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">API Gravity</div>
+                  <div id="assay-prop-api" style="font-size: 13px; font-weight: 800; color: var(--text-heading); font-family: var(--font-mono); margin-top: 1px;">32.8°</div>
+                </div>
+                <div style="background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; text-align: center;">
+                  <div style="font-size: 9px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Sulfur wt%</div>
+                  <div id="assay-prop-sulfur" style="font-size: 13px; font-weight: 800; color: var(--color-warning); font-family: var(--font-mono); margin-top: 1px;">1.97%</div>
+                </div>
+                <div style="background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; text-align: center;">
+                  <div style="font-size: 9px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">TAN Acid</div>
+                  <div id="assay-prop-tan" style="font-size: 13px; font-weight: 800; color: var(--color-info); font-family: var(--font-mono); margin-top: 1px;">0.12</div>
+                </div>
+                <div style="background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; text-align: center;">
+                  <div style="font-size: 9px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Viscosity</div>
+                  <div id="assay-prop-visc" style="font-size: 13px; font-weight: 800; color: var(--text-heading); font-family: var(--font-mono); margin-top: 1px;">5.3 cSt</div>
+                </div>
               </div>
             </div>
 
-            <!-- 3. Hero Typography & Segmented Bar (Bottom Left) -->
+            <!-- 3. Hero Header & Stats -->
             <div class="hud-hero-block">
               <h1 class="hud-hero-heading">Crude Distillation Complex</h1>
               <p class="hud-hero-description">
-                Atmospheric &amp; vacuum fraction separation with real-time True Boiling Point (TBP) crude assay cut control.
+                Atmospheric and vacuum distillation units (CDU-1/2/3 &amp; VDU) operating in continuous high-yield separation mode.
               </p>
 
-              <!-- Segmented Progress Bar (40 vertical glowing ticks) -->
-              <div class="hud-segmented-track" id="hud-main-segmented-track">
-                <!-- Populated via JS -->
-              </div>
+              <div class="hud-segmented-track" id="hud-main-segmented-track"></div>
 
               <div class="hud-hero-stats-row">
                 <div class="hud-hero-stat-item">
@@ -592,135 +601,157 @@
                 </div>
                 <div class="hud-hero-stat-item">
                   <div class="stat-main-num">450.0 <span class="stat-mini-unit">m³/h</span></div>
-                  <div class="stat-main-label">Furnace Feed Rate</div>
+                  <div class="stat-main-label">Furnace Feed</div>
                 </div>
                 <div class="hud-hero-stat-item">
-                  <div class="stat-main-num" style="color: #00F5D4;">32.8° API</div>
-                  <div class="stat-main-label">Crude Quality</div>
+                  <div class="stat-main-num" style="color: #FF9E2C;">98.4 <span class="stat-mini-unit">%</span></div>
+                  <div class="stat-main-label">Distillation Yield</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Right Column: Equalizer Card, Temperatures Card, Mini Stats + Speedometer Dial -->
+          <!-- Right Column -->
           <div class="hud-col-right">
-            <!-- 1. Top Right Frosted Equalizer Card (Assay Cut Slate) -->
-            <div class="hud-glass-card hud-equalizer-card">
-              <div class="hud-card-header">
+            <!-- 1. Distillation Spectrum Card -->
+            <div class="hud-glass-card hud-equalizer-card" style="padding: 16px 18px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <div>
-                  <div class="hud-card-title">Assay Distillation Cut Yields</div>
-                  <div class="hud-card-sub">Volumetric Yield Distribution</div>
+                  <div style="font-size: 13px; font-weight: 700; color: var(--text-heading);">Distillation Yield Slate</div>
+                  <div style="font-size: 10px; color: var(--text-dim); margin-top: 1px;">True Boiling Point Volume Balance</div>
                 </div>
-                <div class="hud-legend-chips">
-                  <span class="legend-chip"><span class="chip-dot dot-orange"></span> Light &amp; Middle</span>
-                  <span class="legend-chip"><span class="chip-dot dot-white"></span> Heavy</span>
-                </div>
+                <span class="status-badge-blue" id="assay-cut-total-label" style="font-size: 10px; font-weight: 700; font-family: var(--font-mono);">100% Balance</span>
               </div>
 
-              <!-- Quick Assay Selector Buttons -->
-              <div class="assay-toggle-row" style="margin: 8px 0 10px 0;">
-                <button class="assay-toggle-btn active" id="btn-assay-arab-light" onclick="switchCrudeAssay('Arabian Light')">Arab Light</button>
-                <button class="assay-toggle-btn" id="btn-assay-arab-heavy" onclick="switchCrudeAssay('Arabian Heavy')">Arab Heavy</button>
-                <button class="assay-toggle-btn" id="btn-assay-brent" onclick="switchCrudeAssay('Brent Blend')">Brent</button>
-                <button class="assay-toggle-btn" id="btn-assay-maya" onclick="switchCrudeAssay('Maya Heavy')">Maya Heavy</button>
-                <button class="assay-toggle-btn" id="btn-assay-mangala" onclick="switchCrudeAssay('Mangala')">Mangala</button>
+              <div class="cut-bar-container" id="assay-cut-bar" style="height: 28px; border-radius: 6px; margin: 8px 0 10px 0; overflow: hidden; display: flex; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
+                <div class="cut-segment cut-lpg" style="width: 2.4%;" title="LPG: 2.4%"></div>
+                <div class="cut-segment cut-naphtha" style="width: 19.4%;" title="Naphtha: 19.4%">Naphtha 19.4%</div>
+                <div class="cut-segment cut-atf" style="width: 12.3%;" title="ATF/Kero: 12.3%">ATF 12.3%</div>
+                <div class="cut-segment cut-diesel" style="width: 21.5%;" title="Diesel: 21.5%">Diesel 21.5%</div>
+                <div class="cut-segment cut-vgo" style="width: 30.3%;" title="VGO: 30.3%">VGO 30.3%</div>
+                <div class="cut-segment cut-residue" style="width: 14.1%;" title="Residue: 14.1%">Resid 14.1%</div>
               </div>
 
-              <div class="hud-equalizer-wrap">
-                <div class="hud-eq-val-top">35% <span class="eq-sub">max yield</span></div>
-                <div class="hud-eq-bars" id="hud-main-equalizer-bars">
-                  <!-- Populated via JS -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); font-size: 10px;">
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: #38BDF8; flex-shrink: 0;"></span>
+                  <span style="color: var(--text-dim);">LPG:</span>
+                  <span id="legend-cut-lpg" style="color: var(--text-heading); font-weight: 700; font-family: var(--font-mono);">2.4%</span>
                 </div>
-                <div class="hud-eq-val-bottom">0% <span class="eq-sub">baseline</span></div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: #60A5FA; flex-shrink: 0;"></span>
+                  <span style="color: var(--text-dim);">Naphtha:</span>
+                  <span id="legend-cut-naphtha" style="color: var(--text-heading); font-weight: 700; font-family: var(--font-mono);">19.4%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: #FBBF24; flex-shrink: 0;"></span>
+                  <span style="color: var(--text-dim);">ATF:</span>
+                  <span id="legend-cut-atf" style="color: var(--text-heading); font-weight: 700; font-family: var(--font-mono);">12.3%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: #10B981; flex-shrink: 0;"></span>
+                  <span style="color: var(--text-dim);">Diesel:</span>
+                  <span id="legend-cut-diesel" style="color: var(--text-heading); font-weight: 700; font-family: var(--font-mono);">21.5%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: #A855F7; flex-shrink: 0;"></span>
+                  <span style="color: var(--text-dim);">VGO:</span>
+                  <span id="legend-cut-vgo" style="color: var(--text-heading); font-weight: 700; font-family: var(--font-mono);">30.3%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: #64748B; flex-shrink: 0;"></span>
+                  <span style="color: var(--text-dim);">Residue:</span>
+                  <span id="legend-cut-residue" style="color: var(--text-heading); font-weight: 700; font-family: var(--font-mono);">14.1%</span>
+                </div>
               </div>
             </div>
 
-            <!-- 2. Middle Right Frosted Temperatures & Trays Card -->
+            <!-- 2. Column Gauges Card -->
             <div class="hud-glass-card hud-temperatures-card">
               <div class="hud-card-header">
-                <div class="hud-card-title">Tower Thermal &amp; Draw Profile</div>
-                <span class="hud-card-badge">CDU-1 TRAYS</span>
+                <div class="hud-card-title">CDU-1 Column Tray Profile</div>
+                <span class="hud-card-badge">Fractionation</span>
               </div>
               <div class="hud-columns-grid">
                 <div class="hud-col-gauge">
                   <div class="gauge-temp-val">365 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-orange" style="height: 78%;"></div>
+                    <div class="gauge-bar-fill fill-cyan" style="height: 75%;"></div>
                   </div>
                   <div class="gauge-col-name">Flash Zone</div>
-                  <div class="gauge-col-sub">Tray 42</div>
+                  <div class="gauge-col-sub">Tray 04</div>
                 </div>
                 <div class="hud-col-gauge">
-                  <div class="gauge-temp-val">215 °C</div>
+                  <div class="gauge-temp-val" style="color: #FF7A00;">215 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-cyan" style="height: 56%;"></div>
+                    <div class="gauge-bar-fill fill-orange" style="height: 55%;"></div>
                   </div>
-                  <div class="gauge-col-name">Kerosene Draw</div>
-                  <div class="gauge-col-sub">Tray 28</div>
+                  <div class="gauge-col-name">Kero Draw</div>
+                  <div class="gauge-col-sub">Tray 18</div>
                 </div>
                 <div class="hud-col-gauge">
                   <div class="gauge-temp-val">168 °C</div>
                   <div class="gauge-bar-track">
                     <div class="gauge-bar-fill fill-cyan" style="height: 44%;"></div>
                   </div>
-                  <div class="gauge-col-name">Heavy Naphtha</div>
-                  <div class="gauge-col-sub">Tray 16</div>
+                  <div class="gauge-col-name">Hvy Naphtha</div>
+                  <div class="gauge-col-sub">Tray 28</div>
                 </div>
                 <div class="hud-col-gauge">
-                  <div class="gauge-temp-val">125 °C</div>
+                  <div class="gauge-temp-val" style="color: #FF7A00;">125 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-cyan" style="height: 32%;"></div>
+                    <div class="gauge-bar-fill fill-orange" style="height: 32%;"></div>
                   </div>
-                  <div class="gauge-col-name">Overhead Reflux</div>
-                  <div class="gauge-col-sub">Tray 01</div>
+                  <div class="gauge-col-name">Overhead</div>
+                  <div class="gauge-col-sub">Tray 48</div>
                 </div>
               </div>
             </div>
 
-            <!-- 3. Bottom Right Cluster: Mini Cards + Speedometer -->
+            <!-- 3. Bottom Cluster -->
             <div class="hud-bottom-cluster">
               <div class="hud-mini-column">
                 <div class="hud-glass-card hud-mini-card">
-                  <div class="mini-card-label">Sulfur Content (wt%)</div>
-                  <div class="mini-card-value" id="assay-prop-sulfur">1.97 <span class="mini-card-unit">wt%</span></div>
+                  <div class="mini-card-label">Corrosion Rate</div>
+                  <div class="mini-card-value" style="color: var(--color-danger);">0.873 <span class="mini-card-unit">mm/yr</span></div>
                 </div>
                 <div class="hud-glass-card hud-mini-card">
-                  <div class="mini-card-label">Total Acid Number (TAN)</div>
-                  <div class="mini-card-value" id="assay-prop-tan">0.12 <span class="mini-card-unit">mg/g</span></div>
+                  <div class="mini-card-label">CML Min Thickness</div>
+                  <div class="mini-card-value" style="color: #EF4444;">4.18 <span class="mini-card-unit">mm</span></div>
                 </div>
               </div>
 
-              <!-- Large High-Contrast Speedometer Card -->
+              <!-- Speedometer Card -->
               <div class="hud-speedometer-card">
                 <div class="speedo-svg-wrap">
                   <svg viewBox="0 0 200 130" class="speedo-svg">
                     <path d="M 28 115 A 72 72 0 0 1 172 115" fill="none" stroke="#E2E8F0" stroke-width="12" stroke-linecap="round" />
-                    <path d="M 28 115 A 72 72 0 0 1 156 66" fill="none" stroke="url(#hud-speedo-grad-mr)" stroke-width="12" stroke-linecap="round" />
-                    <line x1="100" y1="115" x2="146" y2="54" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
+                    <path d="M 28 115 A 72 72 0 0 1 164 74" fill="none" stroke="url(#hud-speedo-grad-mr)" stroke-width="12" stroke-linecap="round" />
+                    <line x1="100" y1="115" x2="152" y2="60" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
                     <circle cx="100" cy="115" r="5" fill="#0F172A" />
                     <defs>
                       <linearGradient id="hud-speedo-grad-mr" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#00F5D4" />
-                        <stop offset="100%" stop-color="#FF7A00" />
+                        <stop offset="0%" stop-color="#FF9E2C" />
+                        <stop offset="100%" stop-color="#FF5722" />
                       </linearGradient>
                     </defs>
                   </svg>
                   <div class="speedo-number-box">
                     <div class="speedo-big-val">98.4</div>
-                    <div class="speedo-unit-label">% EFFICIENCY</div>
+                    <div class="speedo-unit-label">% YIELD</div>
                   </div>
                 </div>
 
                 <div class="speedo-deltas-row">
                   <div class="speedo-delta-badge">
-                    <span class="delta-num" id="assay-prop-api">32.8°</span>
+                    <span class="delta-num">32.8°</span>
                     <span class="delta-arrow">▲</span>
                     <span class="delta-sub">API Gravity</span>
                   </div>
                   <div class="speedo-delta-badge">
-                    <span class="delta-num" id="assay-prop-visc">5.30 cSt</span>
-                    <span class="delta-arrow">▲</span>
-                    <span class="delta-sub">Viscosity</span>
+                    <span class="delta-num">-21°C</span>
+                    <span class="delta-arrow">▼</span>
+                    <span class="delta-sub">Pour Point</span>
                   </div>
                 </div>
               </div>
@@ -728,108 +759,83 @@
           </div>
         </div>
 
-        <!-- Collapsible Detailed Assay & CML Inspection Dossier Drawer (Zero Clutter by default) -->
+        <!-- Collapsible Bottom Drawer -->
         <div class="hud-collapsible-drawer">
           <button class="hud-drawer-toggle" onclick="toggleMainRefineryDrawer()">
-            <span style="display: flex; align-items: center; gap: 8px;">
+            <span class="drawer-toggle-icon">
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span>View Certified Crude Assay Cut Breakdown &amp; 12-Point Ultrasonic Thickness Dossier</span>
             </span>
-            <span class="drawer-arrow" id="mr-drawer-arrow">▾</span>
+            <span>View Detailed Crude Assay Cut Breakdown &amp; 12-Point Ultrasonic NDT Survey</span>
+            <span class="drawer-toggle-arrow" id="mr-drawer-arrow">▾</span>
           </button>
-          <div class="hud-drawer-content" id="hud-mr-drawer-content" style="display: none;">
-            <!-- Hidden properties for JS compatibility -->
-            <span id="assay-prop-density" style="display:none;">861.2 kg/m³</span>
-            <span id="assay-prop-pour" style="display:none;">Pour Point: -21.0°C</span>
-            <span id="assay-cut-total-label" style="display:none;">100.0% Mass Volume Balance</span>
-            <div class="cut-bar-container" id="assay-cut-bar" style="display:none;"></div>
 
-            <div class="dash-card" style="margin-top: 14px;">
-              <div class="card-header">
-                <div class="card-title">Dynamic True Boiling Point (TBP) Distillation Yields</div>
-              </div>
-              <div style="overflow-x: auto;">
+          <div class="hud-drawer-content" id="hud-mr-drawer-content" style="display: none; padding: 18px 24px;">
+            <div class="grid-2" style="gap: 20px; align-items: start;">
+              <div>
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Dynamic True Boiling Point (TBP) Distillation Yields</div>
                 <table class="data-table">
                   <thead>
                     <tr>
                       <th>Fraction Name</th>
-                      <th>True Boiling Range (°C)</th>
+                      <th>True Boiling Range</th>
                       <th>Yield (Vol %)</th>
-                      <th>Primary Disposition / Processing Unit</th>
-                      <th>Action</th>
+                      <th>Primary Disposition</th>
                     </tr>
                   </thead>
-                  <tbody id="assay-cut-table-body">
-                    <!-- Populated dynamically by switchCrudeAssay() -->
-                  </tbody>
+                  <tbody id="assay-cut-table-body"></tbody>
                 </table>
               </div>
-            </div>
 
-            <!-- CDU Column-04 12-point Ultrasonic Survey Table -->
-            <div class="dash-card" style="margin-top: 14px;">
-              <div class="card-header">
-                <div>
-                  <div class="card-title">Atmospheric Column CDU-Col-04 Shell Integrity Survey</div>
-                  <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
-                    Ultrasonic NDT Report Ref: MRPL/NDT/CDU-01/2026/0488 | Olympus Epoch 650 (ASME Sec V Art 5)
-                  </div>
-                </div>
-              </div>
-              <div style="overflow-x: auto;">
+              <div>
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">CDU Column-04 Ultrasonic Shell Integrity (API 510)</div>
                 <table class="data-table">
                   <thead>
                     <tr>
-                      <th>CML Tag</th>
-                      <th>Location / Elevation</th>
-                      <th>Orientation</th>
-                      <th>Nominal (t_nom)</th>
-                      <th>Actual Measured</th>
-                      <th>Min Required (t_min)</th>
-                      <th>Corrosion Margin</th>
-                      <th>Integrity Status</th>
+                      <th>CML Point</th>
+                      <th>Elev / Orientation</th>
+                      <th>Nominal</th>
+                      <th>Measured</th>
+                      <th>API Min</th>
+                      <th>Deficit</th>
+                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr style="background: rgba(239, 68, 68, 0.08);">
+                    <tr style="background: rgba(239, 68, 68, 0.1);">
                       <td><code>CML 01-A</code></td>
-                      <td>Elev +4.2m (Flash Zone Bottom Shell)</td>
-                      <td>North (0°)</td>
-                      <td>16.00 mm</td>
-                      <td style="color: #EF4444; font-weight: 700;">4.18 mm</td>
+                      <td>+4.2m / 0° N</td>
+                      <td>12.0 mm</td>
+                      <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">4.20 mm</td>
                       <td>6.00 mm</td>
-                      <td style="color: #EF4444; font-weight: 700;">-1.82 mm (DEFICIT)</td>
-                      <td><span class="status-badge-red">CRITICAL DEFICIT</span></td>
+                      <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">-1.80 mm</td>
+                      <td><span class="status-badge-red">CRITICAL</span></td>
                     </tr>
                     <tr style="background: rgba(239, 68, 68, 0.08);">
                       <td><code>CML 01-B</code></td>
-                      <td>Elev +4.2m (Flash Zone Bottom Shell)</td>
-                      <td>East (90°)</td>
-                      <td>16.00 mm</td>
-                      <td style="color: #EF4444; font-weight: 700;">4.22 mm</td>
+                      <td>+4.2m / 90° E</td>
+                      <td>12.0 mm</td>
+                      <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">4.18 mm</td>
                       <td>6.00 mm</td>
-                      <td style="color: #EF4444; font-weight: 700;">-1.78 mm (DEFICIT)</td>
-                      <td><span class="status-badge-red">CRITICAL DEFICIT</span></td>
+                      <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">-1.82 mm</td>
+                      <td><span class="status-badge-red">CRITICAL</span></td>
                     </tr>
                     <tr>
                       <td><code>CML 02-A</code></td>
-                      <td>Elev +4.8m (Flash Zone Shell)</td>
-                      <td>North (0°)</td>
-                      <td>16.00 mm</td>
-                      <td style="color: #FBBF24; font-weight: 600;">4.60 mm</td>
-                      <td>6.00 mm</td>
-                      <td style="color: #EF4444; font-weight: 700;">-1.40 mm (DEFICIT)</td>
-                      <td><span class="status-badge-red">ACTION REQUIRED</span></td>
+                      <td>+8.5m / 0° N</td>
+                      <td>10.0 mm</td>
+                      <td style="font-weight: 700; font-family: var(--font-mono);">7.10 mm</td>
+                      <td>5.20 mm</td>
+                      <td style="color: #10B981; font-weight: 700; font-family: var(--font-mono);">+1.90 mm</td>
+                      <td><span class="status-badge-green">PASSED</span></td>
                     </tr>
                     <tr>
                       <td><code>CML 03-A</code></td>
-                      <td>Elev +5.5m (Stripping Section)</td>
-                      <td>North (0°)</td>
-                      <td>14.00 mm</td>
-                      <td style="color: #FBBF24; font-weight: 600;">7.10 mm</td>
-                      <td>6.00 mm</td>
-                      <td style="color: #FBBF24; font-weight: 600;">+1.10 mm</td>
-                      <td><span class="status-badge-yellow">MONITOR CLOSELY</span></td>
+                      <td>+16.2m / 0° N</td>
+                      <td>8.0 mm</td>
+                      <td style="font-weight: 700; font-family: var(--font-mono);">6.40 mm</td>
+                      <td>4.50 mm</td>
+                      <td style="color: #10B981; font-weight: 700; font-family: var(--font-mono);">+1.90 mm</td>
+                      <td><span class="status-badge-green">PASSED</span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -863,7 +869,7 @@
                 <th>Type</th>
                 <th>Size</th>
                 <th>Date</th>
-                <th>Action</th>
+                
               </tr>
             </thead>
             <tbody id="deliverables-tbody">
@@ -1245,13 +1251,12 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
     <!-- ------------------------------------------------------------------
          TAB: PETROCHEMICALS (440 KTPA POLYOLEFINS & NOVOLEN PROCESS)
          ------------------------------------------------------------------ -->
-    <section class="tab-content" id="tab-petrochemicals">
+                <section class="tab-content" id="tab-petrochemicals" style="padding: 0 !important;">
       <div class="hud-overview-container">
-        <!-- HUD Stage Layer -->
         <div class="hud-stage">
-          <!-- Left Column: Status Capsule, Asset HUD Ring, Hero Title & Segmented Progress -->
+          <!-- Left Column -->
           <div class="hud-col-left">
-            <!-- 1. Floating Status Capsule (Top Left) -->
+            <!-- 1. Status Capsule -->
             <div class="hud-glass-card hud-status-capsule">
               <div class="hud-card-header">
                 <span class="hud-capsule-title">Novolen PP Status</span>
@@ -1264,11 +1269,11 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
                 </div>
                 <div class="hud-status-row">
                   <span class="hud-row-label">Loop Pressure</span>
-                  <span class="hud-row-val" id="petro-press-val">32.4 bar (Nominal)</span>
+                  <span class="hud-row-val">32.4 bar Nominal</span>
                 </div>
                 <div class="hud-status-row">
                   <span class="hud-row-label">Reaction Temp</span>
-                  <span class="hud-row-val" id="petro-temp-val">72.5 °C Core</span>
+                  <span class="hud-row-val">72.5 °C Core</span>
                 </div>
                 <div class="hud-status-row">
                   <span class="hud-row-label">Polymer Purity</span>
@@ -1277,113 +1282,107 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
               </div>
             </div>
 
-            <!-- 2. Physical Asset HUD Dial Overlay (Polypropylene Loop Reactor) -->
-            <div class="hud-asset-dial-box">
-              <div class="hud-dial-graphic">
-                <svg viewBox="0 0 200 200" class="hud-dial-svg">
-                  <circle cx="100" cy="100" r="76" class="hud-dial-track" />
-                  <path d="M 100 24 A 76 76 0 0 1 172 76" class="hud-dial-arc" />
-                  <circle cx="172" cy="76" r="4.5" class="hud-dial-dot" />
-                </svg>
-                <div class="hud-dial-ticks">
-                  <span class="hud-tick tick-80">80</span>
-                  <span class="hud-tick tick-70 active">70</span>
-                  <span class="hud-tick tick-60">60</span>
-                  <span class="hud-tick tick-50">50</span>
-                  <span class="hud-tick tick-40">40</span>
-                  <span class="hud-tick tick-30">30</span>
-                  <span class="hud-tick tick-20">20</span>
-                  <span class="hud-tick tick-10">10</span>
-                </div>
-                <div class="hud-dial-inner-hub">
-                  <div class="hud-hub-center-dot"></div>
-                  <div class="hud-hub-tag" id="hud-petro-unit-tag">Reactor R-101</div>
-                  <div class="hud-hub-sub" id="hud-petro-unit-sub">Gas-Phase Loop 1,420 m³/h</div>
-                </div>
+            <!-- 2. Dual Loop Reactor Telemetry Cards -->
+            <div class="grid-2" style="gap: 12px;">
+              <div class="hud-glass-card" style="padding: 14px 16px;">
+                <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Primary Loop R-101</div>
+                <div style="font-size: 20px; font-weight: 800; color: var(--text-heading); font-family: var(--font-mono); margin: 3px 0;">32.4 <span style="font-size: 11px; font-weight: 500; color: var(--text-dim);">bar</span></div>
+                <div style="font-size: 10.5px; color: var(--text-dim);">Temp: 72.5°C &bull; 485 kg/m³</div>
+                <div style="margin-top: 6px;"><span class="status-badge-blue" style="font-size: 9.5px;">1,420 m³/h Circ</span></div>
               </div>
 
-              <!-- Horizontal Interactive Unit Switcher '< >' -->
-              <div class="hud-axis-selector">
-                <div class="hud-axis-line"></div>
-                <button class="hud-axis-btn" onclick="cyclePetroUnit(-1)" title="Previous Unit">&lt;</button>
-                <div class="hud-axis-label" id="hud-petro-active-unit-label">R-101 Primary Loop Reactor</div>
-                <button class="hud-axis-btn" onclick="cyclePetroUnit(1)" title="Next Unit">&gt;</button>
-                <div class="hud-axis-line"></div>
+              <div class="hud-glass-card" style="padding: 14px 16px;">
+                <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Secondary Loop R-102</div>
+                <div style="font-size: 20px; font-weight: 800; color: var(--text-heading); font-family: var(--font-mono); margin: 3px 0;">30.8 <span style="font-size: 11px; font-weight: 500; color: var(--text-dim);">bar</span></div>
+                <div style="font-size: 10.5px; color: var(--text-dim);">Temp: 69.2°C &bull; 52.4 t/h</div>
+                <div style="margin-top: 6px;"><span class="status-badge-green" style="font-size: 9.5px;">99.65% Purity</span></div>
               </div>
             </div>
 
-            <!-- 3. Hero Typography & Segmented Bar (Bottom Left) -->
+            <!-- 3. Hero Header & Stats -->
             <div class="hud-hero-block">
               <h1 class="hud-hero-heading">440 KTPA Novolen Polypropylene</h1>
               <p class="hud-hero-description">
-                Gas-phase vertical fluidized loop reaction system delivering homopolymers, impact copolymers, and BOPP grades.
+                Gas-phase loop reactors producing Raffia, BOPP film, and automotive impact copolymer grades.
               </p>
 
-              <!-- Segmented Progress Bar (42 vertical glowing ticks) -->
-              <div class="hud-segmented-track" id="hud-petro-segmented-track">
-                <!-- Populated via JS -->
-              </div>
+              <div class="hud-segmented-track" id="hud-petro-segmented-track"></div>
 
               <div class="hud-hero-stats-row">
                 <div class="hud-hero-stat-item">
                   <div class="stat-main-num">440 <span class="stat-mini-unit">KTPA</span></div>
-                  <div class="stat-main-label">Annual Capacity</div>
+                  <div class="stat-main-label">Annual Quota</div>
                 </div>
                 <div class="hud-hero-stat-item">
                   <div class="stat-main-num">36.5 <span class="stat-mini-unit">TMT</span></div>
-                  <div class="stat-main-label">Monthly PP Run</div>
+                  <div class="stat-main-label">Monthly Run</div>
                 </div>
                 <div class="hud-hero-stat-item">
-                  <div class="stat-main-num" style="color: #00F5D4;">99.65%</div>
-                  <div class="stat-main-label">Propylene Purity</div>
+                  <div class="stat-main-num" style="color: #FF9E2C;">99.2 <span class="stat-mini-unit">%</span></div>
+                  <div class="stat-main-label">Selectivity</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Right Column: Equalizer Card, Temperatures Card, Mini Stats + Speedometer Dial -->
+          <!-- Right Column -->
           <div class="hud-col-right">
-            <!-- 1. Top Right Frosted Equalizer Card (Polymer Grade Slate) -->
+            <!-- 1. Polymer Output Equalizer Card -->
             <div class="hud-glass-card hud-equalizer-card">
               <div class="hud-card-header">
                 <div>
-                  <div class="hud-card-title">Polymer Grade Production Slate</div>
-                  <div class="hud-card-sub">Monthly Output Distribution (TMT)</div>
+                  <div class="hud-card-title">Polymer Production Slate</div>
+                  <div class="hud-card-sub">Monthly Grade Quotas (TMT)</div>
                 </div>
                 <div class="hud-legend-chips">
-                  <span class="legend-chip"><span class="chip-dot dot-orange"></span> Homopolymer</span>
-                  <span class="legend-chip"><span class="chip-dot dot-white"></span> Copolymer</span>
+                  <span class="legend-chip"><span class="chip-dot dot-orange"></span> M110</span>
+                  <span class="legend-chip"><span class="chip-dot dot-white"></span> MI3530</span>
                 </div>
               </div>
 
               <div class="hud-equalizer-wrap">
-                <div class="hud-eq-val-top">15 TMT <span class="eq-sub">max run</span></div>
-                <div class="hud-eq-bars" id="hud-petro-equalizer-bars">
-                  <!-- Populated via JS -->
+                <div class="hud-eq-val-top">15 <span class="eq-sub">TMT</span></div>
+                <div class="hud-eq-bars" style="height: 56px; display: flex; align-items: flex-end; gap: 10px;">
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 54px;" title="M110: 14.2 TMT"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">M110</span>
+                  </div>
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 38px;" title="MI3530: 9.4 TMT"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">MI3530</span>
+                  </div>
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 34px;" title="H030: 8.5 TMT"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">H030</span>
+                  </div>
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 20px;" title="HM012: 4.4 TMT"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">HM012</span>
+                  </div>
                 </div>
-                <div class="hud-eq-val-bottom">0 TMT <span class="eq-sub">baseline</span></div>
+                <div class="hud-eq-val-bottom">0 <span class="eq-sub">baseline</span></div>
               </div>
             </div>
 
-            <!-- 2. Middle Right Frosted Temperatures & Pressure Card -->
+            <!-- 2. Polymerization Gauges Card -->
             <div class="hud-glass-card hud-temperatures-card">
               <div class="hud-card-header">
                 <div class="hud-card-title">Polymerization &amp; Extruder Profile</div>
-                <span class="hud-card-badge">NOVOLEN LOOP</span>
+                <span class="hud-card-badge">Novolen</span>
               </div>
               <div class="hud-columns-grid">
                 <div class="hud-col-gauge">
                   <div class="gauge-temp-val">72.5 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-orange" style="height: 65%;"></div>
+                    <div class="gauge-bar-fill fill-cyan" style="height: 72%;"></div>
                   </div>
                   <div class="gauge-col-name">R-101 Core</div>
                   <div class="gauge-col-sub">32.4 bar</div>
                 </div>
                 <div class="hud-col-gauge">
-                  <div class="gauge-temp-val">69.2 °C</div>
+                  <div class="gauge-temp-val" style="color: #FF7A00;">69.2 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-cyan" style="height: 58%;"></div>
+                    <div class="gauge-bar-fill fill-orange" style="height: 65%;"></div>
                   </div>
                   <div class="gauge-col-name">R-102 Loop</div>
                   <div class="gauge-col-sub">30.8 bar</div>
@@ -1391,23 +1390,23 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
                 <div class="hud-col-gauge">
                   <div class="gauge-temp-val">228 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-orange" style="height: 75%;"></div>
+                    <div class="gauge-bar-fill fill-cyan" style="height: 85%;"></div>
                   </div>
                   <div class="gauge-col-name">Z-201 Melt</div>
-                  <div class="gauge-col-sub">3,200 kW</div>
+                  <div class="gauge-col-sub">1,850 RPM</div>
                 </div>
                 <div class="hud-col-gauge">
-                  <div class="gauge-temp-val">182 bar</div>
+                  <div class="gauge-temp-val" style="color: #FF7A00;">182 bar</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-cyan" style="height: 80%;"></div>
+                    <div class="gauge-bar-fill fill-orange" style="height: 76%;"></div>
                   </div>
                   <div class="gauge-col-name">Die Head</div>
-                  <div class="gauge-col-sub">1,850 RPM</div>
+                  <div class="gauge-col-sub">Twin Screw</div>
                 </div>
               </div>
             </div>
 
-            <!-- 3. Bottom Right Cluster: Mini Cards + Speedometer -->
+            <!-- 3. Bottom Cluster -->
             <div class="hud-bottom-cluster">
               <div class="hud-mini-column">
                 <div class="hud-glass-card hud-mini-card">
@@ -1415,23 +1414,23 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
                   <div class="mini-card-value">1.82 <span class="mini-card-unit">kg/h</span></div>
                 </div>
                 <div class="hud-glass-card hud-mini-card">
-                  <div class="mini-card-label">TEAL Co-Catalyst</div>
-                  <div class="mini-card-value">0.45 <span class="mini-card-unit">kg/h</span></div>
+                  <div class="mini-card-label">Extruder Motor Power</div>
+                  <div class="mini-card-value">3,200 <span class="mini-card-unit">kW</span></div>
                 </div>
               </div>
 
-              <!-- Large High-Contrast Speedometer Card -->
+              <!-- Speedometer Card -->
               <div class="hud-speedometer-card">
                 <div class="speedo-svg-wrap">
                   <svg viewBox="0 0 200 130" class="speedo-svg">
                     <path d="M 28 115 A 72 72 0 0 1 172 115" fill="none" stroke="#E2E8F0" stroke-width="12" stroke-linecap="round" />
-                    <path d="M 28 115 A 72 72 0 0 1 158 64" fill="none" stroke="url(#hud-speedo-grad-petro)" stroke-width="12" stroke-linecap="round" />
-                    <line x1="100" y1="115" x2="148" y2="52" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
+                    <path d="M 28 115 A 72 72 0 0 1 166 70" fill="none" stroke="url(#hud-speedo-grad-pp)" stroke-width="12" stroke-linecap="round" />
+                    <line x1="100" y1="115" x2="154" y2="56" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
                     <circle cx="100" cy="115" r="5" fill="#0F172A" />
                     <defs>
-                      <linearGradient id="hud-speedo-grad-petro" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#00F5D4" />
-                        <stop offset="100%" stop-color="#FF7A00" />
+                      <linearGradient id="hud-speedo-grad-pp" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#FF9E2C" />
+                        <stop offset="100%" stop-color="#FF5722" />
                       </linearGradient>
                     </defs>
                   </svg>
@@ -1443,9 +1442,9 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
 
                 <div class="speedo-deltas-row">
                   <div class="speedo-delta-badge">
-                    <span class="delta-num">11.0</span>
+                    <span class="delta-num">11.0 g</span>
                     <span class="delta-arrow">▲</span>
-                    <span class="delta-sub">MFI (g/10m)</span>
+                    <span class="delta-sub">MFI Spec</span>
                   </div>
                   <div class="speedo-delta-badge">
                     <span class="delta-num">34 MPa</span>
@@ -1458,86 +1457,69 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
           </div>
         </div>
 
-        <!-- Collapsible Detailed Polymer Dossier Drawer (Zero Clutter by default) -->
+        <!-- Collapsible Bottom Drawer -->
         <div class="hud-collapsible-drawer">
           <button class="hud-drawer-toggle" onclick="togglePetroDrawer()">
-            <span style="display: flex; align-items: center; gap: 8px;">
+            <span class="drawer-toggle-icon">
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span>View Finished Polymer Production Slate &amp; Technical Specifications Dossier</span>
             </span>
-            <span class="drawer-arrow" id="petro-drawer-arrow">▾</span>
+            <span>View Finished Polymer Production Slate &amp; Technical Specifications Dossier</span>
+            <span class="drawer-toggle-arrow" id="petro-drawer-arrow">▾</span>
           </button>
-          <div class="hud-drawer-content" id="hud-petro-drawer-content" style="display: none;">
-            <!-- Polymer Slate Table inside drawer -->
-            <div class="dash-card" style="margin-top: 14px;">
-              <div class="card-header">
-                <div class="card-title">Finished Polymer Production Slate &amp; Technical Specifications</div>
-                <button class="copilot-query-btn" onclick="sendMessage('Analyze Novolen PP catalytic selectivity, MFI response to hydrogen dosing, and production efficiency', ['data/ppac_mrpl_petroleum_production_slate.csv'])">
-                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                  <span>Copilot: Polymer Optimization</span>
-                </button>
-              </div>
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Grade Code</th>
-                    <th>Polymer Classification</th>
-                    <th>Melt Flow Index (MFI)</th>
-                    <th>Mechanical Spec</th>
-                    <th>Monthly Output</th>
-                    <th>Target Market &amp; Applications</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><code>M110</code></td>
-                    <td>Homopolymer (PP-H)</td>
-                    <td>11.0 g / 10 min (230°C/2.16kg)</td>
-                    <td>Tensile: 34 MPa | Flex: 1,500 MPa</td>
-                    <td style="font-weight: 700;">14.2 TMT</td>
-                    <td>Woven Sacks, FIBC Bags, Raffia Tapes, Geotextiles</td>
-                    <td><span class="status-badge-green">Active Run</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>H030SG</code></td>
-                    <td>Homopolymer (BOPP Grade)</td>
-                    <td>3.2 g / 10 min (230°C/2.16kg)</td>
-                    <td>Flexural Modulus: 1,450 MPa</td>
-                    <td style="font-weight: 700;">8.5 TMT</td>
-                    <td>Biaxially Oriented Film, Food Packaging, Tape Base</td>
-                    <td><span class="status-badge-blue">Scheduled</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>MI3530</code></td>
-                    <td>Impact Copolymer (PP-ICP)</td>
-                    <td>30.0 g / 10 min (230°C/2.16kg)</td>
-                    <td>Notched Izod: 8.5 kJ/m² @ 23°C</td>
-                    <td style="font-weight: 700;">9.4 TMT</td>
-                    <td>Automotive Bumpers, Battery Containers, Thin-Wall Pails</td>
-                    <td><span class="status-badge-green">Active Run</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>HM012</code></td>
-                    <td>High Mol. Weight Homopolymer</td>
-                    <td>0.25 g / 10 min (230°C/2.16kg)</td>
-                    <td>ESCR &gt; 500 hrs | High Toughness</td>
-                    <td style="font-weight: 700;">4.4 TMT</td>
-                    <td>Pressure Pipes, Corrugated Conduit, Thermoforming Sheets</td>
-                    <td><span class="status-badge-yellow">Standby</span></td>
-                  </tr>
-                </tbody>
-              </table>
 
-              <!-- Feedstock Mass Balance -->
-              <div style="margin-top: 14px; padding: 10px 14px; background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: space-between; font-size: 11px;">
-                <div>
-                  <span style="color: var(--text-muted); font-weight: 600;">Feedstock Sourcing:</span>
-                  <span style="color: var(--text-main); margin-left: 6px;">Petrochemical FCCU (PFCCU) Propylene Splitter provides 42.0 t/h polymer-grade monomer (99.7% C3=); C3 recovery unit 2.1 t/h.</span>
-                </div>
-                <span class="status-badge-green">100% In-house Sourced</span>
-              </div>
-            </div>
+          <div class="hud-drawer-content" id="hud-petro-drawer-content" style="display: none; padding: 18px 24px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Certified Polypropylene Grades Slate</div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Grade Code</th>
+                  <th>Classification</th>
+                  <th>Melt Flow Index (MFI)</th>
+                  <th>Mechanical Spec</th>
+                  <th>Monthly Output</th>
+                  <th>Target Applications</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>M110</code></td>
+                  <td>Homopolymer (PP-H)</td>
+                  <td>11.0 g / 10 min</td>
+                  <td>Tensile: 34 MPa | Flex: 1,500 MPa</td>
+                  <td style="font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">14.2 TMT</td>
+                  <td>Woven Sacks, FIBC Bags, Raffia Tapes</td>
+                  <td><span class="status-badge-green">Active Run</span></td>
+                </tr>
+                <tr>
+                  <td><code>H030SG</code></td>
+                  <td>Homopolymer (BOPP)</td>
+                  <td>3.2 g / 10 min</td>
+                  <td>Flexural Modulus: 1,450 MPa</td>
+                  <td style="font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">8.5 TMT</td>
+                  <td>Biaxially Oriented Film, Packaging</td>
+                  <td><span class="status-badge-blue">Scheduled</span></td>
+                </tr>
+                <tr>
+                  <td><code>MI3530</code></td>
+                  <td>Impact Copolymer (PP-ICP)</td>
+                  <td>30.0 g / 10 min</td>
+                  <td>Notched Izod: 8.5 kJ/m²</td>
+                  <td style="font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">9.4 TMT</td>
+                  <td>Automotive Bumpers, Battery Containers</td>
+                  <td><span class="status-badge-green">Active Run</span></td>
+                </tr>
+                <tr>
+                  <td><code>HM012</code></td>
+                  <td>High Mol. Weight</td>
+                  <td>0.25 g / 10 min</td>
+                  <td>ESCR &gt; 500 hrs</td>
+                  <td style="font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">4.4 TMT</td>
+                  <td>Pressure Pipes, Conduit Lines</td>
+                  <td><span class="status-badge-yellow">Standby</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -1546,13 +1528,12 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
     <!-- ------------------------------------------------------------------
          TAB: AROMATICS COMPLEX (900 KTPA OMPL AROMATICS CHAIN)
          ------------------------------------------------------------------ -->
-    <section class="tab-content" id="tab-aromatics">
+                <section class="tab-content" id="tab-aromatics" style="padding: 0 !important;">
       <div class="hud-overview-container">
-        <!-- HUD Stage Layer -->
         <div class="hud-stage">
-          <!-- Left Column: Status Capsule, Asset HUD Ring, Hero Title & Segmented Progress -->
+          <!-- Left Column -->
           <div class="hud-col-left">
-            <!-- 1. Floating Status Capsule (Top Left) -->
+            <!-- 1. Status Capsule -->
             <div class="hud-glass-card hud-status-capsule">
               <div class="hud-card-header">
                 <span class="hud-capsule-title">OMPL Aromatics Status</span>
@@ -1568,8 +1549,8 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
                   <span class="hud-row-val">102.4 (518°C Inlet)</span>
                 </div>
                 <div class="hud-status-row">
-                  <span class="hud-row-label">Paraxylene (PX)</span>
-                  <span class="hud-row-val">99.82 wt% Lab Purity</span>
+                  <span class="hud-row-label">Paraxylene Purity</span>
+                  <span class="hud-row-val">99.82 wt% Lab Certified</span>
                 </div>
                 <div class="hud-status-row">
                   <span class="hud-row-label">Benzene Purity</span>
@@ -1578,167 +1559,157 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
               </div>
             </div>
 
-            <!-- 2. Physical Asset HUD Dial Overlay (Continuous Catalytic Reformer) -->
-            <div class="hud-asset-dial-box">
-              <div class="hud-dial-graphic">
-                <svg viewBox="0 0 200 200" class="hud-dial-svg">
-                  <circle cx="100" cy="100" r="76" class="hud-dial-track" />
-                  <path d="M 100 24 A 76 76 0 0 1 172 76" class="hud-dial-arc" />
-                  <circle cx="172" cy="76" r="4.5" class="hud-dial-dot" />
-                </svg>
-                <div class="hud-dial-ticks">
-                  <span class="hud-tick tick-80">80</span>
-                  <span class="hud-tick tick-70 active">70</span>
-                  <span class="hud-tick tick-60">60</span>
-                  <span class="hud-tick tick-50">50</span>
-                  <span class="hud-tick tick-40">40</span>
-                  <span class="hud-tick tick-30">30</span>
-                  <span class="hud-tick tick-20">20</span>
-                  <span class="hud-tick tick-10">10</span>
-                </div>
-                <div class="hud-dial-inner-hub">
-                  <div class="hud-hub-center-dot"></div>
-                  <div class="hud-hub-tag" id="hud-aromatics-unit-tag">CCR Reformer</div>
-                  <div class="hud-hub-sub" id="hud-aromatics-unit-sub">Platformer 518°C / 4.2 bar</div>
-                </div>
+            <!-- 2. Dual Reaction Train Key Telemetry -->
+            <div class="grid-2" style="gap: 12px;">
+              <div class="hud-glass-card" style="padding: 14px 16px;">
+                <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">CCR Platformer</div>
+                <div style="font-size: 20px; font-weight: 800; color: var(--text-heading); font-family: var(--font-mono); margin: 3px 0;">102.4 <span style="font-size: 11px; font-weight: 500; color: var(--text-dim);">RON</span></div>
+                <div style="font-size: 10.5px; color: var(--text-dim);">Inlet: 518°C &bull; 4.2 bar</div>
+                <div style="margin-top: 6px;"><span class="status-badge-blue" style="font-size: 9.5px;">680 kg/h Circ</span></div>
               </div>
 
-              <!-- Horizontal Interactive Unit Switcher '< >' -->
-              <div class="hud-axis-selector">
-                <div class="hud-axis-line"></div>
-                <button class="hud-axis-btn" onclick="cycleAromaticsUnit(-1)" title="Previous Unit">&lt;</button>
-                <div class="hud-axis-label" id="hud-aromatics-active-unit-label">CCR Platformer Unit</div>
-                <button class="hud-axis-btn" onclick="cycleAromaticsUnit(1)" title="Next Unit">&gt;</button>
-                <div class="hud-axis-line"></div>
+              <div class="hud-glass-card" style="padding: 14px 16px;">
+                <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Parex Adsorption</div>
+                <div style="font-size: 20px; font-weight: 800; color: #10B981; font-family: var(--font-mono); margin: 3px 0;">99.82% <span style="font-size: 11px; font-weight: 500; color: var(--text-dim);">PX</span></div>
+                <div style="font-size: 10.5px; color: var(--text-dim);">Desorbent: 1,420 m³/h</div>
+                <div style="margin-top: 6px;"><span class="status-badge-green" style="font-size: 9.5px;">97.4% Recovery</span></div>
               </div>
             </div>
 
-            <!-- 3. Hero Typography & Segmented Bar (Bottom Left) -->
+            <!-- 3. Hero Header & Stats -->
             <div class="hud-hero-block">
               <h1 class="hud-hero-heading">900 KTPA Aromatics Complex</h1>
               <p class="hud-hero-description">
-                Continuous catalytic reforming, simulated moving bed (Parex) adsorption, and isomerization chain.
+                Continuous catalytic reforming, simulated moving bed Parex adsorption, and Isomar isomerization chain.
               </p>
 
-              <!-- Segmented Progress Bar (42 vertical glowing ticks) -->
-              <div class="hud-segmented-track" id="hud-aromatics-segmented-track">
-                <!-- Populated via JS -->
-              </div>
+              <div class="hud-segmented-track" id="hud-aromatics-segmented-track"></div>
 
               <div class="hud-hero-stats-row">
                 <div class="hud-hero-stat-item">
                   <div class="stat-main-num">900 <span class="stat-mini-unit">KTPA</span></div>
-                  <div class="stat-main-label">Paraxylene (PX)</div>
+                  <div class="stat-main-label">PX Capacity</div>
                 </div>
                 <div class="hud-hero-stat-item">
                   <div class="stat-main-num">270 <span class="stat-mini-unit">KTPA</span></div>
-                  <div class="stat-main-label">High-Purity Benzene</div>
+                  <div class="stat-main-label">Benzene Capacity</div>
                 </div>
                 <div class="hud-hero-stat-item">
-                  <div class="stat-main-num" style="color: #00F5D4;">102.4</div>
+                  <div class="stat-main-num" style="color: #FF9E2C;">102.4 <span class="stat-mini-unit">RON</span></div>
                   <div class="stat-main-label">Platformer RON</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Right Column: Equalizer Card, Temperatures Card, Mini Stats + Speedometer Dial -->
+          <!-- Right Column -->
           <div class="hud-col-right">
-            <!-- 1. Top Right Frosted Equalizer Card (Aromatics Slate) -->
+            <!-- 1. Aromatics Slate Equalizer Card -->
             <div class="hud-glass-card hud-equalizer-card">
               <div class="hud-card-header">
                 <div>
                   <div class="hud-card-title">Aromatics Production Slate</div>
-                  <div class="hud-card-sub">Monthly Output Distribution (TMT)</div>
+                  <div class="hud-card-sub">High-Purity Product Streams (TMT)</div>
                 </div>
                 <div class="hud-legend-chips">
-                  <span class="legend-chip"><span class="chip-dot dot-orange"></span> Paraxylene</span>
-                  <span class="legend-chip"><span class="chip-dot dot-white"></span> Benzene &amp; Heavy</span>
+                  <span class="legend-chip"><span class="chip-dot dot-orange"></span> PX</span>
+                  <span class="legend-chip"><span class="chip-dot dot-white"></span> Benzene</span>
                 </div>
               </div>
 
               <div class="hud-equalizer-wrap">
-                <div class="hud-eq-val-top">80 TMT <span class="eq-sub">max run</span></div>
-                <div class="hud-eq-bars" id="hud-aromatics-equalizer-bars">
-                  <!-- Populated via JS -->
+                <div class="hud-eq-val-top">80 <span class="eq-sub">TMT</span></div>
+                <div class="hud-eq-bars" style="height: 56px; display: flex; align-items: flex-end; gap: 12px;">
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 54px;" title="PX: 75.0 TMT"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">PX (75T)</span>
+                  </div>
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 36px;" title="BZ: 22.5 TMT"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">BZ (22.5T)</span>
+                  </div>
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 16px;" title="C9+: 3.8 TMT"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">C9+ (3.8T)</span>
+                  </div>
                 </div>
-                <div class="hud-eq-val-bottom">0 TMT <span class="eq-sub">baseline</span></div>
+                <div class="hud-eq-val-bottom">0 <span class="eq-sub">baseline</span></div>
               </div>
             </div>
 
-            <!-- 2. Middle Right Frosted Process Temperatures Card -->
+            <!-- 2. Reaction Train Gauges Card -->
             <div class="hud-glass-card hud-temperatures-card">
               <div class="hud-card-header">
-                <div class="hud-card-title">Aromatics Reaction Train Profiles</div>
-                <span class="hud-card-badge">OMPL TRAIN</span>
+                <div class="hud-card-title">Aromatics Reaction Train Profile</div>
+                <span class="hud-card-badge">OMPL</span>
               </div>
               <div class="hud-columns-grid">
                 <div class="hud-col-gauge">
                   <div class="gauge-temp-val">518 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-orange" style="height: 85%;"></div>
+                    <div class="gauge-bar-fill fill-cyan" style="height: 88%;"></div>
                   </div>
-                  <div class="gauge-col-name">CCR Platformer</div>
+                  <div class="gauge-col-name">CCR Reformer</div>
                   <div class="gauge-col-sub">4.2 bar</div>
                 </div>
                 <div class="hud-col-gauge">
-                  <div class="gauge-temp-val">425 °C</div>
+                  <div class="gauge-temp-val" style="color: #FF7A00;">425 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-cyan" style="height: 70%;"></div>
+                    <div class="gauge-bar-fill fill-orange" style="height: 75%;"></div>
                   </div>
-                  <div class="gauge-col-name">Tatoray Unit</div>
+                  <div class="gauge-col-name">Tatoray RX</div>
                   <div class="gauge-col-sub">28.0 bar</div>
                 </div>
                 <div class="hud-col-gauge">
                   <div class="gauge-temp-val">392 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-orange" style="height: 64%;"></div>
+                    <div class="gauge-bar-fill fill-cyan" style="height: 68%;"></div>
                   </div>
                   <div class="gauge-col-name">Isomar RX</div>
                   <div class="gauge-col-sub">18.5 bar</div>
                 </div>
                 <div class="hud-col-gauge">
-                  <div class="gauge-temp-val">185 °C</div>
+                  <div class="gauge-temp-val" style="color: #FF7A00;">185 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-cyan" style="height: 40%;"></div>
+                    <div class="gauge-bar-fill fill-orange" style="height: 42%;"></div>
                   </div>
-                  <div class="gauge-col-name">Parex Desorbent</div>
-                  <div class="gauge-col-sub">1,420 m³/h</div>
+                  <div class="gauge-col-name">Parex Unit</div>
+                  <div class="gauge-col-sub">PDEB Desorb</div>
                 </div>
               </div>
             </div>
 
-            <!-- 3. Bottom Right Cluster: Mini Cards + Speedometer -->
+            <!-- 3. Bottom Cluster -->
             <div class="hud-bottom-cluster">
               <div class="hud-mini-column">
                 <div class="hud-glass-card hud-mini-card">
                   <div class="mini-card-label">H2/HC Molar Ratio</div>
-                  <div class="mini-card-value">3.8 : 1 <span class="mini-card-unit">ratio</span></div>
+                  <div class="mini-card-value">3.8 <span class="mini-card-unit">: 1</span></div>
                 </div>
                 <div class="hud-glass-card hud-mini-card">
-                  <div class="mini-card-label">EB Conversion Rate</div>
-                  <div class="mini-card-value">34.2% <span class="mini-card-unit">Isomar</span></div>
+                  <div class="mini-card-label">EB Conversion</div>
+                  <div class="mini-card-value">34.2 <span class="mini-card-unit">%</span></div>
                 </div>
               </div>
 
-              <!-- Large High-Contrast Speedometer Card -->
+              <!-- Speedometer Card -->
               <div class="hud-speedometer-card">
                 <div class="speedo-svg-wrap">
                   <svg viewBox="0 0 200 130" class="speedo-svg">
                     <path d="M 28 115 A 72 72 0 0 1 172 115" fill="none" stroke="#E2E8F0" stroke-width="12" stroke-linecap="round" />
-                    <path d="M 28 115 A 72 72 0 0 1 154 68" fill="none" stroke="url(#hud-speedo-grad-aromatics)" stroke-width="12" stroke-linecap="round" />
-                    <line x1="100" y1="115" x2="144" y2="56" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
+                    <path d="M 28 115 A 72 72 0 0 1 163 75" fill="none" stroke="url(#hud-speedo-grad-ar)" stroke-width="12" stroke-linecap="round" />
+                    <line x1="100" y1="115" x2="150" y2="62" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
                     <circle cx="100" cy="115" r="5" fill="#0F172A" />
                     <defs>
-                      <linearGradient id="hud-speedo-grad-aromatics" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#00F5D4" />
-                        <stop offset="100%" stop-color="#FF7A00" />
+                      <linearGradient id="hud-speedo-grad-ar" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#FF9E2C" />
+                        <stop offset="100%" stop-color="#FF5722" />
                       </linearGradient>
                     </defs>
                   </svg>
                   <div class="speedo-number-box">
                     <div class="speedo-big-val">97.4</div>
-                    <div class="speedo-unit-label">% PAREX RECOVERY</div>
+                    <div class="speedo-unit-label">% PX RECOVERY</div>
                   </div>
                 </div>
 
@@ -1759,77 +1730,60 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
           </div>
         </div>
 
-        <!-- Collapsible Detailed Aromatics Dossier Drawer (Zero Clutter by default) -->
+        <!-- Collapsible Bottom Drawer -->
         <div class="hud-collapsible-drawer">
           <button class="hud-drawer-toggle" onclick="toggleAromaticsDrawer()">
-            <span style="display: flex; align-items: center; gap: 8px;">
+            <span class="drawer-toggle-icon">
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span>View Certified High-Purity Aromatics Slate &amp; Lab Quality Specifications</span>
             </span>
-            <span class="drawer-arrow" id="aromatics-drawer-arrow">▾</span>
+            <span>View Certified High-Purity Aromatics Slate &amp; Lab Quality Specifications</span>
+            <span class="drawer-toggle-arrow" id="aromatics-drawer-arrow">▾</span>
           </button>
-          <div class="hud-drawer-content" id="hud-aromatics-drawer-content" style="display: none;">
-            <!-- Aromatics Quality Table inside drawer -->
-            <div class="dash-card" style="margin-top: 14px;">
-              <div class="card-header">
-                <div class="card-title">Certified High-Purity Aromatics Slate &amp; Lab Quality Controls</div>
-                <button class="copilot-query-btn" onclick="sendMessage('Review OMPL Aromatics Complex Parex unit adsorbent selectivity, desorbent ratio, and benzene purity assays', ['data/ppac_mrpl_petroleum_production_slate.csv'])">
-                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                  <span>Copilot: Aromatics Yield</span>
-                </button>
-              </div>
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Product Name</th>
-                    <th>Annual Capacity</th>
-                    <th>Monthly Output</th>
-                    <th>Laboratory Purity</th>
-                    <th>Critical Quality Specification</th>
-                    <th>Customer / Dispatch Infrastructure</th>
-                    <th>Compliance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><code>Paraxylene (PX)</code></td>
-                    <td>900 KTPA</td>
-                    <td style="font-weight: 700;">75.0 TMT</td>
-                    <td style="color: #10B981; font-weight: 700;">99.82 wt%</td>
-                    <td>Meta-xylene &lt; 0.08% | Saybolt Color +30</td>
-                    <td>PTA Manufacturers / Dedicated Tankers (NMPT Jetty 8)</td>
-                    <td><span class="status-badge-green">PASSED</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>Benzene</code></td>
-                    <td>270 KTPA</td>
-                    <td style="font-weight: 700;">22.5 TMT</td>
-                    <td style="color: #10B981; font-weight: 700;">99.94 wt%</td>
-                    <td>Solidification Pt 5.49°C | Thiophene &lt; 0.5 ppm</td>
-                    <td>Ethylbenzene &amp; Caprolactam / Dedicated Jetty Berth 8</td>
-                    <td><span class="status-badge-green">PASSED</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>Heavy Aromatics (C9+)</code></td>
-                    <td>45 KTPA</td>
-                    <td style="font-weight: 700;">3.8 TMT</td>
-                    <td>Mixed C9-C10</td>
-                    <td>Flash Point &gt; 62°C | Specific Gravity 0.890</td>
-                    <td>High-Boiling Industrial Solvents / Road Gantry</td>
-                    <td><span class="status-badge-green">PASSED</span></td>
-                  </tr>
-                </tbody>
-              </table>
 
-              <!-- Feedstock Inflow Pipeline -->
-              <div style="margin-top: 14px; padding: 10px 14px; background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: space-between; font-size: 11px;">
-                <div>
-                  <span style="color: var(--text-muted); font-weight: 600;">Feedstock Inflow:</span>
-                  <span style="color: var(--text-main); margin-left: 6px;">Petrochemical Naphtha direct pipeline from MRPL CDU/NHT: 98.2 TMT/month (1,178.4 TMT/yr).</span>
-                </div>
-                <span class="status-badge-green">Dedicated PMHBL Connection</span>
-              </div>
-            </div>
+          <div class="hud-drawer-content" id="hud-aromatics-drawer-content" style="display: none; padding: 18px 24px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Laboratory Quality Controls &amp; Customer Dispatch</div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Annual Capacity</th>
+                  <th>Monthly Output</th>
+                  <th>Laboratory Purity</th>
+                  <th>Quality Specification</th>
+                  <th>Dispatch Logistics</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>Paraxylene (PX)</code></td>
+                  <td>900 KTPA</td>
+                  <td style="font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">75.0 TMT</td>
+                  <td style="color: #10B981; font-weight: 700;">99.82 wt%</td>
+                  <td>Meta-xylene &lt; 0.08% | Saybolt Color +30</td>
+                  <td>PTA Manufacturers / NMPT Marine Jetty 8</td>
+                  <td><span class="status-badge-green">PASSED</span></td>
+                </tr>
+                <tr>
+                  <td><code>Benzene</code></td>
+                  <td>270 KTPA</td>
+                  <td style="font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">22.5 TMT</td>
+                  <td style="color: #10B981; font-weight: 700;">99.94 wt%</td>
+                  <td>Solidification Pt 5.49°C | Thiophene &lt; 0.5 ppm</td>
+                  <td>Dedicated Pipeline to Berth 8</td>
+                  <td><span class="status-badge-green">PASSED</span></td>
+                </tr>
+                <tr>
+                  <td><code>Heavy Aromatics (C9+)</code></td>
+                  <td>45 KTPA</td>
+                  <td style="font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">3.8 TMT</td>
+                  <td>Mixed C9-C10</td>
+                  <td>Flash Point &gt; 62°C | Specific Gravity 0.890</td>
+                  <td>High-Boiling Solvents / Road Gantry</td>
+                  <td><span class="status-badge-green">PASSED</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -1838,13 +1792,12 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
     <!-- ------------------------------------------------------------------
          TAB: OFFSITES & UTILITIES (120 MW CPP, STEAM & CEMS EMISSIONS)
          ------------------------------------------------------------------ -->
-    <section class="tab-content" id="tab-utilities">
+                <section class="tab-content" id="tab-utilities" style="padding: 0 !important;">
       <div class="hud-overview-container">
-        <!-- HUD Stage Layer -->
         <div class="hud-stage">
-          <!-- Left Column: Status Capsule, Asset HUD Ring, Hero Title & Segmented Progress -->
+          <!-- Left Column -->
           <div class="hud-col-left">
-            <!-- 1. Floating Status Capsule (Top Left) -->
+            <!-- 1. Status Capsule -->
             <div class="hud-glass-card hud-status-capsule">
               <div class="hud-card-header">
                 <span class="hud-capsule-title">CPP &amp; Steam Status</span>
@@ -1857,11 +1810,11 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
                 </div>
                 <div class="hud-status-row">
                   <span class="hud-row-label">Grid Frequency</span>
-                  <span class="hud-row-val">50.01 Hz (Synchronous)</span>
+                  <span class="hud-row-val">50.01 Hz Synchronous</span>
                 </div>
                 <div class="hud-status-row">
                   <span class="hud-row-label">Total Steam Rate</span>
-                  <span class="hud-row-val">1,015 t/h (HP+MP+LP)</span>
+                  <span class="hud-row-val">1,015 t/h Generation</span>
                 </div>
                 <div class="hud-status-row">
                   <span class="hud-row-label">CEMS Compliance</span>
@@ -1870,111 +1823,101 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
               </div>
             </div>
 
-            <!-- 2. Physical Asset HUD Dial Overlay (Gas Turbine Generator) -->
-            <div class="hud-asset-dial-box">
-              <div class="hud-dial-graphic">
-                <svg viewBox="0 0 200 200" class="hud-dial-svg">
-                  <circle cx="100" cy="100" r="76" class="hud-dial-track" />
-                  <path d="M 100 24 A 76 76 0 0 1 172 76" class="hud-dial-arc" />
-                  <circle cx="172" cy="76" r="4.5" class="hud-dial-dot" />
-                </svg>
-                <div class="hud-dial-ticks">
-                  <span class="hud-tick tick-80">80</span>
-                  <span class="hud-tick tick-70 active">70</span>
-                  <span class="hud-tick tick-60">60</span>
-                  <span class="hud-tick tick-50">50</span>
-                  <span class="hud-tick tick-40">40</span>
-                  <span class="hud-tick tick-30">30</span>
-                  <span class="hud-tick tick-20">20</span>
-                  <span class="hud-tick tick-10">10</span>
-                </div>
-                <div class="hud-dial-inner-hub">
-                  <div class="hud-hub-center-dot"></div>
-                  <div class="hud-hub-tag" id="hud-utilities-unit-tag">Turbine GTG-1</div>
-                  <div class="hud-hub-sub" id="hud-utilities-unit-sub">Frame 6 (34.8 MW)</div>
-                </div>
+            <!-- 2. Dual GTG Generation Telemetry -->
+            <div class="grid-2" style="gap: 12px;">
+              <div class="hud-glass-card" style="padding: 14px 16px;">
+                <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Gas Turbines GTG 1-3</div>
+                <div style="font-size: 20px; font-weight: 800; color: var(--text-heading); font-family: var(--font-mono); margin: 3px 0;">106.5 <span style="font-size: 11px; font-weight: 500; color: var(--text-dim);">MW</span></div>
+                <div style="font-size: 10.5px; color: var(--text-dim);">3x Frame 6 &bull; 538°C Exhaust</div>
+                <div style="margin-top: 6px;"><span class="status-badge-green" style="font-size: 9.5px;">100% Online Base</span></div>
               </div>
 
-              <!-- Horizontal Interactive Unit Switcher '< >' -->
-              <div class="hud-axis-selector">
-                <div class="hud-axis-line"></div>
-                <button class="hud-axis-btn" onclick="cycleUtilitiesUnit(-1)" title="Previous Unit">&lt;</button>
-                <div class="hud-axis-label" id="hud-utilities-active-unit-label">Gas Turbine GTG-1 (Frame 6)</div>
-                <button class="hud-axis-btn" onclick="cycleUtilitiesUnit(1)" title="Next Unit">&gt;</button>
-                <div class="hud-axis-line"></div>
+              <div class="hud-glass-card" style="padding: 14px 16px;">
+                <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Steam Turbine STG-1</div>
+                <div style="font-size: 20px; font-weight: 800; color: var(--text-heading); font-family: var(--font-mono); margin: 3px 0;">14.5 <span style="font-size: 11px; font-weight: 500; color: var(--text-dim);">MW</span></div>
+                <div style="font-size: 10.5px; color: var(--text-dim);">42 bar / 395°C &bull; Vacuum 0.08 bar</div>
+                <div style="margin-top: 6px;"><span class="status-badge-blue" style="font-size: 9.5px;">KPTCL Export +12.6 MW</span></div>
               </div>
             </div>
 
-            <!-- 3. Hero Typography & Segmented Bar (Bottom Left) -->
+            <!-- 3. Hero Header & Stats -->
             <div class="hud-hero-block">
               <h1 class="hud-hero-heading">120 MW Captive Power &amp; Utilities</h1>
               <p class="hud-hero-description">
-                Islanded co-generation power grid, 3-tier high-pressure steam distribution, and SWRO desalination.
+                Co-generation electrical grid, 3-tier steam distribution, and CEMS continuous emission monitoring.
               </p>
 
-              <!-- Segmented Progress Bar (42 vertical glowing ticks) -->
-              <div class="hud-segmented-track" id="hud-utilities-segmented-track">
-                <!-- Populated via JS -->
-              </div>
+              <div class="hud-segmented-track" id="hud-utilities-segmented-track"></div>
 
               <div class="hud-hero-stats-row">
                 <div class="hud-hero-stat-item">
                   <div class="stat-main-num">121.0 <span class="stat-mini-unit">MW</span></div>
-                  <div class="stat-main-label">Captive Generation</div>
+                  <div class="stat-main-label">Captive Power</div>
                 </div>
                 <div class="hud-hero-stat-item">
                   <div class="stat-main-num">1,015 <span class="stat-mini-unit">t/h</span></div>
-                  <div class="stat-main-label">Total Steam Flow</div>
+                  <div class="stat-main-label">Total Steam</div>
                 </div>
                 <div class="hud-hero-stat-item">
-                  <div class="stat-main-num" style="color: #00F5D4;">+12.6 MW</div>
-                  <div class="stat-main-label">Grid Net Export</div>
+                  <div class="stat-main-num" style="color: #FF9E2C;">+12.6 <span class="stat-mini-unit">MW</span></div>
+                  <div class="stat-main-label">Grid Export</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Right Column: Equalizer Card, Temperatures Card, Mini Stats + Speedometer Dial -->
+          <!-- Right Column -->
           <div class="hud-col-right">
-            <!-- 1. Top Right Frosted Equalizer Card (Generation Slate) -->
+            <!-- 1. Steam Header Equalizer Card -->
             <div class="hud-glass-card hud-equalizer-card">
               <div class="hud-card-header">
                 <div>
-                  <div class="hud-card-title">Captive Generation &amp; Steam Headers</div>
-                  <div class="hud-card-sub">Electrical &amp; Thermal Output Balance</div>
+                  <div class="hud-card-title">Steam Generation &amp; Headers</div>
+                  <div class="hud-card-sub">High, Medium &amp; Low Pressure Network (t/h)</div>
                 </div>
                 <div class="hud-legend-chips">
-                  <span class="legend-chip"><span class="chip-dot dot-orange"></span> Gas Turbines</span>
-                  <span class="legend-chip"><span class="chip-dot dot-white"></span> Steam &amp; STG</span>
+                  <span class="legend-chip"><span class="chip-dot dot-orange"></span> HP</span>
+                  <span class="legend-chip"><span class="chip-dot dot-white"></span> MP</span>
                 </div>
               </div>
 
               <div class="hud-equalizer-wrap">
-                <div class="hud-eq-val-top">40 MW <span class="eq-sub">max unit</span></div>
-                <div class="hud-eq-bars" id="hud-utilities-equalizer-bars">
-                  <!-- Populated via JS -->
+                <div class="hud-eq-val-top">500 <span class="eq-sub">t/h</span></div>
+                <div class="hud-eq-bars" style="height: 56px; display: flex; align-items: flex-end; gap: 12px;">
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 54px;" title="HP Steam: 480 t/h"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">HP (480t)</span>
+                  </div>
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 36px;" title="MP Steam: 310 t/h"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">MP (310t)</span>
+                  </div>
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 26px;" title="LP Steam: 225 t/h"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">LP (225t)</span>
+                  </div>
                 </div>
-                <div class="hud-eq-val-bottom">0 MW <span class="eq-sub">baseline</span></div>
+                <div class="hud-eq-val-bottom">0 <span class="eq-sub">baseline</span></div>
               </div>
             </div>
 
-            <!-- 2. Middle Right Frosted Thermal & Pressure Card -->
+            <!-- 2. Turbine Gauges Card -->
             <div class="hud-glass-card hud-temperatures-card">
               <div class="hud-card-header">
-                <div class="hud-card-title">Turbine Exhaust &amp; Header Telemetry</div>
-                <span class="hud-card-badge">CPP CO-GEN</span>
+                <div class="hud-card-title">Turbine Exhaust &amp; Header Profile</div>
+                <span class="hud-card-badge">CPP 120MW</span>
               </div>
               <div class="hud-columns-grid">
                 <div class="hud-col-gauge">
                   <div class="gauge-temp-val">538 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-orange" style="height: 88%;"></div>
+                    <div class="gauge-bar-fill fill-cyan" style="height: 90%;"></div>
                   </div>
-                  <div class="gauge-col-name">GTG-1 Exhaust</div>
-                  <div class="gauge-col-sub">34.8 MW</div>
+                  <div class="gauge-col-name">GTG Exhaust</div>
+                  <div class="gauge-col-sub">Frame 6</div>
                 </div>
                 <div class="hud-col-gauge">
-                  <div class="gauge-temp-val">510 °C</div>
+                  <div class="gauge-temp-val" style="color: #FF7A00;">510 °C</div>
                   <div class="gauge-bar-track">
                     <div class="gauge-bar-fill fill-orange" style="height: 84%;"></div>
                   </div>
@@ -1990,9 +1933,9 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
                   <div class="gauge-col-sub">42.0 bar</div>
                 </div>
                 <div class="hud-col-gauge">
-                  <div class="gauge-temp-val">168 °C</div>
+                  <div class="gauge-temp-val" style="color: #FF7A00;">168 °C</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-cyan" style="height: 38%;"></div>
+                    <div class="gauge-bar-fill fill-orange" style="height: 38%;"></div>
                   </div>
                   <div class="gauge-col-name">LP Header</div>
                   <div class="gauge-col-sub">4.5 bar</div>
@@ -2000,7 +1943,7 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
               </div>
             </div>
 
-            <!-- 3. Bottom Right Cluster: Mini Cards + Speedometer -->
+            <!-- 3. Bottom Cluster -->
             <div class="hud-bottom-cluster">
               <div class="hud-mini-column">
                 <div class="hud-glass-card hud-mini-card">
@@ -2013,32 +1956,32 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
                 </div>
               </div>
 
-              <!-- Large High-Contrast Speedometer Card -->
+              <!-- Speedometer Card -->
               <div class="hud-speedometer-card">
                 <div class="speedo-svg-wrap">
                   <svg viewBox="0 0 200 130" class="speedo-svg">
                     <path d="M 28 115 A 72 72 0 0 1 172 115" fill="none" stroke="#E2E8F0" stroke-width="12" stroke-linecap="round" />
-                    <path d="M 28 115 A 72 72 0 0 1 156 66" fill="none" stroke="url(#hud-speedo-grad-utilities)" stroke-width="12" stroke-linecap="round" />
-                    <line x1="100" y1="115" x2="146" y2="54" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
+                    <path d="M 28 115 A 72 72 0 0 1 165 72" fill="none" stroke="url(#hud-speedo-grad-ut)" stroke-width="12" stroke-linecap="round" />
+                    <line x1="100" y1="115" x2="153" y2="58" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
                     <circle cx="100" cy="115" r="5" fill="#0F172A" />
                     <defs>
-                      <linearGradient id="hud-speedo-grad-utilities" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#00F5D4" />
-                        <stop offset="100%" stop-color="#FF7A00" />
+                      <linearGradient id="hud-speedo-grad-ut" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#FF9E2C" />
+                        <stop offset="100%" stop-color="#FF5722" />
                       </linearGradient>
                     </defs>
                   </svg>
                   <div class="speedo-number-box">
                     <div class="speedo-big-val">98.8</div>
-                    <div class="speedo-unit-label">% GRID STABILITY</div>
+                    <div class="speedo-unit-label">% STABILITY</div>
                   </div>
                 </div>
 
                 <div class="speedo-deltas-row">
                   <div class="speedo-delta-badge">
-                    <span class="delta-num">50.01</span>
+                    <span class="delta-num">50.01Hz</span>
                     <span class="delta-arrow">▲</span>
-                    <span class="delta-sub">Hz Freq</span>
+                    <span class="delta-sub">Grid Freq</span>
                   </div>
                   <div class="speedo-delta-badge">
                     <span class="delta-num">0.06 µS</span>
@@ -2051,143 +1994,101 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
           </div>
         </div>
 
-        <!-- Collapsible Detailed Utilities & CEMS Dossier Drawer (Zero Clutter by default) -->
+        <!-- Collapsible Bottom Drawer -->
         <div class="hud-collapsible-drawer">
           <button class="hud-drawer-toggle" onclick="toggleUtilitiesDrawer()">
-            <span style="display: flex; align-items: center; gap: 8px;">
+            <span class="drawer-toggle-icon">
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span>View 3-Tier Steam Balance, SWRO Desalination &amp; CEMS Emission Dossier</span>
             </span>
-            <span class="drawer-arrow" id="utilities-drawer-arrow">▾</span>
+            <span>View 3-Tier Steam Balance, SWRO Desalination &amp; CEMS Emission Dossier</span>
+            <span class="drawer-toggle-arrow" id="utilities-drawer-arrow">▾</span>
           </button>
-          <div class="hud-drawer-content" id="hud-utilities-drawer-content" style="display: none;">
-            <!-- 3-Tier Steam Network and Water Treatment inside drawer -->
-            <div class="grid-2" style="margin-top: 14px;">
-              <div style="background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
+
+          <div class="hud-drawer-content" id="hud-utilities-drawer-content" style="display: none; padding: 18px 24px;">
+            <div class="grid-2" style="gap: 20px; align-items: start;">
+              <div>
                 <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">3-Tier Steam Balance Network</div>
-                <table class="data-table" style="margin-top: 0; font-size: 11px;">
+                <table class="data-table">
                   <thead>
                     <tr>
                       <th>Header Level</th>
                       <th>Pressure / Temp</th>
                       <th>Flow Rate</th>
-                      <th>Primary Users</th>
+                      <th>Primary Source &amp; Users</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <td><code>HP Steam</code></td>
                       <td>105.0 bar / 510°C</td>
-                      <td style="font-weight: 700;">480 t/h</td>
-                      <td>HRSG-1/2/3 &rarr; STG Drives &amp; Letdown</td>
+                      <td style="font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">480 t/h</td>
+                      <td>HRSG Boilers &rarr; STG Drives &amp; Letdown</td>
                     </tr>
                     <tr>
                       <td><code>MP Steam</code></td>
                       <td>42.0 bar / 395°C</td>
-                      <td style="font-weight: 700;">310 t/h</td>
+                      <td style="font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">310 t/h</td>
                       <td>Hydrogen Unit, FCC Preheater, Reboilers</td>
                     </tr>
                     <tr>
                       <td><code>LP Steam</code></td>
                       <td>4.5 bar / 168°C</td>
-                      <td style="font-weight: 700;">225 t/h</td>
+                      <td style="font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">225 t/h</td>
                       <td>Deaerators, Crude Tank Heating, Tracing</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              <div style="background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
-                <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Desalination &amp; Demineralized Water (SWRO)</div>
-                <table class="data-table" style="margin-top: 0; font-size: 11px;">
-                  <thead>
-                    <tr>
-                      <th>Treatment Stage</th>
-                      <th>Capacity / Throughput</th>
-                      <th>Conductivity Spec</th>
-                      <th>Operational Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><code>SWRO Seawater Intake</code></td>
-                      <td>36,000 m³ / day</td>
-                      <td>Arabian Sea Intake</td>
-                      <td><span class="status-badge-green">Normal</span></td>
-                    </tr>
-                    <tr>
-                      <td><code>RO Permeate Output</code></td>
-                      <td>18,500 m³ / day</td>
-                      <td>&lt; 250 µS/cm</td>
-                      <td><span class="status-badge-green">Normal</span></td>
-                    </tr>
-                    <tr>
-                      <td><code>Mixed Bed DM Water</code></td>
-                      <td>420 m³ / h</td>
-                      <td>0.06 µS/cm | Silica &lt; 0.01 mg/l</td>
-                      <td><span class="status-badge-green">Boiler Quality</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+              <div>
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">CPCB Continuous Emission Monitoring (CEMS)</div>
+                <div class="grid-2" style="gap: 8px;">
+                  <div class="cems-meter-card">
+                    <div class="cems-meter-top">
+                      <span style="color: var(--text-muted); font-weight: 600;">Stack SO2</span>
+                      <span class="cems-meter-val">142 mg/Nm³</span>
+                    </div>
+                    <div class="cems-track"><div class="cems-fill" style="width: 47.3%; background: #10B981;"></div></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
+                      <span>Limit: 300 mg/Nm³</span>
+                      <span style="color: #10B981; font-weight: 600;">47.3% Load</span>
+                    </div>
+                  </div>
 
-            <!-- CPCB Environmental Continuous Emissions (CEMS) -->
-            <div style="margin-top: 16px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <div style="font-size: 12px; font-weight: 600; color: var(--text-heading);">CPCB Continuous Emission Monitoring System (CEMS) Telemetry</div>
-                <button class="copilot-query-btn" onclick="sendMessage('Analyze MRPL captive power plant steam balance, boiler stack CEMS emissions, and thermal efficiency', ['data/ppac_mrpl_petroleum_production_slate.csv'])">
-                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                  <span>Copilot: Cogeneration Audit</span>
-                </button>
-              </div>
+                  <div class="cems-meter-card">
+                    <div class="cems-meter-top">
+                      <span style="color: var(--text-muted); font-weight: 600;">Stack NOx</span>
+                      <span class="cems-meter-val">185 mg/Nm³</span>
+                    </div>
+                    <div class="cems-track"><div class="cems-fill" style="width: 52.8%; background: #10B981;"></div></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
+                      <span>Limit: 350 mg/Nm³</span>
+                      <span style="color: #10B981; font-weight: 600;">52.8% Load</span>
+                    </div>
+                  </div>
 
-              <div class="grid-4" style="gap: 8px;">
-                <div class="cems-meter-card">
-                  <div class="cems-meter-top">
-                    <span style="color: var(--text-muted); font-weight: 600;">Stack SO2</span>
-                    <span class="cems-meter-val">142 mg/Nm³</span>
+                  <div class="cems-meter-card">
+                    <div class="cems-meter-top">
+                      <span style="color: var(--text-muted); font-weight: 600;">Particulate PM</span>
+                      <span class="cems-meter-val">28 mg/Nm³</span>
+                    </div>
+                    <div class="cems-track"><div class="cems-fill" style="width: 56.0%; background: #10B981;"></div></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
+                      <span>Limit: 50 mg/Nm³</span>
+                      <span style="color: #10B981; font-weight: 600;">56.0% Load</span>
+                    </div>
                   </div>
-                  <div class="cems-track"><div class="cems-fill" style="width: 47.3%; background: #10B981;"></div></div>
-                  <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
-                    <span>CPCB Limit: 300 mg/Nm³</span>
-                    <span style="color: #10B981; font-weight: 600;">47.3% Load (OK)</span>
-                  </div>
-                </div>
 
-                <div class="cems-meter-card">
-                  <div class="cems-meter-top">
-                    <span style="color: var(--text-muted); font-weight: 600;">Stack NOx</span>
-                    <span class="cems-meter-val">185 mg/Nm³</span>
-                  </div>
-                  <div class="cems-track"><div class="cems-fill" style="width: 52.8%; background: #10B981;"></div></div>
-                  <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
-                    <span>CPCB Limit: 350 mg/Nm³</span>
-                    <span style="color: #10B981; font-weight: 600;">52.8% Load (OK)</span>
-                  </div>
-                </div>
-
-                <div class="cems-meter-card">
-                  <div class="cems-meter-top">
-                    <span style="color: var(--text-muted); font-weight: 600;">Particulate (PM)</span>
-                    <span class="cems-meter-val">28 mg/Nm³</span>
-                  </div>
-                  <div class="cems-track"><div class="cems-fill" style="width: 56.0%; background: #10B981;"></div></div>
-                  <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
-                    <span>CPCB Limit: 50 mg/Nm³</span>
-                    <span style="color: #10B981; font-weight: 600;">56.0% Load (OK)</span>
-                  </div>
-                </div>
-
-                <div class="cems-meter-card">
-                  <div class="cems-meter-top">
-                    <span style="color: var(--text-muted); font-weight: 600;">ETP Effluent COD</span>
-                    <span class="cems-meter-val">48 mg/l</span>
-                  </div>
-                  <div class="cems-track"><div class="cems-fill" style="width: 38.4%; background: #10B981;"></div></div>
-                  <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
-                    <span>Statutory Limit: 125 mg/l</span>
-                    <span style="color: #10B981; font-weight: 600;">38.4% Load (OK)</span>
+                  <div class="cems-meter-card">
+                    <div class="cems-meter-top">
+                      <span style="color: var(--text-muted); font-weight: 600;">ETP COD</span>
+                      <span class="cems-meter-val">48 mg/l</span>
+                    </div>
+                    <div class="cems-track"><div class="cems-fill" style="width: 38.4%; background: #10B981;"></div></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-dim);">
+                      <span>Limit: 125 mg/l</span>
+                      <span style="color: #10B981; font-weight: 600;">38.4% Load</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2200,21 +2101,20 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
     <!-- ------------------------------------------------------------------
          TAB: STATUTORY AUDITS & ASSET INTEGRITY REGISTER
          ------------------------------------------------------------------ -->
-    <section class="tab-content" id="tab-alerts">
+                <section class="tab-content" id="tab-alerts" style="padding: 0 !important;">
       <div class="hud-overview-container">
-        <!-- HUD Stage Layer -->
         <div class="hud-stage">
-          <!-- Left Column: Status Capsule, Asset HUD Ring, Hero Title & Segmented Progress -->
+          <!-- Left Column -->
           <div class="hud-col-left">
-            <!-- 1. Floating Status Capsule (Top Left) -->
+            <!-- 1. Status Capsule -->
             <div class="hud-glass-card hud-status-capsule">
               <div class="hud-card-header">
                 <span class="hud-capsule-title">Statutory Audit Status</span>
-                <span class="status-pill-orange">Continuous 24x7</span>
+                <span class="status-pill-orange">Continuous Surveillance</span>
               </div>
               <div class="hud-status-rows">
                 <div class="hud-status-row">
-                  <span class="hud-row-label">OISD-129 / API 510</span>
+                  <span class="hud-row-label">OISD / API 510</span>
                   <span class="hud-row-val">Continuous Surveillance</span>
                 </div>
                 <div class="hud-status-row">
@@ -2223,7 +2123,7 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
                 </div>
                 <div class="hud-status-row">
                   <span class="hud-row-label">Critical Deficit</span>
-                  <span class="hud-row-val" style="color: #FF7A00;">CDU Col-04 (Overlay Req)</span>
+                  <span class="hud-row-val" style="color: #EF4444;">CDU Col-04 Overlay Req</span>
                 </div>
                 <div class="hud-status-row">
                   <span class="hud-row-label">CAAQMS Telemetry</span>
@@ -2232,108 +2132,102 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
               </div>
             </div>
 
-            <!-- 2. Physical Asset HUD Dial Overlay (Inspected Asset) -->
-            <div class="hud-asset-dial-box">
-              <div class="hud-dial-graphic">
-                <svg viewBox="0 0 200 200" class="hud-dial-svg">
-                  <circle cx="100" cy="100" r="76" class="hud-dial-track" />
-                  <path d="M 100 24 A 76 76 0 0 1 172 76" class="hud-dial-arc" />
-                  <circle cx="172" cy="76" r="4.5" class="hud-dial-dot" />
-                </svg>
-                <div class="hud-dial-ticks">
-                  <span class="hud-tick tick-80">80</span>
-                  <span class="hud-tick tick-70 active">70</span>
-                  <span class="hud-tick tick-60">60</span>
-                  <span class="hud-tick tick-50">50</span>
-                  <span class="hud-tick tick-40">40</span>
-                  <span class="hud-tick tick-30">30</span>
-                  <span class="hud-tick tick-20">20</span>
-                  <span class="hud-tick tick-10">10</span>
-                </div>
-                <div class="hud-dial-inner-hub">
-                  <div class="hud-hub-center-dot"></div>
-                  <div class="hud-hub-tag" id="hud-alerts-unit-tag">CDU Col-04</div>
-                  <div class="hud-hub-sub" id="hud-alerts-unit-sub">Bottom Shell Elev +4.2m</div>
-                </div>
+            <!-- 2. Dual Critical Deficit Badges -->
+            <div class="grid-2" style="gap: 12px;">
+              <div class="hud-glass-card" style="padding: 14px 16px;">
+                <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">CDU-Col-04 Shell</div>
+                <div style="font-size: 20px; font-weight: 800; color: #EF4444; font-family: var(--font-mono); margin: 3px 0;">4.18 <span style="font-size: 11px; font-weight: 500; color: var(--text-dim);">mm</span></div>
+                <div style="font-size: 10.5px; color: #EF4444;">Deficit: -1.82 mm below t_min</div>
+                <div style="margin-top: 6px;"><span class="status-badge-red" style="font-size: 9.5px;">Inconel Overlay Clad</span></div>
               </div>
 
-              <!-- Horizontal Interactive Unit Switcher '< >' -->
-              <div class="hud-axis-selector">
-                <div class="hud-axis-line"></div>
-                <button class="hud-axis-btn" onclick="cycleAuditUnit(-1)" title="Previous Unit">&lt;</button>
-                <div class="hud-axis-label" id="hud-alerts-active-unit-label">CDU-Col-04 Bottom Shell</div>
-                <button class="hud-axis-btn" onclick="cycleAuditUnit(1)" title="Next Unit">&gt;</button>
-                <div class="hud-axis-line"></div>
+              <div class="hud-glass-card" style="padding: 14px 16px;">
+                <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Inconel Spares</div>
+                <div style="font-size: 20px; font-weight: 800; color: var(--color-warning); font-family: var(--font-mono); margin: 3px 0;">12 <span style="font-size: 11px; font-weight: 500; color: var(--text-dim);">kg</span></div>
+                <div style="font-size: 10.5px; color: var(--text-dim);">Min Req: 50 kg (-38 kg def)</div>
+                <div style="margin-top: 6px;"><span class="status-badge-yellow" style="font-size: 9.5px;">Urgent PO Req</span></div>
               </div>
             </div>
 
-            <!-- 3. Hero Typography & Segmented Bar (Bottom Left) -->
+            <!-- 3. Hero Header & Stats -->
             <div class="hud-hero-block">
               <h1 class="hud-hero-heading">Statutory Asset Integrity</h1>
               <p class="hud-hero-description">
-                Real-time regulatory compliance register grounded in OISD-STD-129, API 510/570, PESO SMPV, and CPCB.
+                Compliance register tracking static pressure vessels, piping, LPG bullets, and CPCB environmental limits.
               </p>
 
-              <!-- Segmented Progress Bar (42 vertical glowing ticks) -->
-              <div class="hud-segmented-track" id="hud-alerts-segmented-track">
-                <!-- Populated via JS -->
-              </div>
+              <div class="hud-segmented-track" id="hud-alerts-segmented-track"></div>
 
               <div class="hud-hero-stats-row">
                 <div class="hud-hero-stat-item">
+                  <div class="stat-main-num">94.4 <span class="stat-mini-unit">%</span></div>
+                  <div class="stat-main-label">Audit Score</div>
+                </div>
+                <div class="hud-hero-stat-item">
                   <div class="stat-main-num">18 <span class="stat-mini-unit">Units</span></div>
-                  <div class="stat-main-label">Audit Register</div>
+                  <div class="stat-main-label">Static Assets</div>
                 </div>
                 <div class="hud-hero-stat-item">
-                  <div class="stat-main-num">4.18 <span class="stat-mini-unit">mm</span></div>
-                  <div class="stat-main-label">CML Min Thickness</div>
-                </div>
-                <div class="hud-hero-stat-item">
-                  <div class="stat-main-num" style="color: #00F5D4;">100%</div>
+                  <div class="stat-main-num" style="color: #FF9E2C;">100 <span class="stat-mini-unit">%</span></div>
                   <div class="stat-main-label">CPCB Transmit</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Right Column: Equalizer Card, Temperatures Card, Mini Stats + Speedometer Dial -->
+          <!-- Right Column -->
           <div class="hud-col-right">
-            <!-- 1. Top Right Frosted Equalizer Card (Compliance Slate) -->
+            <!-- 1. Standards Equalizer Card -->
             <div class="hud-glass-card hud-equalizer-card">
               <div class="hud-card-header">
                 <div>
-                  <div class="hud-card-title">Statutory Compliance Distribution</div>
-                  <div class="hud-card-sub">Inspection Code Verification Index</div>
+                  <div class="hud-card-title">Statutory Standards Compliance</div>
+                  <div class="hud-card-sub">Inspection &amp; Surveillance Distribution</div>
                 </div>
                 <div class="hud-legend-chips">
-                  <span class="legend-chip"><span class="chip-dot dot-orange"></span> Directives</span>
-                  <span class="legend-chip"><span class="chip-dot dot-white"></span> Standards</span>
+                  <span class="legend-chip"><span class="chip-dot dot-orange"></span> API</span>
+                  <span class="legend-chip"><span class="chip-dot dot-white"></span> PESO</span>
                 </div>
               </div>
 
               <div class="hud-equalizer-wrap">
-                <div class="hud-eq-val-top">100% <span class="eq-sub">target</span></div>
-                <div class="hud-eq-bars" id="hud-alerts-equalizer-bars">
-                  <!-- Populated via JS -->
+                <div class="hud-eq-val-top">100 <span class="eq-sub">%</span></div>
+                <div class="hud-eq-bars" style="height: 56px; display: flex; align-items: flex-end; gap: 10px;">
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 50px;" title="API 510: 18 Units"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">API 510</span>
+                  </div>
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 42px;" title="API 570: 42 Circuits"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">API 570</span>
+                  </div>
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 56px;" title="PESO: 100%"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">PESO</span>
+                  </div>
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                    <div class="eq-bar active" style="width: 100%; height: 58px;" title="CPCB: 99.2%"></div>
+                    <span style="font-size: 9px; color: var(--text-dim);">CPCB</span>
+                  </div>
                 </div>
-                <div class="hud-eq-val-bottom">0% <span class="eq-sub">baseline</span></div>
+                <div class="hud-eq-val-bottom">0 <span class="eq-sub">baseline</span></div>
               </div>
             </div>
 
-            <!-- 2. Middle Right Frosted Ultrasonic & Pressure Card -->
+            <!-- 2. Asset Thickness Gauges Card -->
             <div class="hud-glass-card hud-temperatures-card">
               <div class="hud-card-header">
                 <div class="hud-card-title">Critical Static Asset Deficits</div>
-                <span class="hud-card-badge">OISD / API</span>
+                <span class="hud-card-badge">OISD-129</span>
               </div>
               <div class="hud-columns-grid">
                 <div class="hud-col-gauge">
-                  <div class="gauge-temp-val" style="color: #FF7A00;">4.18 mm</div>
+                  <div class="gauge-temp-val" style="color: #EF4444;">4.18 mm</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-orange" style="height: 48%;"></div>
+                    <div class="gauge-bar-fill fill-orange" style="height: 42%; background: #EF4444;"></div>
                   </div>
                   <div class="gauge-col-name">CDU Col-04</div>
-                  <div class="gauge-col-sub">-1.82 mm def</div>
+                  <div class="gauge-col-sub" style="color: #EF4444;">-1.82 mm def</div>
                 </div>
                 <div class="hud-col-gauge">
                   <div class="gauge-temp-val">8.20 mm</div>
@@ -2341,20 +2235,20 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
                     <div class="gauge-bar-fill fill-cyan" style="height: 75%;"></div>
                   </div>
                   <div class="gauge-col-name">Heater Line</div>
-                  <div class="gauge-col-sub">Si &ge; 0.10%</div>
+                  <div class="gauge-col-sub">Si 0.12 wt%</div>
                 </div>
                 <div class="hud-col-gauge">
                   <div class="gauge-temp-val">28.4 mm</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-cyan" style="height: 92%;"></div>
+                    <div class="gauge-bar-fill fill-cyan" style="height: 90%;"></div>
                   </div>
                   <div class="gauge-col-name">LPG Bullets</div>
                   <div class="gauge-col-sub">PESO 5-Yr</div>
                 </div>
                 <div class="hud-col-gauge">
-                  <div class="gauge-temp-val">9.5 bar</div>
+                  <div class="gauge-temp-val" style="color: #FF7A00;">9.5 bar</div>
                   <div class="gauge-bar-track">
-                    <div class="gauge-bar-fill fill-cyan" style="height: 95%;"></div>
+                    <div class="gauge-bar-fill fill-orange" style="height: 80%;"></div>
                   </div>
                   <div class="gauge-col-name">Fire Deluge</div>
                   <div class="gauge-col-sub">OISD-117</div>
@@ -2362,44 +2256,44 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
               </div>
             </div>
 
-            <!-- 3. Bottom Right Cluster: Mini Cards + Speedometer -->
+            <!-- 3. Bottom Cluster -->
             <div class="hud-bottom-cluster">
               <div class="hud-mini-column">
                 <div class="hud-glass-card hud-mini-card">
                   <div class="mini-card-label">Inconel 625 Stock</div>
-                  <div class="mini-card-value" style="color: #FF7A00;">12 kg <span class="mini-card-unit">(-38 kg def)</span></div>
+                  <div class="mini-card-value" style="color: #EF4444;">12 <span class="mini-card-unit">kg</span></div>
                 </div>
                 <div class="hud-glass-card hud-mini-card">
-                  <div class="mini-card-label">Critical Spares Reorder</div>
-                  <div class="mini-card-value">5 Items <span class="mini-card-unit">tracked</span></div>
+                  <div class="mini-card-label">Critical Spares Deficit</div>
+                  <div class="mini-card-value" style="color: var(--color-warning);">5 <span class="mini-card-unit">Items</span></div>
                 </div>
               </div>
 
-              <!-- Large High-Contrast Speedometer Card -->
+              <!-- Speedometer Card -->
               <div class="hud-speedometer-card">
                 <div class="speedo-svg-wrap">
                   <svg viewBox="0 0 200 130" class="speedo-svg">
                     <path d="M 28 115 A 72 72 0 0 1 172 115" fill="none" stroke="#E2E8F0" stroke-width="12" stroke-linecap="round" />
-                    <path d="M 28 115 A 72 72 0 0 1 150 72" fill="none" stroke="url(#hud-speedo-grad-alerts)" stroke-width="12" stroke-linecap="round" />
-                    <line x1="100" y1="115" x2="140" y2="60" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
+                    <path d="M 28 115 A 72 72 0 0 1 160 67" fill="none" stroke="url(#hud-speedo-grad-al)" stroke-width="12" stroke-linecap="round" />
+                    <line x1="100" y1="115" x2="149" y2="54" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
                     <circle cx="100" cy="115" r="5" fill="#0F172A" />
                     <defs>
-                      <linearGradient id="hud-speedo-grad-alerts" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#00F5D4" />
-                        <stop offset="100%" stop-color="#FF7A00" />
+                      <linearGradient id="hud-speedo-grad-al" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#FF9E2C" />
+                        <stop offset="100%" stop-color="#FF5722" />
                       </linearGradient>
                     </defs>
                   </svg>
                   <div class="speedo-number-box">
                     <div class="speedo-big-val">94.4</div>
-                    <div class="speedo-unit-label">% AUDIT SCORE</div>
+                    <div class="speedo-unit-label">% COMPLIANCE</div>
                   </div>
                 </div>
 
                 <div class="speedo-deltas-row">
                   <div class="speedo-delta-badge">
                     <span class="delta-num">4.18 mm</span>
-                    <span class="delta-arrow">▲</span>
+                    <span class="delta-arrow">▼</span>
                     <span class="delta-sub">Current t</span>
                   </div>
                   <div class="speedo-delta-badge">
@@ -2413,172 +2307,127 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
           </div>
         </div>
 
-        <!-- Collapsible Detailed Statutory Register & Spares Drawer (Zero Clutter by default) -->
+        <!-- Collapsible Bottom Drawer -->
         <div class="hud-collapsible-drawer">
           <button class="hud-drawer-toggle" onclick="toggleAlertsDrawer()">
-            <span style="display: flex; align-items: center; gap: 8px;">
+            <span class="drawer-toggle-icon">
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span>View Full Statutory Compliance Register &amp; Critical Equipment Spares Inventory</span>
             </span>
-            <span class="drawer-arrow" id="alerts-drawer-arrow">▾</span>
+            <span>View Full Statutory Compliance Register &amp; Critical Equipment Spares Inventory</span>
+            <span class="drawer-toggle-arrow" id="alerts-drawer-arrow">▾</span>
           </button>
-          <div class="hud-drawer-content" id="hud-alerts-drawer-content" style="display: none;">
-            <!-- Statutory Compliance Audit Register Table inside drawer -->
-            <div class="dash-card" style="margin-top: 14px;">
-              <div class="card-header">
-                <div>
-                  <div class="card-title">Statutory Asset Integrity &amp; Regulatory Compliance Register</div>
-                  <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
-                    Grounded in statutory inspection codes (OISD-STD-129, API 510/570, PESO SMPV Rules, CPCB Directives)
-                  </div>
-                </div>
-                <button class="copilot-query-btn" onclick="sendMessage('Generate formal statutory remediation note for OISD and API 510 inspection findings', ['data/real_cdu_ultrasonic_thickness_scan.pdf'])">
-                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                  <span>Copilot: Draft OISD Note</span>
-                </button>
-              </div>
 
+          <div class="hud-drawer-content" id="hud-alerts-drawer-content" style="display: none; padding: 18px 24px;">
+            <div style="margin-bottom: 20px;">
+              <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Statutory Asset Integrity Compliance Register</div>
               <table class="data-table">
                 <thead>
                   <tr>
                     <th>Standard / Code</th>
                     <th>Equipment Tag &amp; Location</th>
-                    <th>Observed Condition &amp; Diagnostic Metric</th>
-                    <th>Statutory Requirement</th>
-                    <th>Mandatory Action</th>
+                    <th>Diagnostic Finding</th>
+                    <th>Statutory Action Required</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr style="background: rgba(239, 68, 68, 0.08);">
                     <td><code>API 510 / OISD-129</code></td>
-                    <td><strong>CDU-Col-04</strong> (Bottom Shell Elev +4.2m)</td>
-                    <td>Measured thickness 4.18 mm (Deficit: -1.82 mm below t_min 6.00 mm)</td>
-                    <td>Pressure vessel retirement or structural weld reinforcement</td>
-                    <td>Mandatory in-situ Inconel-625 weld overlay cladding (min 3.0 mm)</td>
+                    <td><strong>CDU-Col-04</strong> (+4.2m bottom shell)</td>
+                    <td>Thickness 4.18 mm (-1.82 mm deficit vs t_min 6.00 mm)</td>
+                    <td>Mandatory in-situ Inconel-625 weld overlay cladding</td>
                     <td><span class="status-badge-red">CRITICAL DEFICIT</span></td>
                   </tr>
                   <tr>
                     <td><code>API 570 / CSB-R32</code></td>
-                    <td><strong>Crude Heater Transfer Line</strong> (CDU-1)</td>
-                    <td>ASTM A106 Gr B carbon steel in 384°C sour crude service</td>
-                    <td>PMI silicon verification (Si &ge; 0.10 wt% to resist sulfidation)</td>
-                    <td>Schedule positive material identification and ultrasonic baseline mapping</td>
-                    <td><span class="status-badge-yellow">PRIORITY 1 AUDIT</span></td>
+                    <td><strong>Crude Heater Line</strong> (CDU-1)</td>
+                    <td>ASTM A106 Gr B in 384°C sour crude service</td>
+                    <td>PMI silicon check (Si &ge; 0.10 wt% sulfidation resistance)</td>
+                    <td><span class="status-badge-yellow">PRIORITY 1</span></td>
                   </tr>
                   <tr>
                     <td><code>PESO SMPV Rules</code></td>
-                    <td><strong>Mounded LPG Bullets</strong> (TK-101 to TK-104)</td>
-                    <td>4x 1,200 m³ pressurized bullets, hydraulic relief valves certified</td>
-                    <td>5-year hydrostatic test &amp; acoustic emission examination</td>
-                    <td>Routine operational inspection log; next statutory overhaul: Nov 2027</td>
+                    <td><strong>Mounded LPG Bullets</strong> (TK-101 to 104)</td>
+                    <td>4x 1,200 m³ pressurized bullets, hydraulic relief valid</td>
+                    <td>5-yr hydrotest &amp; acoustic emission log certified</td>
                     <td><span class="status-badge-green">FULLY COMPLIANT</span></td>
                   </tr>
                   <tr>
                     <td><code>OISD-STD-117</code></td>
-                    <td><strong>Fire Protection Network</strong> (Storage Tank Farm)</td>
-                    <td>Medium expansion foam pourers &amp; deluge system flow testing</td>
-                    <td>Monthly functional run &amp; pressure test (9.5 barg header pressure)</td>
-                    <td>Deluge test executed at Berth 8 &amp; Naphtha gantry; all nozzles cleared</td>
+                    <td><strong>Fire Protection Network</strong></td>
+                    <td>Deluge system &amp; foam pourers at Berth 8 &amp; Tank Farm</td>
+                    <td>Monthly 9.5 barg header pressure verification completed</td>
                     <td><span class="status-badge-green">VERIFIED PASSED</span></td>
                   </tr>
                   <tr>
                     <td><code>CPCB / SPCB</code></td>
-                    <td><strong>CAAQMS Station 1 &amp; 2</strong> (Perimeter Fence)</td>
-                    <td>Continuous ambient PM2.5, SO2, NOx analyzers (99.2% uptime)</td>
-                    <td>Quarterly calibration against certified span gas cylinders</td>
-                    <td>Zero and span drift check completed; data transmitted to CPCB portal</td>
+                    <td><strong>CAAQMS Station 1 &amp; 2</strong></td>
+                    <td>Continuous PM2.5, SO2, NOx ambient analyzers</td>
+                    <td>99.2% uptime telemetry transmitted to CPCB portal</td>
                     <td><span class="status-badge-green">CERTIFIED</span></td>
                   </tr>
                 </tbody>
               </table>
+            </div>
 
-              <!-- Critical Spares & Procurement Allocation Table -->
-              <div style="margin-top: 18px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <div>
-                    <div style="font-size: 12px; font-weight: 600; color: var(--text-heading);">Critical Equipment Spares &amp; Procurement Allocation</div>
-                    <div style="font-size: 11px; color: var(--text-dim);">Live inventory tracked against data/refinery_equipment_spares_catalog.csv</div>
-                  </div>
-                  <button class="copilot-query-btn" onclick="sendMessage('Check critical spares stock deficit for CDU Column-04 Inconel weld overlay and draft SAP purchase requisition', ['data/refinery_equipment_spares_catalog.csv'])">
-                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <span>Copilot: Generate PO Requisition</span>
-                  </button>
-                </div>
-
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Part Number</th>
-                      <th>Description</th>
-                      <th>Equipment Tag</th>
-                      <th>Material Spec</th>
-                      <th>Stock on Hand</th>
-                      <th>Min Reorder</th>
-                      <th>Lead Time</th>
-                      <th>Unit Cost (INR)</th>
-                      <th>Procurement Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style="background: rgba(239, 68, 68, 0.08);">
-                      <td><code>INC-625-WELD-ROD</code></td>
-                      <td>Inconel 625 TIG Welding Wire 2.4mm</td>
-                      <td>CDU-COL-04-REPAIR</td>
-                      <td>ERNiCrMo-3 (UNS N06625)</td>
-                      <td style="color: #EF4444; font-weight: 700;">12 kg</td>
-                      <td>50 kg</td>
-                      <td>15 days</td>
-                      <td>₹6,800 / kg</td>
-                      <td><span class="status-badge-red">URGENT DEFICIT (-38 kg)</span></td>
-                    </tr>
-                    <tr>
-                      <td><code>FSH-ED-6-600</code></td>
-                      <td>Balanced Plug Control Valve 6-inch CL600</td>
-                      <td>PV-CDU-201</td>
-                      <td>ASTM A217 WC9 / Stellite</td>
-                      <td style="color: #FBBF24; font-weight: 700;">1 unit</td>
-                      <td>2 units</td>
-                      <td>60 days</td>
-                      <td>₹8,50,000</td>
-                      <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
-                    </tr>
-                    <tr>
-                      <td><code>JC-8648-80</code></td>
-                      <td>High Temp Metal Bellows Seal 80mm</td>
-                      <td>P-CDU-BOTTOM</td>
-                      <td>Inconel 718 / Carbon</td>
-                      <td style="color: #FBBF24; font-weight: 700;">2 units</td>
-                      <td>4 units</td>
-                      <td>40 days</td>
-                      <td>₹4,10,000</td>
-                      <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
-                    </tr>
-                    <tr>
-                      <td><code>FSH-ET-2-300</code></td>
-                      <td>Control Valve Globe 2-inch CL300</td>
-                      <td>FV-CDU-104</td>
-                      <td>ASTM A216 WCC / 316 Trim</td>
-                      <td style="color: #FBBF24; font-weight: 700;">2 units</td>
-                      <td>4 units</td>
-                      <td>45 days</td>
-                      <td>₹3,85,000</td>
-                      <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
-                    </tr>
-                    <tr>
-                      <td><code>GSK-SPW-12-300</code></td>
-                      <td>Spiral Wound Gasket 12-inch CL300</td>
-                      <td>FLG-12-300</td>
-                      <td>316L Windings / FG Filler</td>
-                      <td style="color: #FBBF24; font-weight: 700;">14 units</td>
-                      <td>50 units</td>
-                      <td>7 days</td>
-                      <td>₹3,800</td>
-                      <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+            <div>
+              <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Critical Equipment Spares &amp; Procurement Allocation</div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Part Number</th>
+                    <th>Description</th>
+                    <th>Equipment Tag</th>
+                    <th>Stock on Hand</th>
+                    <th>Min Reorder</th>
+                    <th>Lead Time</th>
+                    <th>Unit Cost</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="background: rgba(239, 68, 68, 0.08);">
+                    <td><code>INC-625-WELD-ROD</code></td>
+                    <td>Inconel 625 TIG Wire 2.4mm</td>
+                    <td>CDU-COL-04</td>
+                    <td style="color: #EF4444; font-weight: 700;">12 kg</td>
+                    <td>50 kg</td>
+                    <td>15 days</td>
+                    <td>₹6,800/kg</td>
+                    <td><span class="status-badge-red">URGENT DEFICIT (-38 kg)</span></td>
+                  </tr>
+                  <tr>
+                    <td><code>FSH-ED-6-600</code></td>
+                    <td>Fisher Plug Valve 6" CL600</td>
+                    <td>PV-CDU-201</td>
+                    <td style="color: #FBBF24; font-weight: 700;">1 unit</td>
+                    <td>2 units</td>
+                    <td>60 days</td>
+                    <td>₹8,50,000</td>
+                    <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
+                  </tr>
+                  <tr>
+                    <td><code>JC-8648-80</code></td>
+                    <td>John Crane Metal Seal 80mm</td>
+                    <td>P-CDU-BOTTOM</td>
+                    <td style="color: #FBBF24; font-weight: 700;">2 units</td>
+                    <td>4 units</td>
+                    <td>40 days</td>
+                    <td>₹4,10,000</td>
+                    <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
+                  </tr>
+                  <tr>
+                    <td><code>GSK-SPW-12-300</code></td>
+                    <td>Spiral Wound Gasket 12" CL300</td>
+                    <td>FLG-CDU-12</td>
+                    <td style="color: #FBBF24; font-weight: 700;">14 units</td>
+                    <td>50 units</td>
+                    <td>7 days</td>
+                    <td>₹3,800</td>
+                    <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -2587,103 +2436,132 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
   </main>
 
   <!-- ====================================================================
-       RIGHT PANEL: AI COPILOT (PIXEL-ALIGNED WITH REFERENCE IMAGE)
+       RIGHT PANEL: AI COPILOT (GLITCH-FREE SCADA DARK GLASSMORPHISM)
        ==================================================================== -->
   <aside class="copilot-panel">
     <!-- Copilot Header -->
     <div class="copilot-header">
-      <div class="copilot-title">
-        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
-        </svg>
-        <span>AI COPILOT</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <div class="llm-badge">
-          <span class="status-dot dot-success"></span> <span id="copilot-badge-text">Offline LLM Active</span>
-        </div>
-        <button class="copilot-close-btn" onclick="toggleCopilotDrawer()" title="Close Copilot Panel">
-          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Chat Stream -->
-    <div class="chat-container" id="chat-container">
-      <div class="chat-bubble chat-bot">
-        <div><strong>Hello! I am DRISHTI-MRPL.</strong></div>
-        <div style="margin-top: 4px;">Your sovereign operations copilot for plant telemetry, PPAC analytics, statutory compliance, and process engineering.</div>
-        <div style="margin-top: 8px;">How can I assist your shift today?</div>
-        
-        <!-- Real Government and Statutory Data Quick-Action Pills -->
-        <div class="chips-container">
-          <div class="suggestion-chip" onclick="sendMessage('Analyze PPAC monthly crude throughput and capacity utilization for MRPL', ['data/ppac_mrpl_monthly_crude_processing.csv'])">
-            PPAC Crude Throughput &amp; Util
-          </div>
-          <div class="suggestion-chip" onclick="sendMessage('Compare Arabian Light vs Maya crude assay sulfur, TAN, and distillation yields in DuckDB', ['data/real_crude_oil_assays.csv'])">
-            Crude Assay Comparison
-          </div>
-          <div class="suggestion-chip" onclick="sendMessage('Process CDU Column-04 inspection report and evaluate API 510 deficit', ['data/real_cdu_ultrasonic_thickness_scan.pdf'])">
-            API 510 NDT Audit
-          </div>
-          <div class="suggestion-chip" onclick="sendMessage('Which spare parts in inventory are below their reorder threshold and what is replenishment cost?', ['data/refinery_equipment_spares_catalog.csv'])">
-            OEM Spares Inventory
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Chat Input Area -->
-    <div class="chat-input-area">
-      <!-- Model Router Selector -->
-      <div class="model-selector-bar">
-        <div class="model-selector-left">
-          <svg viewBox="0 0 24 24" width="11" height="11" stroke="var(--accent-purple)" stroke-width="2" fill="none"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
-          <span class="model-selector-label">ROUTER:</span>
-        </div>
-        <select id="model-profile-select" class="model-select-dropdown" onchange="onModelProfileChange()">
-          <option value="auto">Auto-Route (Smart Intent Selection)</option>
-          <option value="code">Code &amp; Hydraulics (qwen2.5-coder:7b)</option>
-          <option value="reasoning">Root-Cause Diagnostics (deepseek-r1:1.5b)</option>
-          <option value="general">PSU Notes &amp; Memos (qwen2.5:7b)</option>
-          <option value="vision">Multimodal Vision (qwen2.5vl:3b)</option>
-        </select>
-      </div>
-
-      <div class="input-row">
-        <input type="text" class="chat-input" id="chat-input" placeholder="Ask anything about MRPL operations..." onkeydown="if(event.key==='Enter') sendMessage()">
-        <button class="attach-btn" onclick="document.getElementById('file-upload-input').click()" title="Attach Engineering Drawing / NDT Scan / CSV">
-          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-        </button>
-        <button class="send-button" onclick="sendMessage()" title="Send">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="#FFFFFF">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+      <div class="copilot-brand">
+        <div class="copilot-icon-badge">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
           </svg>
+        </div>
+        <div class="copilot-title-wrap">
+          <div class="copilot-brand-title">DRISHTI AI</div>
+          <div class="copilot-brand-sub">Sovereign Air-Gapped Intelligence</div>
+        </div>
+      </div>
+      <div class="copilot-header-actions">
+        <div class="copilot-status-pill" onclick="openModelRegistryModal()" title="Hardware Telemetry &amp; Model Registry">
+          <span class="status-dot dot-success"></span>
+          <span id="copilot-badge-text">Ollama Active</span>
+        </div>
+        <button class="copilot-icon-btn" onclick="clearCopilotChat()" title="Clear Chat Stream">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         </button>
+        
       </div>
     </div>
 
-    <!-- Sleek Compact Attachment Bar -->
-    <div class="compact-attach-bar dropzone-box" onclick="document.getElementById('file-upload-input').click()" title="Drag &amp; drop or click to attach files">
-      <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <span>Attach Drawing / NDT Scan / CSV (Drop or Click)</span>
-      <input type="file" id="file-upload-input" style="display: none;" onchange="handleFileUpload(this.files)">
+    <!-- Copilot Sub-Header Segmented View Tabs -->
+    <div class="copilot-view-tabs">
+      <button class="copilot-view-tab active" id="copilot-tab-chat" onclick="switchCopilotTab('chat')">
+        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Conversation</span>
+      </button>
+      <button class="copilot-view-tab" id="copilot-tab-deliverables" onclick="switchCopilotTab('deliverables')">
+        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span id="copilot-deliverables-label">Deliverables</span>
+      </button>
     </div>
 
-    <!-- Collapsible Generated Deliverables Drawer -->
-    <div class="copilot-results-drawer" id="copilot-results-drawer">
-      <div class="results-drawer-header" onclick="document.getElementById('copilot-results-drawer').classList.toggle('expanded')">
-        <span style="display: flex; align-items: center; gap: 6px;">
-          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <strong>Generated Deliverables</strong>
-        </span>
-        <span class="drawer-toggle-arrow">▾</span>
+    <!-- VIEW 1: Conversation & Composer -->
+    <div class="copilot-view-body" id="copilot-chat-view">
+      <!-- Chat Stream -->
+      <div class="chat-container" id="chat-container">
+        <div class="chat-welcome-card" style="padding: 14px 16px; margin-bottom: 12px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <div style="width: 24px; height: 24px; border-radius: 6px; background: rgba(255, 122, 0, 0.15); display: flex; align-items: center; justify-content: center; color: #FF9E2C;">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div>
+              <div style="font-size: 12px; font-weight: 700; color: var(--text-heading);">DRISHTI AI Operations Assistant</div>
+              <div style="font-size: 9.5px; color: var(--text-dim);">100% Air-Gapped Sovereign Inference</div>
+            </div>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 10px;">
+            Ask questions regarding plant telemetry, crude distillation yields, API 510 NDT inspection scans, or OEM spares:
+          </div>
+          
+          <!-- Compact Suggestion Chips -->
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <button class="copilot-chip" onclick="sendMessage('Analyze PPAC monthly crude throughput and capacity utilization for MRPL', ['data/ppac_mrpl_monthly_crude_processing.csv'])">PPAC Telemetry</button>
+            <button class="copilot-chip" onclick="sendMessage('Compare Arabian Light vs Maya crude assay sulfur, TAN, and distillation yields', ['data/real_crude_oil_assays.csv'])">Crude Assays</button>
+            <button class="copilot-chip" onclick="sendMessage('Process CDU Column-04 inspection report and evaluate API 510 deficit', ['data/real_cdu_ultrasonic_thickness_scan.pdf'])">API 510 NDT</button>
+            <button class="copilot-chip" onclick="sendMessage('Which spare parts in inventory are below their reorder threshold?', ['data/refinery_equipment_spares_catalog.csv'])">OEM Spares</button>
+          </div>
+        </div>
+      </div><!-- Active File Attachment Chips (shown when files attached) -->
+      <div class="copilot-attached-chips" id="copilot-attached-chips" style="display: none;"></div>
+
+      <!-- Unified Pro Copilot Composer -->
+      <div class="copilot-composer">
+        <!-- Composer Top Bar: Model Router Capsule + Sovereign Security Badge -->
+        <div class="composer-top-bar">
+          <div class="composer-router-capsule">
+            <svg viewBox="0 0 24 24" width="11" height="11" stroke="#FF9E2C" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <select id="model-profile-select" class="composer-model-select" onchange="onModelProfileChange()">
+              <option value="auto">Auto-Route (Smart Selection)</option>
+              <option value="code">Code &amp; Hydraulics (qwen2.5-coder:7b)</option>
+              <option value="reasoning">Root-Cause Diagnostics (deepseek-r1:1.5b)</option>
+              <option value="general">PSU Notes &amp; Memos (qwen2.5:7b)</option>
+              <option value="vision">Multimodal Vision (qwen2.5vl:3b)</option>
+            </select>
+          </div>
+          <div class="composer-sovereign-tag">
+            <svg viewBox="0 0 24 24" width="10" height="10" stroke="#10B981" stroke-width="2.5" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Air-Gapped</span>
+          </div>
+        </div>
+
+        <!-- Composer Middle: Text Input Area -->
+        <div class="composer-input-row">
+          <textarea class="composer-textarea" id="chat-input" rows="1" placeholder="Ask Drishti anything about refinery operations..." onkeydown="handleChatInputKeydown(event)"></textarea>
+        </div>
+
+        <!-- Composer Bottom Toolbar: File Upload & Send -->
+        <div class="composer-bottom-toolbar">
+          <div class="composer-tools-left">
+            <button class="composer-tool-btn" onclick="document.getElementById('file-upload-input').click()" title="Attach Engineering Drawing / NDT Scan / CSV">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              <span>Attach</span>
+            </button>
+            <input type="file" id="file-upload-input" style="display: none;" onchange="handleFileUpload(this.files)">
+            <span class="composer-drop-hint">or drop files</span>
+          </div>
+          <button class="composer-send-btn" onclick="sendMessage()" title="Send Message (Enter)">
+            <span>Send</span>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </div>
       </div>
-      <div id="results-drawer-list" class="results-drawer-body">
-        <div class="empty-results">
-          <div style="font-size: 11px; color: var(--text-muted);">No reports generated yet.</div>
-          <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Ask the AI to generate analysis, notes, or charts.</div>
+    </div>
+
+    <!-- VIEW 2: Deliverables & Reports List -->
+    <div class="copilot-view-body" id="copilot-deliverables-view" style="display: none;">
+      <div class="deliverables-tab-container">
+        <div class="deliverables-tab-header">
+          <div class="deliverables-tab-title">Generated Operational Deliverables</div>
+          <div class="deliverables-tab-sub">Exported SAP PR notes, NDT surveys, DuckDB CSVs &amp; Python sandbox charts</div>
+        </div>
+        <div id="results-drawer-list" class="deliverables-cards-list">
+          <div class="empty-results">
+            <div style="font-size: 11.5px; color: var(--text-muted);">No reports generated in this shift yet.</div>
+            <div style="font-size: 10.5px; color: var(--text-dim); margin-top: 4px;">Prompt the Copilot to draft an inspection note, export assay cuts, or run a hydrodynamic calculation.</div>
+          </div>
         </div>
       </div>
     </div>

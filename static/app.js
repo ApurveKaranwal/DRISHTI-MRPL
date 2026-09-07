@@ -51,14 +51,15 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchSystemTelemetry();
   fetchRefineryOverview();
   initHudOverview();
-  initMainRefineryHud();
-  initPetroHud();
-  initAromaticsHud();
-  initUtilitiesHud();
-  initAlertsHud();
+  renderTrack("hud-main-segmented-track", 42, 38);
+  renderTrack("hud-petro-segmented-track", 42, 36);
+  renderTrack("hud-aromatics-segmented-track", 42, 39);
+  renderTrack("hud-utilities-segmented-track", 42, 40);
+  renderTrack("hud-alerts-segmented-track", 42, 41);
   switchCrudeAssay("Arabian Light");
   executeInteractiveDarcy();
   renderGovDatasetChart("monthly");
+  initTouchAndMicroInteractions();
   setInterval(fetchSystemTelemetry, 2500);
 });
 
@@ -95,13 +96,21 @@ function switchTab(tabId) {
     initHudOverview();
   }
   if (tabId === "main-refinery") {
-    initMainRefineryHud();
+    renderTrack("hud-main-segmented-track", 42, 38);
     switchCrudeAssay(currentAssayName || "Arabian Light");
   }
-  if (tabId === "petrochemicals") initPetroHud();
-  if (tabId === "aromatics") initAromaticsHud();
-  if (tabId === "utilities") initUtilitiesHud();
-  if (tabId === "alerts") initAlertsHud();
+  if (tabId === "petrochemicals") {
+    renderTrack("hud-petro-segmented-track", 42, 36);
+  }
+  if (tabId === "aromatics") {
+    renderTrack("hud-aromatics-segmented-track", 42, 39);
+  }
+  if (tabId === "utilities") {
+    renderTrack("hud-utilities-segmented-track", 42, 40);
+  }
+  if (tabId === "alerts") {
+    renderTrack("hud-alerts-segmented-track", 42, 41);
+  }
   if (tabId === "reports") fetchDeliverables();
   if (tabId === "analytics") {
     setTimeout(() => {
@@ -109,6 +118,7 @@ function switchTab(tabId) {
       renderGovDatasetChart(currentGovDataset || "monthly");
     }, 60);
   }
+  setTimeout(initTouchAndMicroInteractions, 50);
 }
 
 // -----------------------------------------------------------------------------
@@ -171,25 +181,23 @@ async function fetchSystemTelemetry() {
 
     const ramEl = document.getElementById("ticker-ram-val");
     if (ramEl && data.ram) {
-      ramEl.textContent = `${data.ram.used_gb}/${data.ram.total_gb} GB`;
+      ramEl.textContent = `${data.ram.used_gb} GB`;
     }
 
     const gpuEl = document.getElementById("ticker-gpu-val");
     if (gpuEl && data.gpu) {
-      if (data.gpu.detected && data.gpu.vram_total_mb > 0) {
-        const usedGb = (data.gpu.vram_used_mb / 1024).toFixed(1);
-        const totGb = (data.gpu.vram_total_mb / 1024).toFixed(1);
-        gpuEl.textContent = `${usedGb}/${totGb} GB`;
+      if (data.gpu.detected && data.gpu.vram_used_mb > 0) {
+        gpuEl.textContent = `${(data.gpu.vram_used_mb / 1024).toFixed(1)} GB`;
       } else if (data.gpu.detected) {
-        gpuEl.textContent = "Active";
+        gpuEl.textContent = "Online";
       } else {
-        gpuEl.textContent = "CPU Mode";
+        gpuEl.textContent = "Active";
       }
     }
 
     const romEl = document.getElementById("ticker-rom-val");
     if (romEl && data.storage) {
-      romEl.textContent = `${data.storage.used_gb}/${data.storage.total_gb} GB`;
+      romEl.textContent = `${data.storage.used_gb} GB`;
     }
 
     // 2. Hardware Modal Full Telemetry
@@ -467,8 +475,12 @@ async function sendMessage(overrideText = null, attachedFiles = []) {
   if (copilotPanel && copilotPanel.classList.contains("collapsed")) {
     copilotPanel.classList.remove("collapsed");
   }
+  switchCopilotTab("chat");
 
-  if (!overrideText) inputEl.value = "";
+  if (!overrideText) {
+    inputEl.value = "";
+    inputEl.style.height = "auto";
+  }
 
   const filesToSend = attachedFiles.length > 0 ? attachedFiles : activeAttachedFiles;
   activeAttachedFiles = [];
@@ -795,25 +807,36 @@ async function fetchDeliverables() {
     const data = await res.json();
     const list = data.deliverables || [];
 
-    // Right copilot drawer
+    const delivBadge = document.getElementById("copilot-deliverables-label");
+    if (delivBadge) {
+      delivBadge.textContent = list.length > 0 ? `Deliverables (${list.length})` : "Deliverables";
+    }
+
+    // Right copilot deliverables view
     const drawerEl = document.getElementById("results-drawer-list");
     if (drawerEl) {
       if (list.length === 0) {
         drawerEl.innerHTML = `
           <div class="empty-results">
-            <div style="font-size: 11px; color: var(--text-muted);">Your generated reports and charts will appear here.</div>
-            <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Ask the AI to generate analysis, reports or charts.</div>
+            <div style="font-size: 11.5px; color: var(--text-muted);">No reports generated in this shift yet.</div>
+            <div style="font-size: 10.5px; color: var(--text-dim); margin-top: 4px;">Prompt the Copilot to draft an inspection note, export assay cuts, or run a hydrodynamic calculation.</div>
           </div>`;
       } else {
-        drawerEl.innerHTML = list.slice(0, 5).map(f => `
-          <div class="result-card-item">
+        drawerEl.innerHTML = list.map(f => {
+          const dateStr = new Date(f.modified * 1000).toLocaleDateString();
+          return `
+          <div class="deliverable-card-item">
             <div class="result-file-info">
               ${getFileIcon(f.extension)}
-              <span class="result-file-name" title="${f.name}">${f.name}</span>
+              <div class="deliv-file-meta">
+                <span class="result-file-name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span>
+                <span class="deliv-file-date">${f.size_kb} KB &bull; ${dateStr}</span>
+              </div>
             </div>
             <a class="download-link-btn" href="${f.url}" download>Download</a>
           </div>
-        `).join("");
+        `;
+        }).join("");
       }
     }
 
@@ -1117,15 +1140,30 @@ function switchCrudeAssay(assayName) {
 
   // Rebuild Distillation Cut Bar
   const cutBar = document.getElementById("assay-cut-bar");
-  if (cutBar) {
-    cutBar.innerHTML = assay.cuts.map(cut => `
-      <div class="cut-segment ${cut.class}" style="width: ${cut.pct}%;" title="${cut.name}: ${cut.pct}%">
-        ${cut.name.split(' ')[0]} ${cut.pct}%
-      </div>
-    `).join("");
-  }
+  if (cutBar && assay.cuts) {
+    const cutNameMap = {
+      "cut-lpg": "LPG",
+      "cut-naphtha": "Naphtha",
+      "cut-atf": "ATF",
+      "cut-diesel": "Diesel",
+      "cut-vgo": "VGO",
+      "cut-residue": "Resid"
+    };
 
-  // Rebuild Cut Table Body
+    cutBar.innerHTML = assay.cuts.map(cut => {
+      const shortName = cutNameMap[cut.class] || cut.name.split(' ')[0];
+      // If segment is very narrow (< 6%), omit text to avoid clipping
+      const textContent = cut.pct >= 6.0 ? `${shortName} ${cut.pct.toFixed(1)}%` : "";
+      return `<div class="cut-segment ${cut.class}" style="width: ${cut.pct}%;" title="${escapeHtml(cut.name)}: ${cut.pct.toFixed(1)}%">${textContent}</div>`;
+    }).join("");
+
+    // Update legend values if elements exist
+    assay.cuts.forEach(cut => {
+      const el = document.getElementById(`legend-${cut.class}`);
+      if (el) el.textContent = `${cut.pct.toFixed(1)}%`;
+    });
+  }
+// Rebuild Cut Table Body
   const tbody = document.getElementById("assay-cut-table-body");
   if (tbody) {
     tbody.innerHTML = assay.cuts.map(cut => `
@@ -1134,11 +1172,6 @@ function switchCrudeAssay(assayName) {
         <td><code>${cut.range}</code></td>
         <td style="font-weight: 700; color: var(--text-heading); font-family: var(--font-mono);">${cut.pct.toFixed(1)}%</td>
         <td>${cut.unit}</td>
-        <td>
-          <button class="copilot-query-btn" onclick="sendMessage('Analyze crude assay cut for ${escapeHtml(cut.name)} in ${escapeHtml(assayName)} crude and evaluate refinery downstream processing economics', ['data/real_crude_oil_assays.csv'])">
-            Ask Copilot
-          </button>
-        </td>
       </tr>
     `).join("");
   }
@@ -2511,6 +2544,11 @@ function renderTrack(trackId, totalTicks = 42, activeCount = 36) {
   }
 }
 
+function renderHudSegmentedBar(pct) {
+  const activeCount = Math.min(42, Math.max(0, Math.round(((pct || 100) / 120) * 42)));
+  renderTrack("hud-segmented-track", 42, activeCount);
+}
+
 // Generic Helper: Render Glowing Equalizer Bars
 function renderEqualizer(containerId, items) {
   const container = document.getElementById(containerId);
@@ -2816,3 +2854,289 @@ function toggleCopilotDrawer() {
   }
 }
 
+
+
+// --- COLLAPSIBLE WORKSPACE HEADER CONTROLLER ---
+function toggleHeaderCollapse() {
+  const header = document.querySelector(".workspace-header");
+  const pill = document.getElementById("header-expand-pill");
+  const btn = document.getElementById("header-collapse-btn");
+  if (!header) return;
+  const isCollapsed = header.classList.toggle("collapsed");
+  if (pill) pill.style.display = isCollapsed ? "flex" : "none";
+  if (btn) {
+    btn.innerHTML = isCollapsed
+      ? '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"/></svg>'
+      : '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="18 15 12 9 6 15"/></svg>';
+  }
+}
+
+// --- COPILOT PANEL CONTROLLERS ---
+function switchCopilotTab(tabName) {
+  const chatView = document.getElementById("copilot-chat-view");
+  const delivView = document.getElementById("copilot-deliverables-view");
+  const chatTab = document.getElementById("copilot-tab-chat");
+  const delivTab = document.getElementById("copilot-tab-deliverables");
+  if (!chatView || !delivView) return;
+
+  if (tabName === "deliverables") {
+    chatView.style.display = "none";
+    delivView.style.display = "flex";
+    if (chatTab) chatTab.classList.remove("active");
+    if (delivTab) delivTab.classList.add("active");
+  } else {
+    chatView.style.display = "flex";
+    delivView.style.display = "none";
+    if (chatTab) chatTab.classList.add("active");
+    if (delivTab) delivTab.classList.remove("active");
+  }
+}
+
+function handleChatInputKeydown(event) {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+}
+
+function clearCopilotChat() {
+  const chatContainer = document.getElementById("chat-container");
+  if (!chatContainer) return;
+  const welcome = chatContainer.querySelector(".chat-welcome-card");
+  if (welcome) {
+    chatContainer.innerHTML = "";
+    chatContainer.appendChild(welcome);
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+// TOUCH-SENSITIVE MICRO-INTERACTION & SCADA ANIMATION ENGINE
+// -----------------------------------------------------------------------------
+
+// Tooltip DOM instance
+let globalHudTooltip = null;
+
+function getOrCreateHudTooltip() {
+  if (!globalHudTooltip) {
+    globalHudTooltip = document.createElement("div");
+    globalHudTooltip.className = "hud-touch-tooltip";
+    document.body.appendChild(globalHudTooltip);
+  }
+  return globalHudTooltip;
+}
+
+function showHudTooltip(text, x, y) {
+  const tt = getOrCreateHudTooltip();
+  tt.innerHTML = text;
+  tt.style.left = `${x}px`;
+  tt.style.top = `${y}px`;
+  tt.classList.add("visible");
+}
+
+function hideHudTooltip() {
+  if (globalHudTooltip) {
+    globalHudTooltip.classList.remove("visible");
+  }
+}
+
+// 1. Universal Touch Ripple Generator
+function initUniversalTouchRipple() {
+  const rippleTargets = ".btn, .nav-item, .assay-toggle-btn, .hud-axis-btn, .copilot-chip, .hud-drawer-toggle, .speedo-delta-badge, .hud-speedometer-card, .hud-col-gauge, .reformer-btn, .legend-chip";
+
+  document.addEventListener("pointerdown", (e) => {
+    const target = e.target.closest(rippleTargets);
+    if (!target) return;
+
+    const rect = target.getBoundingClientRect();
+    const ripple = document.createElement("span");
+    ripple.className = "touch-ripple-effect";
+
+    const size = Math.max(rect.width, rect.height);
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+
+    ripple.style.width = ripple.style.height = `${size}px`;
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+
+    // Ensure target position relative
+    const compPos = window.getComputedStyle(target).position;
+    if (compPos === "static") {
+      target.style.position = "relative";
+    }
+    target.style.overflow = "hidden";
+    target.appendChild(ripple);
+
+    setTimeout(() => {
+      ripple.remove();
+    }, 600);
+  }, { passive: true });
+}
+
+// 2. Interactive Linked Cut Bar & 2x3 Legend
+function initCutBarInteractions() {
+  const cutMeta = {
+    "cut-lpg": { name: "Liquefied Petroleum Gas (LPG)", range: "C3 - C4 (-42°C to 0°C)", desc: "Bottling & clean domestic fuel" },
+    "cut-naphtha": { name: "Light & Heavy Naphtha", range: "35°C - 175°C", desc: "Petrochemical feedstock (OMPL Aromatics/PP)" },
+    "cut-atf": { name: "Aviation Turbine Fuel (ATF / Jet A-1)", range: "150°C - 260°C", desc: "Freeze point -47°C commercial aviation" },
+    "cut-diesel": { name: "Ultra-Low Sulfur Diesel (BS-VI)", range: "250°C - 370°C", desc: "Sulfur < 10 ppm, Cetane 51+ prime transport fuel" },
+    "cut-vgo": { name: "Vacuum Gas Oil (Heavy VGO)", range: "370°C - 540°C", desc: "FCC & Hydrocracker conversion feedstock" },
+    "cut-residue": { name: "Vacuum Residue (VR / Bitumen)", range: "540°C+ Heavy Ends", desc: "Bitumen VG-30/40 & Petcoke delayed coker feed" },
+  };
+
+  const cutSegments = document.querySelectorAll(".cut-segment");
+  cutSegments.forEach(seg => {
+    // Find class matching cut-*
+    let cutKey = null;
+    for (const cls of seg.classList) {
+      if (cutMeta[cls]) {
+        cutKey = cls;
+        break;
+      }
+    }
+    if (!cutKey) return;
+
+    function handleEnter(e) {
+      seg.classList.add("active-cut-highlight");
+      const meta = cutMeta[cutKey];
+      const shortKey = cutKey.replace("cut-", "");
+      
+      // Highlight matching legend item
+      const legEl = document.getElementById(`legend-cut-${shortKey}`) || document.getElementById(`legend-petro-${shortKey}`);
+      if (legEl && legEl.parentElement) {
+        legEl.parentElement.classList.add("active-legend-highlight");
+      }
+
+      const rect = seg.getBoundingClientRect();
+      const valText = seg.textContent.trim() || seg.getAttribute("title") || "";
+      showHudTooltip(`
+        <div style="font-weight:800; color:#FF9E2C; margin-bottom:2px;">${meta.name}</div>
+        <div style="font-size:10px; color:#38BDF8;">Boiling Cut: ${meta.range}</div>
+        <div style="font-size:9.5px; color:#94A3B8; margin-top:2px;">${meta.desc}</div>
+        <div style="font-size:10px; font-weight:700; color:#FFFFFF; margin-top:3px;">Yield Fraction: ${valText}</div>
+      `, rect.left + rect.width / 2, rect.top);
+    }
+
+    function handleLeave() {
+      seg.classList.remove("active-cut-highlight");
+      const shortKey = cutKey.replace("cut-", "");
+      const legEl = document.getElementById(`legend-cut-${shortKey}`) || document.getElementById(`legend-petro-${shortKey}`);
+      if (legEl && legEl.parentElement) {
+        legEl.parentElement.classList.remove("active-legend-highlight");
+      }
+      hideHudTooltip();
+    }
+
+    seg.addEventListener("mouseenter", handleEnter);
+    seg.addEventListener("mouseleave", handleLeave);
+    seg.addEventListener("touchstart", (e) => {
+      handleEnter(e);
+      setTimeout(handleLeave, 2500);
+    }, { passive: true });
+  });
+
+  // Link legend hover to cut bar
+  const legendItems = document.querySelectorAll(".cut-bar-container + div > div, .hud-equalizer-card [id^='legend-']");
+  legendItems.forEach(item => {
+    item.classList.add("legend-cut-item");
+    item.addEventListener("mouseenter", () => {
+      const valSpan = item.querySelector("[id^='legend-']");
+      if (!valSpan) return;
+      const key = valSpan.id.replace("legend-cut-", "").replace("legend-petro-", "");
+      const targetSeg = document.querySelector(`.cut-segment.cut-${key}`);
+      if (targetSeg) {
+        targetSeg.classList.add("active-cut-highlight");
+      }
+    });
+    item.addEventListener("mouseleave", () => {
+      document.querySelectorAll(".cut-segment").forEach(s => s.classList.remove("active-cut-highlight"));
+    });
+  });
+}
+
+// 3. Interactive Segmented Track Scrubber
+function initTrackScrubbers() {
+  const tracks = document.querySelectorAll(".hud-segmented-track");
+  tracks.forEach(track => {
+    function handleScrub(e) {
+      const rect = track.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+      const ticks = track.querySelectorAll(".seg-tick");
+      const activeIdx = Math.round(pct * ticks.length);
+
+      ticks.forEach((tick, i) => {
+        if (i <= activeIdx) {
+          tick.classList.add("active", "touch-scrub");
+        } else {
+          tick.classList.remove("active", "touch-scrub");
+        }
+      });
+
+      showHudTooltip(`
+        <div style="font-weight:700; color:#00F5D4;">Operating Throughput</div>
+        <div style="font-size:12px; font-weight:800; font-family:var(--font-mono);">${(pct * 120).toFixed(1)}% Capacity (${(pct * 16.77).toFixed(2)} MMT)</div>
+      `, clientX, rect.top - 10);
+    }
+
+    function handleEnd() {
+      track.querySelectorAll(".seg-tick").forEach(t => t.classList.remove("touch-scrub"));
+      hideHudTooltip();
+    }
+
+    track.addEventListener("mousemove", handleScrub);
+    track.addEventListener("mouseleave", handleEnd);
+    track.addEventListener("touchmove", handleScrub, { passive: true });
+    track.addEventListener("touchend", handleEnd);
+  });
+}
+
+// 4. Interactive Column Gauges Tactile Pulse
+function initGaugeInteractions() {
+  const gauges = document.querySelectorAll(".hud-col-gauge");
+  gauges.forEach(gauge => {
+    gauge.addEventListener("pointerdown", () => {
+      gauge.classList.add("active-touch");
+      const tempVal = gauge.querySelector(".gauge-temp-val")?.textContent || "";
+      const colName = gauge.querySelector(".gauge-col-name")?.textContent || "";
+      const colSub = gauge.querySelector(".gauge-col-sub")?.textContent || "";
+
+      const rect = gauge.getBoundingClientRect();
+      showHudTooltip(`
+        <div style="font-weight:800; color:#FF9E2C;">${colName}</div>
+        <div style="font-size:10px; color:#94A3B8;">${colSub}</div>
+        <div style="font-size:12px; font-weight:800; color:#00F5D4; font-family:var(--font-mono); margin-top:2px;">Operating: ${tempVal}</div>
+      `, rect.left + rect.width / 2, rect.top);
+
+      setTimeout(() => {
+        gauge.classList.remove("active-touch");
+        hideHudTooltip();
+      }, 2000);
+    });
+  });
+}
+
+// 5. Interactive Equalizer Bouncing Physics
+function initEqualizerInteractions() {
+  const eqBars = document.querySelectorAll(".eq-bar");
+  eqBars.forEach(bar => {
+    bar.addEventListener("pointerenter", () => {
+      bar.classList.add("active-touch");
+      const origHeight = parseInt(bar.style.height) || 40;
+      bar.style.height = `${Math.min(64, origHeight + 10)}px`;
+    });
+    bar.addEventListener("pointerleave", () => {
+      bar.classList.remove("active-touch");
+    });
+  });
+}
+
+// Master Initializer called on DOMContentLoaded and tab switch
+function initTouchAndMicroInteractions() {
+  initUniversalTouchRipple();
+  initCutBarInteractions();
+  initTrackScrubbers();
+  initGaugeInteractions();
+  initEqualizerInteractions();
+}
