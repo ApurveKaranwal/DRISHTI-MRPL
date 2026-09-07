@@ -2449,16 +2449,23 @@ code {
   z-index: 3;
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
-  gap: 28px;
-  padding: 24px 32px 32px 32px;
-  min-height: calc(100vh - 80px);
+  gap: 32px;
+  padding: 24px 36px 16px 36px;
+  min-height: auto;
 }
 
 @media (max-width: 1280px) {
   .hud-stage {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 24px;
   }
+}
+
+.hud-col-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
 }
 
 /* Glassmorphic Cards */
@@ -2467,8 +2474,8 @@ code {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 18px;
-  padding: 16px 20px;
+  border-radius: 20px;
+  padding: 20px 24px;
   box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.45);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
@@ -2479,20 +2486,21 @@ code {
 
 /* 1. Status Capsule */
 .hud-status-capsule {
-  width: 310px;
-  margin-bottom: 24px;
+  width: 380px;
+  max-width: 100%;
+  margin-bottom: 8px;
 }
 
 .hud-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .hud-capsule-title {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   color: #FFFFFF;
   letter-spacing: 0.3px;
 }
@@ -2501,40 +2509,42 @@ code {
   background: rgba(255, 122, 0, 0.18);
   color: #FF9E2C;
   border: 1px solid rgba(255, 122, 0, 0.45);
-  border-radius: 12px;
-  font-size: 10.5px;
-  font-weight: 700;
-  padding: 2px 10px;
+  border-radius: 14px;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 3px 12px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
 .hud-status-rows {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .hud-status-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 11.5px;
+  font-size: 13px;
 }
 
 .hud-row-label {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12.5px;
 }
 
 .hud-row-val {
   color: #F1F5F9;
-  font-weight: 600;
+  font-weight: 700;
   font-family: var(--font-mono);
+  font-size: 13px;
 }
 
 /* 2. Physical Asset HUD Dial Overlay */
 .hud-asset-dial-box {
-  margin: 16px 0 28px 30px;
+  margin: 14px 0 24px 20px;
   position: relative;
   display: inline-flex;
   flex-direction: column;
@@ -2543,8 +2553,8 @@ code {
 
 .hud-dial-graphic {
   position: relative;
-  width: 190px;
-  height: 190px;
+  width: 250px;
+  height: 250px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2560,59 +2570,62 @@ code {
 
 .hud-dial-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.12);
-  stroke-width: 1.5;
-  stroke-dasharray: 2 4;
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 2;
+  stroke-dasharray: 3 5;
 }
 
 .hud-dial-arc {
   fill: none;
   stroke: #FF7A00;
-  stroke-width: 2.5;
-  filter: drop-shadow(0 0 6px rgba(255, 122, 0, 0.8));
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 8px rgba(255, 122, 0, 0.85));
 }
 
 .hud-dial-dot {
   fill: #FF7A00;
-  filter: drop-shadow(0 0 8px #FF7A00);
+  filter: drop-shadow(0 0 10px #FF7A00);
 }
 
 .hud-dial-inner-hub {
   text-align: center;
   position: relative;
   z-index: 2;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(15, 23, 42, 0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
   border-radius: 50%;
-  width: 100px;
-  height: 100px;
+  width: 136px;
+  height: 136px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
 }
 
 .hud-hub-center-dot {
-  width: 7px;
-  height: 7px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: #FF7A00;
-  box-shadow: 0 0 10px #FF7A00;
-  margin-bottom: 4px;
+  box-shadow: 0 0 12px #FF7A00;
+  margin-bottom: 6px;
 }
 
 .hud-hub-tag {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
   color: #FFFFFF;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
 .hud-hub-sub {
-  font-size: 9px;
+  font-size: 11px;
   color: #FF9E2C;
   font-family: var(--font-mono);
+  font-weight: 600;
+  margin-top: 2px;
 }
 
 .hud-dial-ticks {
@@ -2623,8 +2636,8 @@ code {
 
 .hud-tick {
   position: absolute;
-  font-size: 9.5px;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
   font-family: var(--font-mono);
   font-weight: 600;
 }
@@ -2632,43 +2645,43 @@ code {
 .hud-tick.active {
   color: #FF9E2C;
   font-weight: 800;
-  text-shadow: 0 0 8px rgba(255, 122, 0, 0.6);
+  text-shadow: 0 0 8px rgba(255, 122, 0, 0.7);
 }
 
-.tick-80 { top: 12px; right: 48px; }
-.tick-70 { top: 36px; right: 14px; }
-.tick-60 { top: 72px; right: 0px; }
-.tick-50 { top: 108px; right: 2px; }
-.tick-40 { top: 140px; right: 18px; }
-.tick-30 { top: 166px; right: 46px; }
-.tick-20 { bottom: 0px; right: 86px; }
-.tick-10 { bottom: 8px; left: 60px; }
+.tick-80 { top: 22px; right: 65px; }
+.tick-70 { top: 56px; right: 22px; }
+.tick-60 { top: 105px; right: 6px; }
+.tick-50 { top: 155px; right: 10px; }
+.tick-40 { top: 200px; right: 35px; }
+.tick-30 { top: 232px; right: 78px; }
+.tick-20 { bottom: 0px; right: 125px; }
+.tick-10 { bottom: 12px; left: 75px; }
 
 .hud-axis-selector {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-top: 14px;
+  gap: 14px;
+  margin-top: 18px;
 }
 
 .hud-axis-line {
-  width: 32px;
+  width: 44px;
   height: 1px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .hud-axis-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: #F1F5F9;
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 13px;
   transition: all 0.15s ease;
 }
 
@@ -2679,47 +2692,46 @@ code {
 }
 
 .hud-axis-label {
-  font-size: 11.5px;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 600;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
   letter-spacing: 0.3px;
 }
 
 /* 3. Hero Typography & Segmented Bar */
 .hud-hero-block {
-  margin-top: auto;
-  max-width: 580px;
+  max-width: 680px;
 }
 
 .hud-hero-heading {
-  font-size: 30px;
+  font-size: 38px;
   font-weight: 800;
   color: #FFFFFF;
-  line-height: 1.2;
-  letter-spacing: -0.5px;
-  margin-bottom: 8px;
+  line-height: 1.18;
+  letter-spacing: -0.6px;
+  margin-bottom: 10px;
 }
 
 .hud-hero-description {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.65);
-  line-height: 1.5;
-  margin-bottom: 18px;
+  font-size: 14.5px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-bottom: 22px;
 }
 
 /* Segmented 40-Tick Horizontal Bar */
 .hud-segmented-track {
   display: flex;
-  gap: 3px;
+  gap: 4px;
   align-items: center;
-  height: 14px;
-  margin-bottom: 18px;
+  height: 20px;
+  margin-bottom: 22px;
 }
 
 .seg-tick {
   flex: 1;
-  height: 12px;
-  border-radius: 1px;
+  height: 18px;
+  border-radius: 2px;
   background: rgba(255, 255, 255, 0.12);
   transition: all 0.2s ease;
   cursor: default;
@@ -2728,39 +2740,41 @@ code {
 
 .seg-tick.active {
   background: #FF7A00;
-  box-shadow: 0 0 6px rgba(255, 122, 0, 0.65);
+  box-shadow: 0 0 8px rgba(255, 122, 0, 0.7);
 }
 
 .hud-hero-stats-row {
   display: flex;
   align-items: flex-end;
-  gap: 40px;
+  gap: 48px;
 }
 
 .stat-main-num {
-  font-size: 20px;
+  font-size: 28px;
   font-weight: 800;
   color: #FFFFFF;
   font-family: var(--font-mono);
+  line-height: 1.1;
 }
 
 .stat-mini-unit {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.55);
-  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
 }
 
 .stat-main-label {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-top: 3px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 4px;
+  font-weight: 600;
 }
 
 /* Right Column Widgets */
 .hud-col-right {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
 }
 
 /* 4. Top Right Equalizer Card */
@@ -2770,69 +2784,59 @@ code {
 }
 
 .hud-card-title {
-  font-size: 13.5px;
-  font-weight: 700;
+  font-size: 15.5px;
+  font-weight: 800;
   color: #FFFFFF;
 }
 
 .hud-card-sub {
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.55);
-  margin-top: 1px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
 }
 
 .hud-legend-chips {
   display: flex;
-  gap: 12px;
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.7);
+  gap: 14px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .legend-chip {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .chip-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
 }
-.chip-dot.dot-orange { background: #FF7A00; box-shadow: 0 0 6px #FF7A00; }
+.chip-dot.dot-orange { background: #FF7A00; box-shadow: 0 0 7px #FF7A00; }
 .chip-dot.dot-white { background: #FFFFFF; }
 
 .hud-equalizer-wrap {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.hud-eq-val-top {
-  align-self: flex-start;
-  margin-top: 2px;
-}
-
-.hud-eq-val-bottom {
-  align-self: flex-end;
-  margin-bottom: 16px;
+  gap: 14px;
+  margin-top: 22px;
 }
 
 .hud-eq-val-top,
 .hud-eq-val-bottom {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   font-family: var(--font-mono);
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.75);
   display: flex;
   flex-direction: column;
 }
 
 .eq-sub {
-  font-size: 8.5px;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.45);
   font-weight: 400;
 }
 
@@ -2840,9 +2844,9 @@ code {
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
-  gap: 12px;
+  gap: 14px;
   flex: 1;
-  height: 76px;
+  height: 90px;
 }
 
 .hud-eq-col {
@@ -2855,11 +2859,11 @@ code {
 }
 
 .hud-eq-label {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 600;
   font-family: var(--font-mono);
   color: var(--text-dim);
-  margin-top: 6px;
+  margin-top: 8px;
   white-space: nowrap;
 }
 
@@ -2873,9 +2877,9 @@ code {
 }
 
 .hud-eq-col .eq-bar {
-  width: 22px;
-  max-width: 26px;
-  border-radius: 4px 4px 2px 2px;
+  width: 28px;
+  max-width: 32px;
+  border-radius: 5px 5px 2px 2px;
 }
 
 .eq-bar.active {
@@ -2885,11 +2889,11 @@ code {
 
 /* 5. Temperatures Card (4 vertical gauges) */
 .hud-card-badge {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.7);
-  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 3px 10px;
   border-radius: 6px;
   font-family: var(--font-mono);
 }
@@ -2897,40 +2901,40 @@ code {
 .hud-columns-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-top: 14px;
+  gap: 14px;
+  margin-top: 16px;
 }
 
 .hud-col-gauge {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 10px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 12px 10px;
   text-align: center;
 }
 
 .gauge-temp-val {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 13.5px;
+  font-weight: 800;
   color: #FFFFFF;
   font-family: var(--font-mono);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .gauge-bar-track {
   width: 100%;
-  height: 60px;
+  height: 80px;
   background: rgba(255, 255, 255, 0.06);
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   align-items: flex-end;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .gauge-bar-fill {
   width: 100%;
-  border-radius: 6px;
+  border-radius: 8px;
   transition: height 0.4s ease;
 }
 
@@ -2945,45 +2949,48 @@ code {
 }
 
 .gauge-col-name {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 600;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 700;
 }
 
 .gauge-col-sub {
-  font-size: 9px;
-  color: rgba(255, 255, 255, 0.45);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
   font-family: var(--font-mono);
-  margin-top: 2px;
+  margin-top: 3px;
+  font-weight: 600;
 }
 
 /* 6. Bottom Cluster: Two Dark Mini Cards + Large High-Contrast Speedometer Card */
 .hud-bottom-cluster {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
-  gap: 16px;
+  gap: 18px;
 }
 
 .hud-mini-column {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .hud-mini-card {
-  padding: 14px 16px;
+  padding: 16px 20px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .mini-card-label {
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.55);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .mini-card-value {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 800;
   color: #FFFFFF;
   font-family: var(--font-mono);
@@ -2991,9 +2998,9 @@ code {
 }
 
 .mini-card-unit {
-  font-size: 12px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* Large High-Contrast White Speedometer Card */
@@ -3001,7 +3008,7 @@ code {
   background: #F8FAFC;
   color: #0F172A;
   border-radius: 20px;
-  padding: 16px;
+  padding: 18px 20px;
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
   display: flex;
   flex-direction: column;
@@ -3016,8 +3023,8 @@ code {
 }
 
 .speedo-svg {
-  width: 180px;
-  height: 110px;
+  width: 210px;
+  height: 122px;
 }
 
 .speedo-number-box {
@@ -3029,7 +3036,7 @@ code {
 }
 
 .speedo-big-val {
-  font-size: 28px;
+  font-size: 34px;
   font-weight: 800;
   color: #0F172A;
   font-family: var(--font-mono);
@@ -3037,24 +3044,24 @@ code {
 }
 
 .speedo-unit-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #64748B;
   letter-spacing: 0.5px;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .speedo-deltas-row {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .speedo-delta-badge {
   background: #EDF2F7;
-  border-radius: 8px;
-  padding: 6px 10px;
+  border-radius: 10px;
+  padding: 7px 12px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -3062,19 +3069,19 @@ code {
 }
 
 .delta-num {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   color: #0F172A;
   font-family: var(--font-mono);
 }
 
 .delta-arrow {
-  font-size: 9px;
+  font-size: 10px;
   color: #059669;
 }
 
 .delta-sub {
-  font-size: 9.5px;
+  font-size: 10px;
   color: #64748B;
 }
 
@@ -3082,18 +3089,18 @@ code {
 .hud-collapsible-drawer {
   position: relative;
   z-index: 4;
-  padding: 0 32px 32px 32px;
+  padding: 8px 36px 32px 36px;
 }
 
 .hud-drawer-toggle {
   width: 100%;
   background: rgba(18, 24, 38, 0.7);
   backdrop-filter: blur(14px);
-  border: 1px dashed rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  padding: 12px 18px;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: 14px 20px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
