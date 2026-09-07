@@ -24,18 +24,15 @@ let cachedRefineryData = null;
 let currentGovDataset = "monthly";
 
 // -----------------------------------------------------------------------------
-// Night / Day Theme Controller
+// Theme Controller (Locked permanently to Dark SCADA)
 // -----------------------------------------------------------------------------
 function initTheme() {
-  const saved = localStorage.getItem("mrpl_theme") || "dark";
-  document.documentElement.setAttribute("data-theme", saved);
+  try { localStorage.removeItem("mrpl_theme"); } catch (e) {}
+  document.documentElement.setAttribute("data-theme", "dark");
 }
 
 function toggleTheme() {
-  const current = document.documentElement.getAttribute("data-theme") || "dark";
-  const next = current === "dark" ? "light" : "dark";
-  document.documentElement.setAttribute("data-theme", next);
-  localStorage.setItem("mrpl_theme", next);
+  document.documentElement.setAttribute("data-theme", "dark");
 }
 
 // Apply immediately on parse
