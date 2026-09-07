@@ -116,7 +116,10 @@ def _validate_operations(fmt: str, operations: list[dict[str, Any]]) -> None:
             raise InvalidOperationError(f"operation[{i}]: unknown operation type '{op_type}'")
         if op_type not in allowed:
             raise InvalidOperationError(f"operation[{i}]: '{op_type}' is not valid for .{fmt} files")
-        missing = REQUIRED_KEYS_BY_OP[op_type] - op.keys()
+        missing = set(REQUIRED_KEYS_BY_OP[op_type]) - set(op.keys())
+        if fmt == "csv" and "sheet" in missing:
+            op["sheet"] = "Sheet1"
+            missing.discard("sheet")
         if missing:
             raise InvalidOperationError(
                 f"operation[{i}] ('{op_type}'): missing required field(s) {sorted(missing)}"

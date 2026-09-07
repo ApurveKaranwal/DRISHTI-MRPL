@@ -139,10 +139,7 @@ class VisionWorker:
                     ],
                     "stream": False,
                 },
-                timeout=min(
-                    self.settings.request_timeout,
-                    30.0,
-                ),
+                timeout=self.settings.request_timeout,
             )
 
             response.raise_for_status()
@@ -258,6 +255,7 @@ class VisionWorker:
                 )
 
             page = pdf.load_page(page_number)
+            native_text = page.get_text("text").strip()
 
             pixmap = page.get_pixmap(
                 dpi=self.settings.render_dpi
@@ -265,10 +263,19 @@ class VisionWorker:
 
             image_bytes = pixmap.tobytes("png")
 
-        return self._process_image_bytes(
+        result = self._process_image_bytes(
             image_bytes,
             source_label=f"{path.name} (page {page_number + 1})"
         )
+
+        if native_text:
+            result["native_text"] = native_text
+            existing_combined = result.get("combined_text", "")
+            result["combined_text"] = (
+                f"[Document Native Text]\n{native_text}\n\n{existing_combined}".strip()
+            )
+
+        return result
 
     def find_scanned_pages(
         self,
@@ -305,6 +312,10 @@ class VisionWorker:
         scanned_pages = self.find_scanned_pages(
             pdf_path
         )
+
+        if not scanned_pages:
+            with fitz.open(Path(pdf_path).resolve()) as pdf:
+                scanned_pages = list(range(pdf.page_count))
 
         return [
             self.process_pdf_page(

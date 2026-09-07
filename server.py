@@ -66,6 +66,13 @@ for csv_file in DATA_DIR.glob("*.csv"):
     except Exception:
         pass
 
+# Pre-seed engineering standards, SOPs, and reports into retrieval worker
+for doc_file in list(DATA_DIR.glob("*.pdf")) + list(DATA_DIR.glob("*.md")):
+    try:
+        supervisor._document().ingest(doc_file)
+    except Exception:
+        pass
+
 
 class ChatRequest(BaseModel):
     message: str

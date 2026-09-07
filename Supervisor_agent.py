@@ -525,7 +525,7 @@ class SupervisorAgent:
         if json_mode:
             payload["format"] = "json"
 
-        timeout_sec = float(os.getenv("LLM_TIMEOUT", "90.0"))
+        timeout_sec = float(os.getenv("LLM_TIMEOUT", "180.0"))
         response = requests.post(
             f"{self.OLLAMA_URL}/api/chat",
             json=payload,
@@ -588,36 +588,38 @@ class SupervisorAgent:
     # -----------------------------------------------------------------------
 
     def _known_tables_context(self) -> str:
-        tables = self._data().list_tables()
+        try:
+            tables = self._data().list_tables()
+            if not tables:
+                return "No tables are currently loaded in data_analysis."
 
-        if not tables:
-            return "No tables are currently loaded in data_analysis."
+            lines = []
 
-        lines = []
+            for t in tables:
+                tname = t["table_name"]
 
-        for t in tables:
-            tname = t["table_name"]
+                try:
+                    col_info = self._data().conn.execute(
+                        f'PRAGMA table_info("{tname}")'
+                    ).fetchall()
 
-            try:
-                col_info = self._data().conn.execute(
-                    f'PRAGMA table_info("{tname}")'
-                ).fetchall()
+                    col_names = [r[1] for r in col_info]
+                    cols_str = ", ".join(col_names)
 
-                col_names = [r[1] for r in col_info]
-                cols_str = ", ".join(col_names)
+                except Exception:
+                    cols_str = f"{t['column_count']} cols"
 
-            except Exception:
-                cols_str = f"{t['column_count']} cols"
+                lines.append(
+                    f'- "{tname}" ({t["row_count"]} rows): [{cols_str}]'
+                )
 
-            lines.append(
-                f'- "{tname}" ({t["row_count"]} rows): [{cols_str}]'
+            return (
+                "Tables and exact column names loaded in data_analysis "
+                "(use these EXACT table and column names in SQL):\n"
+                + "\n".join(lines)
             )
-
-        return (
-            "Tables and exact column names loaded in data_analysis "
-            "(use these EXACT table and column names in SQL):\n"
-            + "\n".join(lines)
-        )
+        except Exception:
+            return "No tables are currently accessible in data_analysis."
 
     # -----------------------------------------------------------------------
     # DOCUMENT MODIFIER CONTEXT
@@ -682,8 +684,6 @@ class SupervisorAgent:
             )
 
         base_prompt = f"""
-{AGENT_CONTEXT}
-
 {self._known_tables_context()}
 
 {self._modifier_schema_context()}
@@ -719,6 +719,7 @@ CRITICAL PLANNING RULES:
 7. NEVER put natural language inside 'sql'.
 
 8. ONLY invoke 'vision' if an image or scan file is explicitly supplied.
+   For PDF scans, use action 'process_scanned_pdf'. For images (.png, .jpg), use action 'process_image'.
 
 9. Select the smallest useful plan.
 
@@ -809,18 +810,17 @@ Files explicitly supplied: {files or []}
                     flags=re.DOTALL
                 ).strip()
 
-                # Extract the outer JSON object if the model added text.
-                json_match = re.search(
-                    r"(\{.*\})",
-                    cleaned_raw,
-                    flags=re.DOTALL
-                )
+                # Strip markdown code fences if present
+                cleaned_raw = re.sub(r"^```(?:json)?\s*", "", cleaned_raw, flags=re.IGNORECASE)
+                cleaned_raw = re.sub(r"\s*```$", "", cleaned_raw)
 
-                raw_json = (
-                    json_match.group(1)
-                    if json_match
-                    else cleaned_raw
-                )
+                # Extract the outer JSON object if the model added text.
+                first_brace = cleaned_raw.find("{")
+                last_brace = cleaned_raw.rfind("}")
+                if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
+                    raw_json = cleaned_raw[first_brace:last_brace + 1]
+                else:
+                    raw_json = cleaned_raw
 
                 plan = json.loads(raw_json)
 
@@ -967,12 +967,23 @@ Files explicitly supplied: {files or []}
             "row",
             "column",
             "data",
+            "dataset",
             "statistics",
             "statistical",
             "schema",
             "describe",
             "filter",
             "sort",
+            "assay",
+            "assays",
+            "crude",
+            "crudes",
+            "gravity",
+            "api_gravity",
+            "api gravity",
+            "density",
+            "sulfur",
+            "yield",
         }
 
         engineering_keywords = {
@@ -1011,12 +1022,16 @@ Files explicitly supplied: {files or []}
             "shutdown",
             "startup",
             "safety",
-            "api",
+            "api standard",
+            "api spec",
+            "api 510",
+            "api 570",
+            "api 650",
+            "api 653",
+            "api rp",
             "technical guidance",
             "technical reference",
             "document",
-            "refinery",
-            "mrpl",
         }
 
         vision_keywords = {
@@ -1080,6 +1095,21 @@ Files explicitly supplied: {files or []}
         # VISION ROUTING
         # ---------------------------------------------------------------
 
+        # Route PDF files to vision for OCR + VLM extraction
+        pdf_files = [
+            f for f in files
+            if Path(f).suffix.lower() == ".pdf"
+        ]
+
+        if pdf_files:
+            add_action(
+                {
+                    "worker": "vision",
+                    "action": "process_scanned_pdf",
+                    "file": pdf_files[0],
+                }
+            )
+
         if image_files:
             add_action(
                 {
@@ -1110,22 +1140,69 @@ Files explicitly supplied: {files or []}
             or any(keyword in q for keyword in data_keywords)
         )
 
-        if structured_requested and structured_files:
+        if structured_requested:
+            if structured_files:
+                # For fallback mode with supplied file, describe the file
+                add_action(
+                    {
+                        "worker": "data_analysis",
+                        "action": "describe",
+                        "file": structured_files[0],
+                    }
+                )
+            else:
+                # No file explicitly supplied: route against pre-loaded DuckDB tables
+                try:
+                    known_tables = [t["table_name"] for t in self._data().list_tables()]
+                except Exception:
+                    known_tables = []
 
-            # For fallback mode, describe is safer than inventing SQL.
-            add_action(
-                {
-                    "worker": "data_analysis",
-                    "action": "describe",
-                    "file": structured_files[0],
-                }
-            )
+                target_table = None
+                if any(k in q for k in ["assay", "crude", "gravity", "api_gravity", "api gravity", "brent", "arab", "maya"]):
+                    if "real_crude_oil_assays" in known_tables:
+                        target_table = "real_crude_oil_assays"
+                elif any(k in q for k in ["monthly", "indigenous", "imported", "processing", "throughput"]):
+                    if "ppac_mrpl_monthly_crude_processing" in known_tables:
+                        target_table = "ppac_mrpl_monthly_crude_processing"
+                elif any(k in q for k in ["slate", "production", "petroleum", "lpg", "diesel", "naphtha"]):
+                    if "ppac_mrpl_petroleum_production_slate" in known_tables:
+                        target_table = "ppac_mrpl_petroleum_production_slate"
+                elif any(k in q for k in ["benchmark", "psu", "nelson", "ioc", "bpcl", "hpcl"]):
+                    if "ppac_psu_refineries_benchmark" in known_tables:
+                        target_table = "ppac_psu_refineries_benchmark"
+                elif any(k in q for k in ["schedule", "pipe", "asme", "thickness", "wall"]):
+                    if "asme_pipe_schedules_astm_a106" in known_tables:
+                        target_table = "asme_pipe_schedules_astm_a106"
+                elif any(k in q for k in ["spare", "spares", "catalog", "equipment"]):
+                    if "refinery_equipment_spares_catalog" in known_tables:
+                        target_table = "refinery_equipment_spares_catalog"
+                elif known_tables:
+                    target_table = known_tables[0]
+
+                if target_table == "real_crude_oil_assays" and any(k in q for k in ["average", "avg", "mean"]) and any(k in q for k in ["api", "gravity"]):
+                    add_action(
+                        {
+                            "worker": "data_analysis",
+                            "action": "query",
+                            "sql": "SELECT AVG(api_gravity) as avg_api_gravity FROM real_crude_oil_assays",
+                            "table_name": "real_crude_oil_assays",
+                        }
+                    )
+                elif target_table:
+                    add_action(
+                        {
+                            "worker": "data_analysis",
+                            "action": "describe",
+                            "table_name": target_table,
+                        }
+                    )
 
         # If there are structured files and the user asks for engineering
         # computation, data_analysis comes before code_sandbox.
         if (
             structured_files
             and any(keyword in q for keyword in engineering_keywords)
+            and not any(a.get("worker") == "data_analysis" for a in actions)
         ):
             add_action(
                 {
@@ -1144,7 +1221,7 @@ Files explicitly supplied: {files or []}
             or any(keyword in q for keyword in document_keywords)
         )
 
-        if document_requested:
+        if document_requested and (bool(document_files) or not actions):
             add_action(
                 {
                     "worker": "document_retrieval",
@@ -1294,6 +1371,15 @@ Files explicitly supplied: {files or []}
                         {
                             "worker": "vision",
                             "action": "process_image",
+                            "file": first_file,
+                        }
+                    )
+
+                elif suffix == ".pdf":
+                    add_action(
+                        {
+                            "worker": "vision",
+                            "action": "process_scanned_pdf",
                             "file": first_file,
                         }
                     )
@@ -1914,6 +2000,12 @@ Files explicitly supplied: {files or []}
 
                     else:
 
+                        target_table = (
+                            action.get("table_name")
+                            or (self._resolve_table_name(data, file_path) if file_path else None)
+                            or (data.list_tables()[0]["table_name"] if data.list_tables() else "real_crude_oil_assays")
+                        )
+
                         result = {
                             "ingest":
                                 lambda:
@@ -1922,13 +2014,13 @@ Files explicitly supplied: {files or []}
                             "schema":
                                 lambda:
                                     data.schema(
-                                        action["table_name"]
+                                        target_table
                                     ),
 
                             "describe":
                                 lambda:
                                     data.describe(
-                                        action["table_name"]
+                                        target_table
                                     ),
                         }[name]()
 
@@ -1939,16 +2031,12 @@ Files explicitly supplied: {files or []}
                 elif worker == "vision":
 
                     vision = self._vision()
+                    suffix = Path(file_path).suffix.lower() if file_path else ""
 
-                    result = (
-                        vision.process_image(
-                            file_path
-                        )
-                        if name == "process_image"
-                        else vision.process_scanned_pdf(
-                            file_path
-                        )
-                    )
+                    if suffix == ".pdf" or name == "process_scanned_pdf":
+                        result = vision.process_scanned_pdf(file_path)
+                    else:
+                        result = vision.process_image(file_path)
 
                 # -----------------------------------------------------------
                 # DOCUMENT MODIFIER
@@ -2224,17 +2312,16 @@ Files explicitly supplied: {files or []}
 
         try:
 
-            return self._llm_chat(
+            resp = self._llm_chat(
                 [
                     {
                         "role": "system",
-                        "content":
-                            AGENT_CONTEXT
-                            + (
-                                "\nAnswer using only the supplied "
-                                "worker results. "
-                                "Cite source_name when available."
-                            ),
+                        "content": (
+                            "You are a helpful, precise engineering assistant for Mangalore Refinery and Petrochemicals Limited (MRPL). "
+                            "Answer the user request concisely and factually using only the supplied worker results. "
+                            "Cite source tables, files, or standards when available. "
+                            "Do not hallucinate or extrapolate facts not present in the worker results."
+                        ),
                     },
                     {
                         "role": "user",
@@ -2244,6 +2331,15 @@ Files explicitly supplied: {files or []}
                     },
                 ]
             )
+
+            cleaned = re.sub(
+                r"<think>.*?</think>",
+                "",
+                resp,
+                flags=re.DOTALL
+            ).strip()
+
+            return cleaned if cleaned else resp.strip()
 
         except Exception as error:
 
@@ -2387,10 +2483,16 @@ Files explicitly supplied: {files or []}
         # RESPOND
         # ---------------------------------------------------------------
 
-        answer = self.respond(
-            request,
-            results
-        )
+        if plan.get("fallback_mode") or not llm_online:
+            answer = self._build_fallback_response(
+                request,
+                results
+            )
+        else:
+            answer = self.respond(
+                request,
+                results
+            )
 
         # ---------------------------------------------------------------
         # REPORT
@@ -2407,6 +2509,8 @@ Files explicitly supplied: {files or []}
             self.auditor.get_telemetry()
         )
 
+        is_llm_mode = llm_online and not plan.get("fallback_mode")
+
         return {
             "plan": plan,
             "results": results,
@@ -2414,12 +2518,12 @@ Files explicitly supplied: {files or []}
             "report_path": report_path,
             "telemetry": telemetry,
             "routing": {
-                "mode": "llm_orchestrated" if llm_online else "deterministic_offline_fallback",
-                "model_id": self.LLM_MODEL if llm_online else "keyword_heuristic_planner",
+                "mode": "llm_orchestrated" if is_llm_mode else "deterministic_offline_fallback",
+                "model_id": self.LLM_MODEL if is_llm_mode else "keyword_heuristic_planner",
                 "reason": (
                     f"Ollama is online: LLM '{self.LLM_MODEL}' generated the plan and synthesized the grounded response."
-                    if llm_online
-                    else "Ollama is offline: Deterministic fallback matched keywords to execute agents and returned direct outputs."
+                    if is_llm_mode
+                    else "Deterministic fallback matched keywords to execute agents and returned direct outputs."
                 )
             }
         }
