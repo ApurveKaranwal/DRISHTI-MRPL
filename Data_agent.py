@@ -8,6 +8,7 @@ instead of approximate vector-search results.
 from __future__ import annotations  # Allows modern type hints on supported Python versions.
 
 import hashlib  # Produces a stable content fingerprint for duplicate detection.
+import math
 import os  # Reads deployment configuration from environment variables.
 import re  # Sanitizes filenames/sheet names into safe SQL identifiers, and parses SQL for table validation.
 import uuid  # Creates unique file identifiers.
@@ -29,6 +30,24 @@ _TABLE_REF_PATTERN = re.compile(
 _CTE_NAME_PATTERN = re.compile(
     r'(?:WITH|,)\s*([A-Za-z_][A-Za-z0-9_]*)\s+AS\s*\(', re.IGNORECASE
 )  # Finds CTE aliases so they aren't mistaken for missing real tables.
+
+
+def clean_for_json(val: Any) -> Any:
+    """Recursively replaces NaN, Inf, and -Inf with None, and unwraps numpy scalars for RFC 7159 compliance."""
+    if isinstance(val, float):
+        if math.isnan(val) or math.isinf(val):
+            return None
+        return val
+    elif isinstance(val, dict):
+        return {k: clean_for_json(v) for k, v in val.items()}
+    elif isinstance(val, (list, tuple)):
+        return [clean_for_json(v) for v in val]
+    elif hasattr(val, "item"):
+        try:
+            return clean_for_json(val.item())
+        except Exception:
+            return val
+    return val
 
 
 @dataclass(frozen=True)  # Makes accidental configuration mutation impossible.
@@ -243,7 +262,7 @@ class DataAnalysisWorker:
             raise ValueError(f"Unknown table: {table_name}")
         info = self.conn.execute(f'PRAGMA table_info("{table_name}")').fetchall()  # Column name/type/nullability.
         row_count = self.conn.execute(f'SELECT COUNT(*) FROM "{table_name}"').fetchone()[0]  # Exact row count.
-        sample = self.conn.execute(f'SELECT * FROM "{table_name}" LIMIT 5').fetchdf().to_dict(orient="records")
+        sample = clean_for_json(self.conn.execute(f'SELECT * FROM "{table_name}" LIMIT 5').fetchdf().to_dict(orient="records"))
         return {
             "table_name": table_name,
             "columns": [{"name": row[1], "type": row[2]} for row in info],  # PRAGMA columns: cid, name, type, ...
@@ -257,7 +276,8 @@ class DataAnalysisWorker:
         ).fetchone()  # Same ownership check as schema(), before running SUMMARIZE.
         if not exists:
             raise ValueError(f"Unknown table: {table_name}")
-        return self.conn.execute(f'SUMMARIZE "{table_name}"').fetchdf().to_dict(orient="records")
+        records = self.conn.execute(f'SUMMARIZE "{table_name}"').fetchdf().to_dict(orient="records")
+        return clean_for_json(records)
         # DuckDB's built-in SUMMARIZE returns min/max/avg/std/null-count/approx-unique per column in one call.
 
     @staticmethod
@@ -310,7 +330,7 @@ class DataAnalysisWorker:
             result_df = result_df.head(self.settings.max_result_rows)  # Caps the payload size sent back upstream.
         return {
             "columns": list(result_df.columns),
-            "rows": result_df.to_dict(orient="records"),  # A list of {column: value} dicts, JSON-friendly.
+            "rows": clean_for_json(result_df.to_dict(orient="records")),  # A list of {column: value} dicts, JSON-friendly.
             "row_count_returned": len(result_df),
             "truncated": truncated,  # Tells the supervisor the true result set was larger than what's included.
         }

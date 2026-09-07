@@ -509,11 +509,20 @@ async function sendMessage(overrideText = null, attachedFiles = []) {
       body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
+    let data;
+    const responseText = await response.text();
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseErr) {
+      removeLoading(loadingId);
+      appendBotError(`Server Error (${response.status}): ${responseText.slice(0, 300) || response.statusText || "Invalid server response"}`);
+      return;
+    }
+
     removeLoading(loadingId);
 
-    if (!data.success) {
-      appendBotError(data.detail || "Execution failed.");
+    if (!response.ok || !data.success) {
+      appendBotError(data.detail || data.error || `Execution failed (HTTP ${response.status})`);
       return;
     }
 
@@ -792,18 +801,32 @@ function renderBotResponse(data) {
     stepsHtml = `<div style="font-size: 10.5px; color: var(--text-dim);">Direct LLM generation without auxiliary worker invocation.</div>`;
   }
 
-  const vramText = routing.vram_estimate_gb ? `~${routing.vram_estimate_gb} GB VRAM` : "RTX 3050";
+  let vramText = "";
+  if (routing.vram_estimate_gb) {
+    vramText = `~${routing.vram_estimate_gb} GB VRAM`;
+  } else if (data.telemetry?.hardware?.gpu?.detected && data.telemetry.hardware.gpu.name) {
+    vramText = data.telemetry.hardware.gpu.name.replace("NVIDIA GeForce ", "").replace(" Laptop GPU", "");
+  }
+
+  const modelBadgeHtml = routing.model_id ? `
+    <span class="model-badge">
+      <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+      MODEL: ${escapeHtml(routing.model_id)}
+    </span>` : "";
+
+  const profileBadgeHtml = (routing.profile && routing.profile !== "general") ? `
+    <span class="profile-badge">${escapeHtml(routing.profile)}</span>` : "";
+
+  const vramBadgeHtml = vramText ? `
+    <span class="vram-badge">${escapeHtml(vramText)}</span>` : "";
 
   bubble.innerHTML = `
     <!-- Top Model Banner (Highly Visible) -->
     <div class="bot-model-header">
       <div class="bot-model-left">
-        <span class="model-badge">
-          <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
-          MODEL: ${escapeHtml(routing.model_id)}
-        </span>
-        <span class="profile-badge">${escapeHtml(routing.profile)}</span>
-        <span class="vram-badge">${escapeHtml(vramText)}</span>
+        ${modelBadgeHtml}
+        ${profileBadgeHtml}
+        ${vramBadgeHtml}
       </div>
       <div class="bot-model-right">
         <span class="mode-tag"><span class="status-dot dot-success"></span> GPU Accelerated (Ollama)</span>
@@ -1039,7 +1062,12 @@ function formatMarkdown(md) {
   if (!md) return "";
   let text = escapeHtml(md);
 
-  // Markdown tables: lines with pipes
+  // 1. Code blocks: ```lang ... ```
+  text = text.replace(/```(?:[a-zA-Z0-9_-]+)?\r?\n([\s\S]*?)```/g, (m, code) => {
+    return `<pre class="chat-code-block"><code>${code.trim()}</code></pre>`;
+  });
+
+  // 2. Markdown tables: lines with pipes
   text = text.replace(/((?:\|[^\n]+\|\r?\n)+)/g, (match) => {
     const rows = match.trim().split(/\r?\n/).map(r => r.trim()).filter(Boolean);
     if (rows.length < 2) return match;
@@ -1069,11 +1097,15 @@ function formatMarkdown(md) {
     return tableHtml;
   });
 
-  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // 3. Blockquotes: lines starting with &gt;
+  text = text.replace(/^(?:&gt;|>)\s?(.*)$/gm, '<blockquote class="chat-quote">$1</blockquote>');
+
+  // 4. Inline formatting
+  text = text.replace(/`([^`]+)`/g, '<code class="chat-inline-code">$1</code>');
   text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-  text = text.replace(/### (.*?)(?:\n|$)/g, '<h4 style="margin: 8px 0 4px 0; color: var(--text-heading); font-size: 13px;">$1</h4>');
-  text = text.replace(/## (.*?)(?:\n|$)/g, '<h3 style="margin: 10px 0 6px 0; color: var(--text-heading); font-size: 14px;">$1</h3>');
-  text = text.replace(/^- (.*?)(?:\n|$)/gm, '<li style="margin-left: 16px;">$1</li>');
+  text = text.replace(/### (.*?)(?:\n|$)/g, '<h4 style="margin: 5px 0 2px 0; color: var(--text-heading); font-size: 11px; font-weight: 700;">$1</h4>');
+  text = text.replace(/## (.*?)(?:\n|$)/g, '<h3 style="margin: 6px 0 3px 0; color: var(--text-heading); font-size: 11.5px; font-weight: 700;">$1</h3>');
+  text = text.replace(/^- (.*?)(?:\n|$)/gm, '<li style="margin-left: 12px; margin-bottom: 2px;">$1</li>');
   text = text.replace(/\n/g, "<br>");
   return text;
 }

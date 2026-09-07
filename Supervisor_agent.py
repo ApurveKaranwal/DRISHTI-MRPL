@@ -513,7 +513,7 @@ class SupervisorAgent:
         self,
         messages: list[dict[str, str]],
         json_mode: bool = False,
-        max_tokens: int = 1024,
+        max_tokens: int = 1500,
         temperature: float = 0.1,
     ) -> str:
         """Call the local Supervisor LLM through Ollama HTTP API."""
@@ -525,6 +525,7 @@ class SupervisorAgent:
             "options": {
                 "num_predict": max_tokens,
                 "temperature": temperature,
+                "num_ctx": 8192,
             },
         }
 
@@ -539,7 +540,11 @@ class SupervisorAgent:
         )
         response.raise_for_status()
         data = response.json()
-        return data.get("message", {}).get("content", "")
+        msg = data.get("message", {})
+        content = msg.get("content", "")
+        if not content and "thinking" in msg:
+            content = msg.get("thinking", "")
+        return content
 
     def _llm_available(self) -> bool:
         """
@@ -550,7 +555,7 @@ class SupervisorAgent:
         """
 
         try:
-            resp = requests.get(f"{self.OLLAMA_URL}/api/tags", timeout=1.5)
+            resp = requests.get(f"{self.OLLAMA_URL}/api/tags", timeout=5.0)
             return resp.status_code == 200
         except Exception:
             return False
@@ -662,7 +667,7 @@ class SupervisorAgent:
         request: str,
         files: list[str] | None = None,
         *,
-        max_attempts: int = 3,
+        max_attempts: int = 2,
     ) -> dict[str, Any]:
         """
         Generate and validate a JSON execution plan using qwen3:8b.
@@ -786,8 +791,8 @@ Files explicitly supplied: {files or []}
             try:
                 raw = self._llm_chat(
                     messages,
-                    json_mode=True,
-                    max_tokens=1024,
+                    json_mode=False,
+                    max_tokens=1500,
                     temperature=0.1,
                 )
 
@@ -2220,66 +2225,71 @@ Files explicitly supplied: {files or []}
 
             lines.append("")
             lines.append(
-                f"[Worker {index}] {worker}.{action}"
+                f"### [Worker {index}] {worker}.{action}"
             )
 
-            if isinstance(result, dict):
-
-                if (
-                    result.get("success") is False
-                    or "error" in result
-                ):
-                    lines.append(
-                        f"Status: FAILED — "
-                        f"{result.get('error', 'Unknown error')}"
-                    )
-
+            if isinstance(result, dict) and (result.get("success") is False or "error" in result):
+                lines.append(
+                    f"**Status:** FAILED — `{result.get('error', 'Unknown error')}`"
+                )
+            elif worker == "document_retrieval" and isinstance(result, list):
+                lines.append("**Retrieved Evidence Passages:**\n")
+                for c_idx, chunk in enumerate(result[:3], 1):
+                    if isinstance(chunk, dict) and "text" in chunk:
+                        src = chunk.get("source_name", "Document")
+                        sec = chunk.get("chunk_index", "")
+                        txt = chunk.get("text", "").strip().replace("\n", " ")
+                        if len(txt) > 220:
+                            txt = txt[:220] + "..."
+                        lines.append(f"> **[{c_idx}] `{src}` (Sec {sec}):** {txt}\n")
+                    else:
+                        lines.append(f"- {chunk}")
+            elif worker == "data_analysis" and isinstance(result, list):
+                lines.append("| Column | Type | Min | Max | Non-Null % |")
+                lines.append("| --- | --- | --- | --- | --- |")
+                for col in result[:8]:
+                    if isinstance(col, dict):
+                        cn = col.get("column_name", "")
+                        ct = col.get("column_type", "")
+                        cmin = str(col.get("min", "-"))[:12]
+                        cmax = str(col.get("max", "-"))[:12]
+                        null_pct = col.get("null_percentage", 0)
+                        lines.append(f"| `{cn}` | {ct} | {cmin} | {cmax} | {100 - null_pct:.0f}% |")
+                if len(result) > 8:
+                    lines.append(f"\n*(Showing 8 of {len(result)} columns)*")
+            elif worker == "data_analysis" and isinstance(result, dict) and "rows" in result:
+                cols = result.get("columns", [])
+                rows = result.get("rows", [])
+                if cols and rows:
+                    lines.append("| " + " | ".join(str(c) for c in cols) + " |")
+                    lines.append("| " + " | ".join("---" for _ in cols) + " |")
+                    for r in rows[:8]:
+                        lines.append("| " + " | ".join(str(r.get(c, "")) for c in cols) + " |")
+                    if len(rows) > 8:
+                        lines.append(f"\n*(Showing 8 of {len(rows)} records)*")
                 else:
-                    lines.append(
-                        "Result:"
-                    )
-
-                    try:
-                        lines.append(
-                            json.dumps(
-                                result,
-                                indent=2,
-                                ensure_ascii=False,
-                                default=str,
-                            )
-                        )
-
-                    except Exception:
-                        lines.append(
-                            str(result)
-                        )
-
-            elif isinstance(result, list):
-
-                lines.append(
-                    "Result:"
-                )
-
+                    lines.append(f"Query returned {result.get('row_count_returned', 0)} rows.")
+            elif worker == "code_sandbox" and isinstance(result, dict):
+                stdout = result.get("stdout", "").strip()
+                stderr = result.get("stderr", "").strip()
+                if stdout:
+                    lines.append(f"```text\n{stdout[:400]}\n```")
+                if stderr:
+                    lines.append(f"\n*Diagnostic stderr:* `{stderr[:200]}`")
+            elif worker == "template_author" and isinstance(result, dict):
+                fn = result.get("file_name", "Deliverable")
+                fp = result.get("file_path", "")
+                lines.append(f"Generated deliverable **`{fn}`** saved at `{fp}`.")
+            elif isinstance(result, (dict, list)):
                 try:
-                    lines.append(
-                        json.dumps(
-                            result,
-                            indent=2,
-                            ensure_ascii=False,
-                            default=str,
-                        )
-                    )
-
+                    formatted = json.dumps(result, indent=2, ensure_ascii=False, default=str)
+                    if len(formatted) > 500:
+                        formatted = formatted[:500] + "\n  ... (truncated for brevity)"
+                    lines.append(f"```json\n{formatted}\n```")
                 except Exception:
-                    lines.append(
-                        str(result)
-                    )
-
+                    lines.append(f"`{str(result)[:200]}`")
             else:
-
-                lines.append(
-                    f"Result: {result}"
-                )
+                lines.append(f"{result}")
 
         lines.append("")
         lines.append(
@@ -2331,10 +2341,9 @@ Files explicitly supplied: {files or []}
                         "role": "system",
                         "content": (
                             "You are a helpful, authoritative chemical & refinery engineering assistant for Mangalore Refinery and Petrochemicals Limited (MRPL). "
-                            "Answer the user request concisely, factually, and thoroughly using the supplied worker evidence. "
+                            "Answer the user request concisely, factually, and crisply in 2-3 focused paragraphs or bullet points without filler or verbosity. "
                             "Cite source tables, files, or standards whenever available. "
-                            "Do not hallucinate operational figures; ground all specific plant values in the worker evidence. "
-                            "Provide clear, professional chemical engineering explanations for the underlying process mechanisms (e.g. cracking reaction kinetics, temperature selectivity, catalyst-to-oil dynamics, and polymer-grade purity constraints)."
+                            "Do not hallucinate operational figures; ground all specific plant values directly in the worker evidence."
                         ),
                     },
                     {
@@ -2344,7 +2353,7 @@ Files explicitly supplied: {files or []}
                             f"Worker results: {evidence}",
                     },
                 ],
-                max_tokens=1500,
+                max_tokens=750,
                 temperature=0.15,
             )
 
@@ -2355,7 +2364,10 @@ Files explicitly supplied: {files or []}
                 flags=re.DOTALL
             ).strip()
 
-            return cleaned if cleaned else resp.strip()
+            final_text = cleaned or resp.strip()
+            if not final_text:
+                return self._build_fallback_response(request, results)
+            return final_text
 
         except Exception as error:
 

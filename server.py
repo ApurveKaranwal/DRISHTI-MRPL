@@ -8,6 +8,7 @@ and real-time air-gap sovereign network telemetry.
 from __future__ import annotations
 
 import asyncio
+import json
 import math
 import mimetypes
 import os
@@ -29,10 +30,45 @@ import requests
 from Supervisor_agent import SupervisorAgent
 from Sovereign_monitor import SovereignNetworkAuditor
 
+
+def clean_for_json(val: Any) -> Any:
+    """Recursively replaces NaN, Inf, and -Inf with None, and unwraps numpy scalars for RFC 7159 compliance."""
+    if isinstance(val, float):
+        if math.isnan(val) or math.isinf(val):
+            return None
+        return val
+    elif isinstance(val, dict):
+        return {k: clean_for_json(v) for k, v in val.items()}
+    elif isinstance(val, (list, tuple)):
+        return [clean_for_json(v) for v in val]
+    elif hasattr(val, "item"):
+        try:
+            return clean_for_json(val.item())
+        except Exception:
+            return val
+    return val
+
+
+class SafeJSONResponse(JSONResponse):
+    """A JSONResponse that guarantees strict RFC 7159 JSON compliance with no unhandled NaN/Inf crashes."""
+
+    def render(self, content: Any) -> bytes:
+        cleaned = clean_for_json(content)
+        return json.dumps(
+            cleaned,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=None,
+            separators=(",", ":"),
+            default=str,
+        ).encode("utf-8")
+
+
 app = FastAPI(
     title="MRPL Sovereign AI Workbench",
     description="Air-gapped on-premises industrial intelligence workbench for MRPL",
     version="2.0.0",
+    default_response_class=SafeJSONResponse,
 )
 
 # Enable CORS for local origins
@@ -171,7 +207,7 @@ async def handle_chat(payload: ChatRequest):
                     "size_bytes": rp.stat().st_size,
                 })
 
-        return {
+        return clean_for_json({
             "success": True,
             "routing": result.get("routing"),
             "plan": result.get("plan"),
@@ -180,9 +216,16 @@ async def handle_chat(payload: ChatRequest):
             "report_path": result.get("report_path"),
             "deliverables": deliverables,
             "telemetry": result.get("telemetry"),
-        }
+        })
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        return SafeJSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "detail": str(exc),
+                "error": str(exc),
+            },
+        )
 
 
 ALLOWED_UPLOAD_EXTENSIONS = {
@@ -749,12 +792,15 @@ async def list_models():
         },
     ]
 
+    gpu_info = auditor.get_telemetry().get("hardware", {}).get("gpu", {})
+    target_hw = gpu_info.get("name") if gpu_info.get("detected") else "On-Premises Local Compute"
+
     return {
         "ollama_available": ollama_ok,
         "active_models_in_ollama": available,
         "profiles": profiles_data,
         "vram_budget_gb": 6.0,
-        "target_hardware": "HP Victus RTX 3050 6GB / Apple M2 16GB",
+        "target_hardware": target_hw,
         "current_mode": "Production Ollama" if ollama_ok else "Sovereign Offline Mode (Deterministic Fallback Active)",
     }
 
