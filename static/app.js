@@ -51,6 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchSystemTelemetry();
   fetchRefineryOverview();
   initHudOverview();
+  initMainRefineryHud();
+  initPetroHud();
+  initAromaticsHud();
+  initUtilitiesHud();
+  initAlertsHud();
   switchCrudeAssay("Arabian Light");
   executeInteractiveDarcy();
   renderGovDatasetChart("monthly");
@@ -85,9 +90,19 @@ function switchTab(tabId) {
   if (titleEl) titleEl.textContent = meta.title;
   if (subEl) subEl.textContent = meta.subtitle;
 
+  if (tabId === "overview") {
+    fetchRefineryOverview();
+    initHudOverview();
+  }
+  if (tabId === "main-refinery") {
+    initMainRefineryHud();
+    switchCrudeAssay(currentAssayName || "Arabian Light");
+  }
+  if (tabId === "petrochemicals") initPetroHud();
+  if (tabId === "aromatics") initAromaticsHud();
+  if (tabId === "utilities") initUtilitiesHud();
+  if (tabId === "alerts") initAlertsHud();
   if (tabId === "reports") fetchDeliverables();
-  if (tabId === "overview") fetchRefineryOverview();
-  if (tabId === "main-refinery") switchCrudeAssay(currentAssayName || "Arabian Light");
   if (tabId === "analytics") {
     setTimeout(() => {
       executeInteractiveDarcy();
@@ -1082,6 +1097,23 @@ function switchCrudeAssay(assayName) {
   if (propTan) propTan.textContent = assay.tan;
   if (propVisc) propVisc.textContent = assay.viscosity;
   if (propPour) propPour.textContent = assay.pour;
+
+  const basketLabel = document.getElementById("mr-basket-name");
+  if (basketLabel) basketLabel.textContent = assayName;
+
+  // Update Main Refinery Equalizer Bars in HUD
+  const mainEq = document.getElementById("hud-main-equalizer-bars");
+  if (mainEq && assay.cuts) {
+    mainEq.innerHTML = "";
+    assay.cuts.forEach(cut => {
+      const bar = document.createElement("div");
+      bar.className = "eq-bar active";
+      const h = Math.round(Math.min(64, Math.max(14, cut.pct * 1.8)));
+      bar.style.height = `${h}px`;
+      bar.title = `${cut.name}: ${cut.pct}%`;
+      mainEq.appendChild(bar);
+    });
+  }
 
   // Rebuild Distillation Cut Bar
   const cutBar = document.getElementById("assay-cut-bar");
@@ -2464,8 +2496,36 @@ window.addEventListener("resize", () => {
 });
 
 // -----------------------------------------------------------------------------
-// Cinematic Industrial HUD Controller (Reference UI Implementation)
+// Cinematic Industrial HUD Controller (Universal Architecture Across All Tabs)
 // -----------------------------------------------------------------------------
+
+// Generic Helper: Render Segmented Glowing Bar
+function renderTrack(trackId, totalTicks = 42, activeCount = 36) {
+  const track = document.getElementById(trackId);
+  if (!track) return;
+  track.innerHTML = "";
+  for (let i = 0; i < totalTicks; i++) {
+    const tick = document.createElement("div");
+    tick.className = "seg-tick" + (i < activeCount ? " active" : "");
+    track.appendChild(tick);
+  }
+}
+
+// Generic Helper: Render Glowing Equalizer Bars
+function renderEqualizer(containerId, items) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = "";
+  items.forEach(item => {
+    const bar = document.createElement("div");
+    bar.className = "eq-bar active";
+    bar.style.height = `${item.height}px`;
+    bar.title = item.name;
+    container.appendChild(bar);
+  });
+}
+
+// --- 1. OVERVIEW TAB CONTROLLER ---
 const HUD_UNITS = [
   { tag: "CDU-Col-04", name: "Atmospheric Tower #1", sub: "Flash Zone 4.60mm", tick: 70 },
   { tag: "VDU-Col-02", name: "Vacuum Distillation #2", sub: "Bottom Shell 5.20mm", tick: 60 },
@@ -2475,35 +2535,21 @@ const HUD_UNITS = [
 let currentHudUnitIndex = 0;
 
 function initHudOverview() {
-  renderHudSegmentedBar(111.8);
-  renderHudEqualizerBars();
-}
-
-function renderHudSegmentedBar(utilizationPct = 111.8) {
-  const track = document.getElementById("hud-segmented-track");
-  if (!track) return;
-  track.innerHTML = "";
-  const totalTicks = 42;
-  const activeCount = Math.min(totalTicks, Math.max(1, Math.round((utilizationPct / 125.0) * totalTicks)));
-  for (let i = 0; i < totalTicks; i++) {
-    const tick = document.createElement("div");
-    tick.className = "seg-tick" + (i < activeCount ? " active" : "");
-    track.appendChild(tick);
-  }
-}
-
-function renderHudEqualizerBars() {
-  const container = document.getElementById("hud-equalizer-bars");
-  if (!container) return;
-  container.innerHTML = "";
-  const heights = [28, 44, 38, 54, 48, 62, 58, 52, 46, 60, 50, 42];
-  heights.forEach((h, idx) => {
-    const bar = document.createElement("div");
-    bar.className = "eq-bar active";
-    bar.style.height = `${h}px`;
-    bar.title = `Month ${idx + 1}: ${Math.round(h * 27)} TMT`;
-    container.appendChild(bar);
-  });
+  renderTrack("hud-segmented-track", 42, 38);
+  renderEqualizer("hud-equalizer-bars", [
+    { name: "Month 1: 1,320 TMT", height: 38 },
+    { name: "Month 2: 1,410 TMT", height: 46 },
+    { name: "Month 3: 1,480 TMT", height: 52 },
+    { name: "Month 4: 1,510 TMT", height: 56 },
+    { name: "Month 5: 1,490 TMT", height: 54 },
+    { name: "Month 6: 1,560 TMT", height: 60 },
+    { name: "Month 7: 1,530 TMT", height: 58 },
+    { name: "Month 8: 1,500 TMT", height: 55 },
+    { name: "Month 9: 1,440 TMT", height: 48 },
+    { name: "Month 10: 1,580 TMT", height: 62 },
+    { name: "Month 11: 1,520 TMT", height: 57 },
+    { name: "Month 12: 1,550 TMT", height: 59 }
+  ]);
 }
 
 function cycleHudUnit(dir) {
@@ -2511,13 +2557,13 @@ function cycleHudUnit(dir) {
   const unit = HUD_UNITS[currentHudUnitIndex];
   const tagEl = document.getElementById("hud-unit-tag");
   const labelEl = document.getElementById("hud-active-unit-label");
-  const subEl = document.querySelector(".hud-hub-sub");
+  const subEl = document.querySelector("#tab-overview .hud-hub-sub");
   if (tagEl) tagEl.textContent = unit.tag;
   if (labelEl) labelEl.textContent = unit.name;
   if (subEl) subEl.textContent = unit.sub;
 
-  document.querySelectorAll(".hud-tick").forEach(t => t.classList.remove("active"));
-  const activeTick = document.querySelector(`.hud-tick.tick-${unit.tick}`);
+  document.querySelectorAll("#tab-overview .hud-tick").forEach(t => t.classList.remove("active"));
+  const activeTick = document.querySelector(`#tab-overview .hud-tick.tick-${unit.tick}`);
   if (activeTick) activeTick.classList.add("active");
 }
 
@@ -2530,6 +2576,236 @@ function toggleDetailedPpacTable() {
   if (arrow) arrow.textContent = isOpen ? "▾" : "▴";
 }
 
+// --- 2. MAIN REFINERY TAB CONTROLLER ---
+const MAIN_REFINERY_UNITS = [
+  { tag: "CDU Col-01", name: "CDU-1 Atmospheric Column", sub: "Atmospheric 48 Trays", tick: 70 },
+  { tag: "VDU Col-01", name: "VDU-1 Vacuum Tower", sub: "Vacuum Deep Cut 18 Trays", tick: 60 },
+  { tag: "CDU Col-02", name: "CDU-2 Crude Splitter", sub: "Preflash Vessel 32 Trays", tick: 75 },
+  { tag: "VDU Col-02", name: "VDU-2 Heavy Vacuum", sub: "High Viscosity Bottoms", tick: 80 },
+];
+let currentMainUnitIndex = 0;
+
+function initMainRefineryHud() {
+  renderTrack("hud-main-segmented-track", 42, 36);
+  if (typeof currentAssayName !== "undefined") {
+    switchCrudeAssay(currentAssayName || "Arabian Light");
+  }
+}
+
+function cycleMainRefineryUnit(dir) {
+  currentMainUnitIndex = (currentMainUnitIndex + dir + MAIN_REFINERY_UNITS.length) % MAIN_REFINERY_UNITS.length;
+  const u = MAIN_REFINERY_UNITS[currentMainUnitIndex];
+  const tagEl = document.getElementById("hud-main-unit-tag");
+  const labelEl = document.getElementById("hud-main-active-unit-label");
+  const subEl = document.querySelector("#tab-main-refinery .hud-hub-sub");
+  if (tagEl) tagEl.textContent = u.tag;
+  if (labelEl) labelEl.textContent = u.name;
+  if (subEl) subEl.textContent = u.sub;
+
+  document.querySelectorAll("#tab-main-refinery .hud-tick").forEach(t => t.classList.remove("active"));
+  const activeTick = document.querySelector(`#tab-main-refinery .hud-tick.tick-${u.tick}`);
+  if (activeTick) activeTick.classList.add("active");
+}
+
+function toggleMainRefineryDrawer() {
+  const content = document.getElementById("hud-mr-drawer-content");
+  const arrow = document.getElementById("mr-drawer-arrow");
+  if (!content) return;
+  const isOpen = content.style.display !== "none";
+  content.style.display = isOpen ? "none" : "block";
+  if (arrow) arrow.textContent = isOpen ? "▾" : "▴";
+}
+
+// --- 3. PETROCHEMICALS TAB CONTROLLER ---
+const PETRO_UNITS = [
+  { tag: "Reactor R-101", name: "R-101 Primary Loop Reactor", sub: "Gas-Phase Loop 1,420 m³/h", tick: 70 },
+  { tag: "Reactor R-102", name: "R-102 Impact Copolymer Loop", sub: "Secondary Loop 52.4 t/h", tick: 60 },
+  { tag: "Extruder Z-201", name: "Z-201 Pelletizing Train", sub: "Twin Screw 1,850 RPM", tick: 75 },
+  { tag: "Splitter C-301", name: "C-301 Propylene Splitter", sub: "Polymer Grade 99.7% C3=", tick: 80 },
+];
+let currentPetroUnitIndex = 0;
+
+function initPetroHud() {
+  renderTrack("hud-petro-segmented-track", 42, 38);
+  renderEqualizer("hud-petro-equalizer-bars", [
+    { name: "M110 Raffia (14.2 TMT)", height: 58 },
+    { name: "H030SG BOPP (8.5 TMT)", height: 42 },
+    { name: "MI3530 ICP (9.4 TMT)", height: 48 },
+    { name: "HM012 Pipe (4.4 TMT)", height: 28 },
+    { name: "M120 Fiber (5.2 TMT)", height: 35 },
+    { name: "EP300H Copo (6.0 TMT)", height: 40 },
+    { name: "HP500N Inj (8.1 TMT)", height: 46 },
+    { name: "PP-R Cast (4.0 TMT)", height: 26 }
+  ]);
+}
+
+function cyclePetroUnit(dir) {
+  currentPetroUnitIndex = (currentPetroUnitIndex + dir + PETRO_UNITS.length) % PETRO_UNITS.length;
+  const u = PETRO_UNITS[currentPetroUnitIndex];
+  const tagEl = document.getElementById("hud-petro-unit-tag");
+  const labelEl = document.getElementById("hud-petro-active-unit-label");
+  const subEl = document.getElementById("hud-petro-unit-sub");
+  if (tagEl) tagEl.textContent = u.tag;
+  if (labelEl) labelEl.textContent = u.name;
+  if (subEl) subEl.textContent = u.sub;
+
+  document.querySelectorAll("#tab-petrochemicals .hud-tick").forEach(t => t.classList.remove("active"));
+  const activeTick = document.querySelector(`#tab-petrochemicals .hud-tick.tick-${u.tick}`);
+  if (activeTick) activeTick.classList.add("active");
+}
+
+function togglePetroDrawer() {
+  const content = document.getElementById("hud-petro-drawer-content");
+  const arrow = document.getElementById("petro-drawer-arrow");
+  if (!content) return;
+  const isOpen = content.style.display !== "none";
+  content.style.display = isOpen ? "none" : "block";
+  if (arrow) arrow.textContent = isOpen ? "▾" : "▴";
+}
+
+// --- 4. AROMATICS COMPLEX TAB CONTROLLER ---
+const AROMATICS_UNITS = [
+  { tag: "CCR Reformer", name: "CCR Platformer Unit", sub: "Platformer 518°C / 4.2 bar", tick: 70 },
+  { tag: "Parex Unit", name: "Parex SMB Adsorber", sub: "PDEB Desorbent 1,420 m³/h", tick: 80 },
+  { tag: "Isomar RX", name: "Isomar Isomerization Unit", sub: "H2/HC 3.8:1 / 392°C", tick: 60 },
+  { tag: "Tatoray Unit", name: "Tatoray Transalkylation", sub: "Toluene/C9 145 t/h", tick: 75 },
+];
+let currentAromaticsUnitIndex = 0;
+
+function initAromaticsHud() {
+  renderTrack("hud-aromatics-segmented-track", 42, 37);
+  renderEqualizer("hud-aromatics-equalizer-bars", [
+    { name: "Paraxylene (75.0 TMT)", height: 62 },
+    { name: "Benzene (22.5 TMT)", height: 44 },
+    { name: "Heavy C9+ (3.8 TMT)", height: 22 },
+    { name: "Raffinate (18.0 TMT)", height: 38 },
+    { name: "Toluene Stream (14.2 TMT)", height: 34 },
+    { name: "Mixed Xylenes (28.0 TMT)", height: 48 },
+    { name: "OX Cut (6.4 TMT)", height: 28 },
+    { name: "MX Cut (5.1 TMT)", height: 24 }
+  ]);
+}
+
+function cycleAromaticsUnit(dir) {
+  currentAromaticsUnitIndex = (currentAromaticsUnitIndex + dir + AROMATICS_UNITS.length) % AROMATICS_UNITS.length;
+  const u = AROMATICS_UNITS[currentAromaticsUnitIndex];
+  const tagEl = document.getElementById("hud-aromatics-unit-tag");
+  const labelEl = document.getElementById("hud-aromatics-active-unit-label");
+  const subEl = document.getElementById("hud-aromatics-unit-sub");
+  if (tagEl) tagEl.textContent = u.tag;
+  if (labelEl) labelEl.textContent = u.name;
+  if (subEl) subEl.textContent = u.sub;
+
+  document.querySelectorAll("#tab-aromatics .hud-tick").forEach(t => t.classList.remove("active"));
+  const activeTick = document.querySelector(`#tab-aromatics .hud-tick.tick-${u.tick}`);
+  if (activeTick) activeTick.classList.add("active");
+}
+
+function toggleAromaticsDrawer() {
+  const content = document.getElementById("hud-aromatics-drawer-content");
+  const arrow = document.getElementById("aromatics-drawer-arrow");
+  if (!content) return;
+  const isOpen = content.style.display !== "none";
+  content.style.display = isOpen ? "none" : "block";
+  if (arrow) arrow.textContent = isOpen ? "▾" : "▴";
+}
+
+// --- 5. OFFSITES & UTILITIES TAB CONTROLLER ---
+const UTILITIES_UNITS = [
+  { tag: "Turbine GTG-1", name: "Gas Turbine GTG-1 (Frame 6)", sub: "34.8 MW / 538°C Exhaust", tick: 70 },
+  { tag: "Turbine GTG-2", name: "Gas Turbine GTG-2 (Frame 6)", sub: "36.2 MW / Dual Fuel", tick: 75 },
+  { tag: "Turbine GTG-3", name: "Gas Turbine GTG-3 (Frame 6)", sub: "35.5 MW / Base Loaded", tick: 70 },
+  { tag: "STG-1 Generator", name: "Steam Turbine STG-1", sub: "14.5 MW / 42 bar Extraction", tick: 60 },
+];
+let currentUtilitiesUnitIndex = 0;
+
+function initUtilitiesHud() {
+  renderTrack("hud-utilities-segmented-track", 42, 39);
+  renderEqualizer("hud-utilities-equalizer-bars", [
+    { name: "GTG-1 (34.8 MW)", height: 54 },
+    { name: "GTG-2 (36.2 MW)", height: 58 },
+    { name: "GTG-3 (35.5 MW)", height: 56 },
+    { name: "STG-1 (14.5 MW)", height: 32 },
+    { name: "HP Steam (480 t/h)", height: 62 },
+    { name: "MP Steam (310 t/h)", height: 46 },
+    { name: "LP Steam (225 t/h)", height: 36 },
+    { name: "SWRO DM Water (420 m³/h)", height: 44 }
+  ]);
+}
+
+function cycleUtilitiesUnit(dir) {
+  currentUtilitiesUnitIndex = (currentUtilitiesUnitIndex + dir + UTILITIES_UNITS.length) % UTILITIES_UNITS.length;
+  const u = UTILITIES_UNITS[currentUtilitiesUnitIndex];
+  const tagEl = document.getElementById("hud-utilities-unit-tag");
+  const labelEl = document.getElementById("hud-utilities-active-unit-label");
+  const subEl = document.getElementById("hud-utilities-unit-sub");
+  if (tagEl) tagEl.textContent = u.tag;
+  if (labelEl) labelEl.textContent = u.name;
+  if (subEl) subEl.textContent = u.sub;
+
+  document.querySelectorAll("#tab-utilities .hud-tick").forEach(t => t.classList.remove("active"));
+  const activeTick = document.querySelector(`#tab-utilities .hud-tick.tick-${u.tick}`);
+  if (activeTick) activeTick.classList.add("active");
+}
+
+function toggleUtilitiesDrawer() {
+  const content = document.getElementById("hud-utilities-drawer-content");
+  const arrow = document.getElementById("utilities-drawer-arrow");
+  if (!content) return;
+  const isOpen = content.style.display !== "none";
+  content.style.display = isOpen ? "none" : "block";
+  if (arrow) arrow.textContent = isOpen ? "▾" : "▴";
+}
+
+// --- 6. STATUTORY AUDITS TAB CONTROLLER ---
+const AUDIT_UNITS = [
+  { tag: "CDU Col-04", name: "CDU-Col-04 Bottom Shell", sub: "Bottom Shell Elev +4.2m", tick: 70 },
+  { tag: "Transfer Line", name: "Crude Heater Transfer Line", sub: "ASTM A106 Gr B / Si 0.12%", tick: 75 },
+  { tag: "LPG Bullet TK", name: "Mounded LPG Bullets TK-101", sub: "4x 1,200 m³ PESO 5-Yr", tick: 60 },
+  { tag: "Deluge System", name: "Fire Deluge Berth 8", sub: "9.5 barg Header Clean", tick: 80 },
+  { tag: "CAAQMS-01", name: "Ambient Air Station 1", sub: "PM2.5/SO2/NOx CPCB", tick: 80 },
+];
+let currentAuditUnitIndex = 0;
+
+function initAlertsHud() {
+  renderTrack("hud-alerts-segmented-track", 42, 40);
+  renderEqualizer("hud-alerts-equalizer-bars", [
+    { name: "API 510 Pressure Vessels", height: 50 },
+    { name: "API 570 Process Piping", height: 56 },
+    { name: "PESO SMPV Tank Farm", height: 64 },
+    { name: "OISD-117 Fire Deluge", height: 60 },
+    { name: "CPCB CAAQMS Ambient", height: 62 },
+    { name: "CEMS Continuous Stacks", height: 58 },
+    { name: "OISD-129 Furnace Baseline", height: 52 },
+    { name: "Ultrasonic NDT 12-Pt", height: 48 }
+  ]);
+}
+
+function cycleAuditUnit(dir) {
+  currentAuditUnitIndex = (currentAuditUnitIndex + dir + AUDIT_UNITS.length) % AUDIT_UNITS.length;
+  const u = AUDIT_UNITS[currentAuditUnitIndex];
+  const tagEl = document.getElementById("hud-alerts-unit-tag");
+  const labelEl = document.getElementById("hud-alerts-active-unit-label");
+  const subEl = document.getElementById("hud-alerts-unit-sub");
+  if (tagEl) tagEl.textContent = u.tag;
+  if (labelEl) labelEl.textContent = u.name;
+  if (subEl) subEl.textContent = u.sub;
+
+  document.querySelectorAll("#tab-alerts .hud-tick").forEach(t => t.classList.remove("active"));
+  const activeTick = document.querySelector(`#tab-alerts .hud-tick.tick-${u.tick}`);
+  if (activeTick) activeTick.classList.add("active");
+}
+
+function toggleAlertsDrawer() {
+  const content = document.getElementById("hud-alerts-drawer-content");
+  const arrow = document.getElementById("alerts-drawer-arrow");
+  if (!content) return;
+  const isOpen = content.style.display !== "none";
+  content.style.display = isOpen ? "none" : "block";
+  if (arrow) arrow.textContent = isOpen ? "▾" : "▴";
+}
+
+// --- GLOBAL UTILITIES ---
 function toggleCopilotDrawer() {
   const panel = document.querySelector(".copilot-panel");
   const btn = document.getElementById("copilot-toggle-btn");
