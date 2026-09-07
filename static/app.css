@@ -746,7 +746,16 @@ code {
   display: flex;
   flex-direction: column;
   height: 100%;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.copilot-panel.collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  border-left: none !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .copilot-header {
@@ -1992,6 +2001,714 @@ code {
   width: 10px;
   height: 10px;
   border-radius: 2px;
+}
+
+/* ==============================================================================
+   CINEMATIC INDUSTRIAL HUD DESIGN SYSTEM (Matching User Reference Image)
+   ============================================================================== */
+
+.hud-overview-container {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: #06090E;
+}
+
+/* Atmospheric Backdrop */
+.hud-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 860px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.hud-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  filter: brightness(0.92) contrast(1.05);
+}
+
+.hud-scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 75% 30%, rgba(10, 15, 26, 0.2) 0%, rgba(6, 9, 14, 0.75) 60%, rgba(6, 9, 14, 0.94) 100%),
+              linear-gradient(to bottom, rgba(6, 9, 14, 0.3) 0%, rgba(6, 9, 14, 0.8) 70%, #06090E 100%);
+}
+
+/* HUD Stage: 2-Column Grid */
+.hud-stage {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 28px;
+  padding: 24px 32px 32px 32px;
+  min-height: calc(100vh - 80px);
+}
+
+@media (max-width: 1280px) {
+  .hud-stage {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Glassmorphic Cards */
+.hud-glass-card {
+  background: rgba(18, 24, 38, 0.68);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 18px;
+  padding: 16px 20px;
+  box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.hud-glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* 1. Status Capsule */
+.hud-status-capsule {
+  width: 310px;
+  margin-bottom: 24px;
+}
+
+.hud-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.hud-capsule-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.3px;
+}
+
+.status-pill-orange {
+  background: rgba(255, 122, 0, 0.18);
+  color: #FF9E2C;
+  border: 1px solid rgba(255, 122, 0, 0.45);
+  border-radius: 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hud-status-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hud-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+}
+
+.hud-row-label {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.hud-row-val {
+  color: #F1F5F9;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+/* 2. Physical Asset HUD Dial Overlay */
+.hud-asset-dial-box {
+  margin: 16px 0 28px 30px;
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud-dial-graphic {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hud-dial-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-10deg);
+}
+
+.hud-dial-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 4;
+}
+
+.hud-dial-arc {
+  fill: none;
+  stroke: #FF7A00;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 6px rgba(255, 122, 0, 0.8));
+}
+
+.hud-dial-dot {
+  fill: #FF7A00;
+  filter: drop-shadow(0 0 8px #FF7A00);
+}
+
+.hud-dial-inner-hub {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.hud-hub-center-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FF7A00;
+  box-shadow: 0 0 10px #FF7A00;
+  margin-bottom: 4px;
+}
+
+.hud-hub-tag {
+  font-size: 11px;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: 0.5px;
+}
+
+.hud-hub-sub {
+  font-size: 9px;
+  color: #FF9E2C;
+  font-family: var(--font-mono);
+}
+
+.hud-dial-ticks {
+  position: absolute;
+  inset: -14px;
+  pointer-events: none;
+}
+
+.hud-tick {
+  position: absolute;
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.hud-tick.active {
+  color: #FF9E2C;
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(255, 122, 0, 0.6);
+}
+
+.tick-80 { top: 12px; right: 48px; }
+.tick-70 { top: 36px; right: 14px; }
+.tick-60 { top: 72px; right: 0px; }
+.tick-50 { top: 108px; right: 2px; }
+.tick-40 { top: 140px; right: 18px; }
+.tick-30 { top: 166px; right: 46px; }
+.tick-20 { bottom: 0px; right: 86px; }
+.tick-10 { bottom: 8px; left: 60px; }
+
+.hud-axis-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.hud-axis-line {
+  width: 32px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.hud-axis-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #F1F5F9;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  transition: all 0.15s ease;
+}
+
+.hud-axis-btn:hover {
+  background: rgba(255, 122, 0, 0.25);
+  border-color: #FF7A00;
+  color: #FFFFFF;
+}
+
+.hud-axis-label {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* 3. Hero Typography & Segmented Bar */
+.hud-hero-block {
+  margin-top: auto;
+  max-width: 580px;
+}
+
+.hud-hero-heading {
+  font-size: 30px;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.hud-hero-description {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+/* Segmented 40-Tick Horizontal Bar */
+.hud-segmented-track {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  height: 14px;
+  margin-bottom: 18px;
+}
+
+.seg-tick {
+  flex: 1;
+  height: 12px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: all 0.2s ease;
+}
+
+.seg-tick.active {
+  background: #FF7A00;
+  box-shadow: 0 0 6px rgba(255, 122, 0, 0.65);
+}
+
+.hud-hero-stats-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 40px;
+}
+
+.stat-main-num {
+  font-size: 20px;
+  font-weight: 800;
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+}
+
+.stat-mini-unit {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+}
+
+.stat-main-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 3px;
+}
+
+/* Right Column Widgets */
+.hud-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 4. Top Right Equalizer Card */
+.hud-equalizer-card {
+  background: linear-gradient(135deg, rgba(255, 122, 0, 0.16) 0%, rgba(20, 24, 36, 0.72) 100%);
+  border-color: rgba(255, 122, 0, 0.25);
+}
+
+.hud-card-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.hud-card-sub {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 1px;
+}
+
+.hud-legend-chips {
+  display: flex;
+  gap: 12px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.legend-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.chip-dot.dot-orange { background: #FF7A00; box-shadow: 0 0 6px #FF7A00; }
+.chip-dot.dot-white { background: #FFFFFF; }
+
+.hud-equalizer-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.hud-eq-val-top,
+.hud-eq-val-bottom {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  flex-direction: column;
+}
+
+.eq-sub {
+  font-size: 8.5px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}
+
+.hud-eq-bars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  height: 64px;
+}
+
+.eq-bar {
+  width: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  position: relative;
+  transition: height 0.3s ease;
+}
+
+.eq-bar.active {
+  background: linear-gradient(to top, #FF5722, #FF9E2C);
+  box-shadow: 0 0 8px rgba(255, 122, 0, 0.5);
+}
+
+/* 5. Temperatures Card (4 vertical gauges) */
+.hud-card-badge {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+}
+
+.hud-columns-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.hud-col-gauge {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.gauge-temp-val {
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  margin-bottom: 8px;
+}
+
+.gauge-bar-track {
+  width: 100%;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.gauge-bar-fill {
+  width: 100%;
+  border-radius: 6px;
+  transition: height 0.4s ease;
+}
+
+.gauge-bar-fill.fill-cyan {
+  background: linear-gradient(to top, #0096C7, #00F5D4);
+  box-shadow: 0 0 10px rgba(0, 245, 212, 0.4);
+}
+
+.gauge-bar-fill.fill-orange {
+  background: linear-gradient(to top, #E65100, #FF9E2C);
+  box-shadow: 0 0 10px rgba(255, 158, 44, 0.4);
+}
+
+.gauge-col-name {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+}
+
+.gauge-col-sub {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+
+/* 6. Bottom Cluster: Two Dark Mini Cards + Large High-Contrast Speedometer Card */
+.hud-bottom-cluster {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 16px;
+}
+
+.hud-mini-column {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hud-mini-card {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.mini-card-label {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.mini-card-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  margin-top: 4px;
+}
+
+.mini-card-unit {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Large High-Contrast White Speedometer Card */
+.hud-speedometer-card {
+  background: #F8FAFC;
+  color: #0F172A;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.speedo-svg-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.speedo-svg {
+  width: 180px;
+  height: 110px;
+}
+
+.speedo-number-box {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+.speedo-big-val {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0F172A;
+  font-family: var(--font-mono);
+  line-height: 1;
+}
+
+.speedo-unit-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748B;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.speedo-deltas-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.speedo-delta-badge {
+  background: #EDF2F7;
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.delta-num {
+  font-size: 11px;
+  font-weight: 800;
+  color: #0F172A;
+  font-family: var(--font-mono);
+}
+
+.delta-arrow {
+  font-size: 9px;
+  color: #059669;
+}
+
+.delta-sub {
+  font-size: 9.5px;
+  color: #64748B;
+}
+
+/* Collapsible Detailed Drawer */
+.hud-collapsible-drawer {
+  position: relative;
+  z-index: 4;
+  padding: 0 32px 32px 32px;
+}
+
+.hud-drawer-toggle {
+  width: 100%;
+  background: rgba(18, 24, 38, 0.7);
+  backdrop-filter: blur(14px);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 12px 18px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.hud-drawer-toggle:hover {
+  background: rgba(255, 122, 0, 0.15);
+  border-color: #FF7A00;
+  color: #FFFFFF;
+}
+
+/* Copilot Toggle Pill in Header */
+.copilot-toggle-pill {
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #FFFFFF;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copilot-toggle-pill:hover {
+  background: rgba(99, 102, 241, 0.3);
+  border-color: #6366F1;
+}
+
+.copilot-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copilot-close-btn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 
