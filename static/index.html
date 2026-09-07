@@ -162,24 +162,6 @@
       </div>
 
       <div class="header-right">
-        <!-- Unified System Telemetry & Model Pill -->
-        <div class="header-telemetry-pill" onclick="openModelRegistryModal()" title="Live System Analytics: Click for Hardware Diagnostics & Ollama Models">
-          <span class="status-dot dot-cyan"></span>
-          <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">GPU</span>
-          <span class="ticker-val" id="ticker-gpu-val">--/-- GB</span>
-          <span class="hw-sep">|</span>
-          <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">CPU</span>
-          <span class="ticker-val" id="ticker-cpu-val">--%</span>
-          <span class="hw-sep">|</span>
-          <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">RAM</span>
-          <span class="ticker-val" id="ticker-ram-val">--/-- GB</span>
-          <span class="hw-sep">|</span>
-          <span style="font-weight: 700; color: var(--text-muted); font-size: 10px;">ROM</span>
-          <span class="ticker-val" id="ticker-rom-val">--/-- GB</span>
-          <span class="model-count-tag" id="header-model-label">Ollama Active</span>
-          <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" style="opacity: 0.6; margin-left: 2px;"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-
         <!-- Day / Night Mode Toggle -->
         <button class="icon-button theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle Night/Day Mode">
           <svg class="theme-icon sun-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
@@ -2440,7 +2422,7 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
         </div>
       </div>
       <div class="copilot-header-actions">
-        <div class="copilot-status-pill" onclick="openModelRegistryModal()" title="Hardware Telemetry &amp; Model Registry">
+        <div class="copilot-status-pill">
           <span class="status-dot dot-success"></span>
           <span id="copilot-badge-text">Ollama Active</span>
         </div>
@@ -2542,128 +2524,6 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
     </div>
   </aside>
 
-</div>
-
-<!-- ====================================================================
-     MODEL REGISTRY & HARDWARE MODAL
-     ==================================================================== -->
-<div id="model-modal" class="modal-backdrop" onclick="if(event.target===this) closeModelRegistryModal()">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-title-left">
-        <div class="modal-icon-badge">
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
-            <rect x="2" y="2" width="20" height="8" rx="2"></rect>
-            <rect x="2" y="14" width="20" height="8" rx="2"></rect>
-            <line x1="6" y1="6" x2="6.01" y2="6"></line>
-            <line x1="6" y1="18" x2="6.01" y2="18"></line>
-          </svg>
-        </div>
-        <div>
-          <div class="modal-heading">Local Model Registry &amp; Hardware Budget</div>
-          <div class="modal-subheading"><span id="hw-backend-status">100% On-Premises Air-Gapped Inference</span> &bull; <span id="hw-target-name">NVIDIA RTX 3050 (6GB VRAM)</span> &bull; Zero External WAN</div>
-        </div>
-      </div>
-      <button class="modal-close-button" onclick="closeModelRegistryModal()" title="Close (Esc)">
-        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <!-- Live Real-Time Hardware Analytics (CPU, RAM, GPU, ROM) -->
-      <div class="modal-section-header">
-        <div class="modal-section-title">Host Hardware &amp; Telemetry</div>
-        <span id="modal-os-badge" class="hw-os-pill">Detecting OS...</span>
-      </div>
-
-      <div class="live-hardware-grid">
-        <!-- 1. CPU -->
-        <div class="hw-meter-card">
-          <div class="hw-meter-top">
-            <div class="hw-meter-title">
-              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
-              <span>Processor (CPU)</span>
-            </div>
-            <span class="hw-meter-percent" id="hw-cpu-pct">--%</span>
-          </div>
-          <div class="meter-bar-track">
-            <div class="meter-bar-fill fill-info" id="hw-cpu-bar" style="width: 0%;"></div>
-          </div>
-          <div class="hw-meter-sub" id="hw-cpu-name">Detecting processor...</div>
-          <div class="hw-meter-footer">
-            <span id="hw-cpu-cores">-- Cores</span>
-            <span class="hw-sub-pill" id="hw-cpu-freq">-- MHz</span>
-          </div>
-        </div>
-
-        <!-- 2. RAM -->
-        <div class="hw-meter-card">
-          <div class="hw-meter-top">
-            <div class="hw-meter-title">
-              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M2 2h20v20H2z"/><path d="M7 2v20M17 2v20M2 12h20"/></svg>
-              <span>System Memory (RAM)</span>
-            </div>
-            <span class="hw-meter-percent" id="hw-ram-pct">--%</span>
-          </div>
-          <div class="meter-bar-track">
-            <div class="meter-bar-fill fill-success" id="hw-ram-bar" style="width: 0%;"></div>
-          </div>
-          <div class="hw-meter-sub" id="hw-ram-usage">-- / -- GB Allocated</div>
-          <div class="hw-meter-footer">
-            <span id="hw-ram-avail">-- GB Free</span>
-            <span class="hw-status-dot-text"><span class="status-dot dot-success"></span> Nominal</span>
-          </div>
-        </div>
-
-        <!-- 3. GPU / VRAM -->
-        <div class="hw-meter-card">
-          <div class="hw-meter-top">
-            <div class="hw-meter-title">
-              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="12" r="2"/><path d="M12 8v8"/></svg>
-              <span>Graphics &amp; VRAM (GPU)</span>
-            </div>
-            <span class="hw-meter-percent" id="hw-gpu-pct">--%</span>
-          </div>
-          <div class="meter-bar-track">
-            <div class="meter-bar-fill fill-purple" id="hw-gpu-bar" style="width: 0%;"></div>
-          </div>
-          <div class="hw-meter-sub" id="hw-gpu-name">Detecting GPU accelerator...</div>
-          <div class="hw-meter-footer">
-            <span id="hw-gpu-vram">-- / -- MB VRAM</span>
-            <span class="hw-sub-pill" id="hw-gpu-temp">-- &deg;C</span>
-          </div>
-        </div>
-
-        <!-- 4. Storage / ROM -->
-        <div class="hw-meter-card">
-          <div class="hw-meter-top">
-            <div class="hw-meter-title">
-              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-              <span>Local Storage (Disk Pool)</span>
-            </div>
-            <span class="hw-meter-percent" id="hw-rom-pct">--%</span>
-          </div>
-          <div class="meter-bar-track">
-            <div class="meter-bar-fill fill-warning" id="hw-rom-bar" style="width: 0%;"></div>
-          </div>
-          <div class="hw-meter-sub" id="hw-rom-usage">-- / -- GB Allocated</div>
-          <div class="hw-meter-footer">
-            <span id="hw-rom-free">-- GB Free</span>
-            <span class="hw-status-dot-text"><span class="status-dot dot-success"></span> Mounted</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Profiles Grid Header -->
-      <div class="modal-section-header" style="margin-top: 18px;">
-        <div class="modal-section-title">Registered Domain-Specialized Models</div>
-        <span class="hw-os-pill">6 Open-Weight Local Engines &bull; 0% Cloud Dependency</span>
-      </div>
-      <div id="modal-model-grid" class="modal-model-grid">
-        <!-- Dynamically populated from /api/models -->
-      </div>
-    </div>
-  </div>
 </div>
 
 <script src="/static/app.js"></script>
