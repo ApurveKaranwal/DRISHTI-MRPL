@@ -667,6 +667,14 @@ async def list_documents():
             "format": "MD",
             "path": "data/api_510_inspection_code_statutory.md",
             "description": "Statutory standards documentation with API 510 minimum retirement thickness formula and OISD-STD-129 compliance criteria."
+        },
+        {
+            "name": "mrpl_pfccu_process_operating_manual.md",
+            "title": "MRPL PFCCU Unit 430 & PRU Technical Operating Manual",
+            "category": "Operational Guidelines",
+            "format": "MD",
+            "path": "data/mrpl_pfccu_process_operating_manual.md",
+            "description": "Official MRPL Petrochemical FCCU & PRU operating manual: coil temperatures, propylene selectivity (19.8-20.8 wt%), catalyst circulation, and ASTM D5234 polymer-grade purity."
         }
     ]
 

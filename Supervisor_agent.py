@@ -513,7 +513,7 @@ class SupervisorAgent:
         self,
         messages: list[dict[str, str]],
         json_mode: bool = False,
-        max_tokens: int = 512,
+        max_tokens: int = 1024,
         temperature: float = 0.1,
     ) -> str:
         """Call the local Supervisor LLM through Ollama HTTP API."""
@@ -787,7 +787,7 @@ Files explicitly supplied: {files or []}
                 raw = self._llm_chat(
                     messages,
                     json_mode=True,
-                    max_tokens=384,
+                    max_tokens=1024,
                     temperature=0.1,
                 )
 
@@ -812,7 +812,7 @@ Files explicitly supplied: {files or []}
             try:
                 # Strip reasoning tags such as <think>...</think>
                 cleaned_raw = re.sub(
-                    r"<think>.*?</think>",
+                    r"<think>.*?(?:</think>|$)",
                     "",
                     raw,
                     flags=re.DOTALL
@@ -828,7 +828,12 @@ Files explicitly supplied: {files or []}
                 if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
                     raw_json = cleaned_raw[first_brace:last_brace + 1]
                 else:
-                    raw_json = cleaned_raw
+                    fb_raw = raw.find("{")
+                    lb_raw = raw.rfind("}")
+                    if fb_raw != -1 and lb_raw != -1 and lb_raw > fb_raw:
+                        raw_json = raw[fb_raw:lb_raw + 1]
+                    else:
+                        raw_json = cleaned_raw
 
                 plan = json.loads(raw_json)
 
@@ -2325,10 +2330,11 @@ Files explicitly supplied: {files or []}
                     {
                         "role": "system",
                         "content": (
-                            "You are a helpful, precise engineering assistant for Mangalore Refinery and Petrochemicals Limited (MRPL). "
-                            "Answer the user request concisely and factually using only the supplied worker results. "
-                            "Cite source tables, files, or standards when available. "
-                            "Do not hallucinate or extrapolate facts not present in the worker results."
+                            "You are a helpful, authoritative chemical & refinery engineering assistant for Mangalore Refinery and Petrochemicals Limited (MRPL). "
+                            "Answer the user request concisely, factually, and thoroughly using the supplied worker evidence. "
+                            "Cite source tables, files, or standards whenever available. "
+                            "Do not hallucinate operational figures; ground all specific plant values in the worker evidence. "
+                            "Provide clear, professional chemical engineering explanations for the underlying process mechanisms (e.g. cracking reaction kinetics, temperature selectivity, catalyst-to-oil dynamics, and polymer-grade purity constraints)."
                         ),
                     },
                     {
@@ -2338,12 +2344,12 @@ Files explicitly supplied: {files or []}
                             f"Worker results: {evidence}",
                     },
                 ],
-                max_tokens=600,
+                max_tokens=1500,
                 temperature=0.15,
             )
 
             cleaned = re.sub(
-                r"<think>.*?</think>",
+                r"<think>.*?(?:</think>|$)",
                 "",
                 resp,
                 flags=re.DOTALL
