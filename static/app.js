@@ -3101,42 +3101,6 @@ function initCutBarInteractions() {
   });
 }
 
-// 3. Interactive Segmented Track Scrubber
-function initTrackScrubbers() {
-  const tracks = document.querySelectorAll(".hud-segmented-track");
-  tracks.forEach(track => {
-    function handleScrub(e) {
-      const rect = track.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-      const ticks = track.querySelectorAll(".seg-tick");
-      const activeIdx = Math.round(pct * ticks.length);
-
-      ticks.forEach((tick, i) => {
-        if (i <= activeIdx) {
-          tick.classList.add("active", "touch-scrub");
-        } else {
-          tick.classList.remove("active", "touch-scrub");
-        }
-      });
-
-      showHudTooltip(`
-        <div style="font-weight:700; color:#00F5D4;">Operating Throughput</div>
-        <div style="font-size:12px; font-weight:800; font-family:var(--font-mono);">${(pct * 120).toFixed(1)}% Capacity (${(pct * 16.77).toFixed(2)} MMT)</div>
-      `, clientX, rect.top - 10);
-    }
-
-    function handleEnd() {
-      track.querySelectorAll(".seg-tick").forEach(t => t.classList.remove("touch-scrub"));
-      hideHudTooltip();
-    }
-
-    track.addEventListener("mousemove", handleScrub);
-    track.addEventListener("mouseleave", handleEnd);
-    track.addEventListener("touchmove", handleScrub, { passive: true });
-    track.addEventListener("touchend", handleEnd);
-  });
-}
 
 // 4. Interactive Column Gauges Tactile Pulse
 function initGaugeInteractions() {
@@ -3180,7 +3144,6 @@ function initEqualizerInteractions() {
 function initTouchAndMicroInteractions() {
   initUniversalTouchRipple();
   initCutBarInteractions();
-  initTrackScrubbers();
   initGaugeInteractions();
   initEqualizerInteractions();
 }

@@ -2757,6 +2757,8 @@ code {
   border-radius: 1px;
   background: rgba(255, 255, 255, 0.12);
   transition: all 0.2s ease;
+  cursor: default;
+  pointer-events: none;
 }
 
 .seg-tick.active {
@@ -3393,18 +3395,6 @@ code {
   transition: transform 0.2s ease;
 }
 
-/* Interactive Segmented Track Ticks */
-.seg-tick {
-  cursor: pointer;
-}
-
-.seg-tick:hover,
-.seg-tick.touch-scrub {
-  transform: scaleY(1.4) scaleX(1.15);
-  background: #00F5D4 !important;
-  box-shadow: 0 0 12px #00F5D4 !important;
-  z-index: 5;
-}
 
 /* Interactive Equalizer Bars */
 .eq-bar {
