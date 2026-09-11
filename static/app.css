@@ -3274,11 +3274,24 @@ code {
   max-width: 100%;
 }
 
-/* Collapsible Detailed Drawer */
-.hud-collapsible-drawer {
+/* Detailed SCADA Data Sections (Clean, Permanent, No Collapsible Toggle) */
+.hud-collapsible-drawer,
+.hud-detailed-section {
   position: relative;
   z-index: 4;
-  padding: 8px 36px 32px 36px;
+  padding: 4px 36px 32px 36px;
+}
+
+.hud-drawer-content {
+  display: block !important;
+  background: rgba(13, 17, 26, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--hud-card-border);
+  border-radius: 14px;
+  padding: 18px 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  margin-top: 14px;
 }
 
 .hud-drawer-toggle {

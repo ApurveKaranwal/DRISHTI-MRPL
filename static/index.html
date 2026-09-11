@@ -169,19 +169,9 @@
             <span class="user-name">Operator</span>
             <span class="user-role">Shift A</span>
           </div>
-          <!-- Header Collapse Toggle Button -->
-          <button class="header-collapse-toggle-btn" id="header-collapse-btn" onclick="toggleHeaderCollapse()" title="Collapse Top Header Bar">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="18 15 12 9 6 15"/></svg>
-          </button>
         </div>
       </div>
     </header>
-    <!-- Floating Expand Pill when Header is Collapsed -->
-    <div class="header-floating-expand-pill" id="header-expand-pill" onclick="toggleHeaderCollapse()" title="Expand Top Header &amp; Telemetry" style="display: none;">
-      <span class="status-dot dot-cyan"></span>
-      <span id="expand-pill-title">MRPL SCADA Telemetry</span>
-      <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
 
     <!-- ------------------------------------------------------------------
          TAB 1: OVERVIEW (CLEAN EXECUTIVE SCADA - GROUNDED IN PPAC & API 510)
@@ -245,12 +235,10 @@
                 </div>
               </div>
 
-              <!-- Horizontal Interactive Unit Switcher '< >' -->
+              <!-- Horizontal Unit Badge -->
               <div class="hud-axis-selector">
                 <div class="hud-axis-line"></div>
-                <button class="hud-axis-btn" onclick="cycleHudUnit(-1)" title="Previous Unit">&lt;</button>
                 <div class="hud-axis-label" id="hud-active-unit-label">Atmospheric Tower #1</div>
-                <button class="hud-axis-btn" onclick="cycleHudUnit(1)" title="Next Unit">&gt;</button>
                 <div class="hud-axis-line"></div>
               </div>
             </div>
@@ -400,16 +388,9 @@
           </div>
         </div>
 
-        <!-- Collapsible Detailed PPAC Table Drawer for Operators who want granular figures -->
-        <div class="hud-collapsible-drawer">
-          <button class="hud-drawer-toggle" onclick="toggleDetailedPpacTable()">
-            <span style="display: flex; align-items: center; gap: 8px;">
-              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span>View Certified PPAC Monthly Tables &amp; CML Inspection Dossier</span>
-            </span>
-            <span class="drawer-arrow" id="ppac-drawer-arrow">▾</span>
-          </button>
-          <div class="hud-drawer-content" id="hud-ppac-drawer-content" style="display: none;">
+        <!-- Detailed PPAC & CML Inspection Data Section -->
+        <div class="hud-detailed-section">
+          <div class="hud-drawer-content" id="hud-ppac-drawer-content">
             <div class="grid-2" style="margin-top: 14px;">
               <div class="dash-card">
                 <div class="card-title">PPAC Official Monthly Processing Data</div>
@@ -718,17 +699,9 @@
           </div>
         </div>
 
-        <!-- Collapsible Bottom Drawer -->
-        <div class="hud-collapsible-drawer">
-          <button class="hud-drawer-toggle" onclick="toggleMainRefineryDrawer()">
-            <span class="drawer-toggle-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </span>
-            <span>View Detailed Crude Assay Cut Breakdown &amp; 12-Point Ultrasonic NDT Survey</span>
-            <span class="drawer-toggle-arrow" id="mr-drawer-arrow">▾</span>
-          </button>
-
-          <div class="hud-drawer-content" id="hud-mr-drawer-content" style="display: none; padding: 18px 24px;">
+        <!-- Detailed Crude Assay & NDT Survey Section -->
+        <div class="hud-detailed-section">
+          <div class="hud-drawer-content" id="hud-mr-drawer-content" style="padding: 18px 0;">
             <div class="grid-2" style="gap: 20px; align-items: start;">
               <div>
                 <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Dynamic True Boiling Point (TBP) Distillation Yields</div>
@@ -903,7 +876,7 @@
 
               <button class="calc-exec-btn" onclick="executeInteractiveDarcy()">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                <span>Calculate Darcy-Weisbach Drop</span>
+                <span>Calculate Pressure Drop</span>
               </button>
             </div>
 
@@ -956,10 +929,6 @@
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <div style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Active Script: scripts/hydraulic_gradient_calc.py</div>
-                <button class="copilot-query-btn" onclick="runServerSandboxCode()" title="Execute script in Python Sandbox worker">
-                  <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  <span>Run Sandbox Worker</span>
-                </button>
               </div>
               <pre style="background: #080B12; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; font-size: 11px; color: #93C5FD; overflow-x: auto; height: 230px;" id="darcy-script-code">
 length_m = 500.0          # Pipeline length (m)
@@ -1414,17 +1383,9 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
           </div>
         </div>
 
-        <!-- Collapsible Bottom Drawer -->
-        <div class="hud-collapsible-drawer">
-          <button class="hud-drawer-toggle" onclick="togglePetroDrawer()">
-            <span class="drawer-toggle-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </span>
-            <span>View Finished Polymer Production Slate &amp; Technical Specifications Dossier</span>
-            <span class="drawer-toggle-arrow" id="petro-drawer-arrow">▾</span>
-          </button>
-
-          <div class="hud-drawer-content" id="hud-petro-drawer-content" style="display: none; padding: 18px 24px;">
+        <!-- Finished Polymer Production Slate Section -->
+        <div class="hud-detailed-section">
+          <div class="hud-drawer-content" id="hud-petro-drawer-content" style="padding: 18px 0;">
             <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Certified Polypropylene Grades Slate</div>
             <table class="data-table">
               <thead>
@@ -1685,17 +1646,9 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
           </div>
         </div>
 
-        <!-- Collapsible Bottom Drawer -->
-        <div class="hud-collapsible-drawer">
-          <button class="hud-drawer-toggle" onclick="toggleAromaticsDrawer()">
-            <span class="drawer-toggle-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </span>
-            <span>View Certified High-Purity Aromatics Slate &amp; Lab Quality Specifications</span>
-            <span class="drawer-toggle-arrow" id="aromatics-drawer-arrow">▾</span>
-          </button>
-
-          <div class="hud-drawer-content" id="hud-aromatics-drawer-content" style="display: none; padding: 18px 24px;">
+        <!-- Certified High-Purity Aromatics Slate Section -->
+        <div class="hud-detailed-section">
+          <div class="hud-drawer-content" id="hud-aromatics-drawer-content" style="padding: 18px 0;">
             <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Laboratory Quality Controls &amp; Customer Dispatch</div>
             <table class="data-table">
               <thead>
@@ -1947,17 +1900,9 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
           </div>
         </div>
 
-        <!-- Collapsible Bottom Drawer -->
-        <div class="hud-collapsible-drawer">
-          <button class="hud-drawer-toggle" onclick="toggleUtilitiesDrawer()">
-            <span class="drawer-toggle-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </span>
-            <span>View 3-Tier Steam Balance, SWRO Desalination &amp; CEMS Emission Dossier</span>
-            <span class="drawer-toggle-arrow" id="utilities-drawer-arrow">▾</span>
-          </button>
-
-          <div class="hud-drawer-content" id="hud-utilities-drawer-content" style="display: none; padding: 18px 24px;">
+        <!-- 3-Tier Steam Balance & Utility Dossier Section -->
+        <div class="hud-detailed-section">
+          <div class="hud-drawer-content" id="hud-utilities-drawer-content" style="padding: 18px 0;">
             <div class="grid-2" style="gap: 20px; align-items: start;">
               <div>
                 <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">3-Tier Steam Balance Network</div>
@@ -2258,17 +2203,9 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
           </div>
         </div>
 
-        <!-- Collapsible Bottom Drawer -->
-        <div class="hud-collapsible-drawer">
-          <button class="hud-drawer-toggle" onclick="toggleAlertsDrawer()">
-            <span class="drawer-toggle-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </span>
-            <span>View Full Statutory Compliance Register &amp; Critical Equipment Spares Inventory</span>
-            <span class="drawer-toggle-arrow" id="alerts-drawer-arrow">▾</span>
-          </button>
-
-          <div class="hud-drawer-content" id="hud-alerts-drawer-content" style="display: none; padding: 18px 24px;">
+        <!-- Statutory Asset Integrity Compliance Register Section -->
+        <div class="hud-detailed-section">
+          <div class="hud-drawer-content" id="hud-alerts-drawer-content" style="padding: 18px 0;">
             <div style="margin-bottom: 20px;">
               <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Statutory Asset Integrity Compliance Register</div>
               <table class="data-table">

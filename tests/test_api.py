@@ -8,6 +8,12 @@ import json
 import urllib.request
 import urllib.error
 import sys
+from pathlib import Path
+
+# Ensure project root is on sys.path for direct TestClient fallback
+ROOT_DIR = str(Path(__file__).resolve().parent.parent)
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 
 BASE_URL = "http://localhost:8000"
 
@@ -22,12 +28,28 @@ def get_client():
             from fastapi.testclient import TestClient
             from server import app
             _client = TestClient(app)
-        except Exception:
+        except Exception as err:
             _client = None
     return _client
 
 
+import socket
+
+def is_server_listening(host="localhost", port=8000):
+    try:
+        with socket.create_connection((host, port), timeout=0.15):
+            return True
+    except OSError:
+        return False
+
+
 def request_get(path, timeout=10):
+    if not is_server_listening():
+        client = get_client()
+        if client:
+            resp = client.get(path)
+            return resp.status_code, resp.content
+
     url = f"{BASE_URL}{path}"
     try:
         req = urllib.request.urlopen(url, timeout=timeout)
@@ -41,6 +63,13 @@ def request_get(path, timeout=10):
 
 
 def request_post(path, data, headers=None, timeout=180):
+    if not is_server_listening():
+        client = get_client()
+        if client:
+            json_payload = json.loads(data.decode()) if isinstance(data, bytes) else data
+            resp = client.post(path, json=json_payload)
+            return resp.status_code, resp.content
+
     url = f"{BASE_URL}{path}"
     try:
         req = urllib.request.Request(url, data=data, headers=headers or {})
