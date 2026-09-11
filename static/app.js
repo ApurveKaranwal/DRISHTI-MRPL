@@ -1209,11 +1209,11 @@ const CRUDE_ASSAYS = {
   }
 };
 
-// Toggle between Visual SCADA view and Raw Data Table in Main Refinery
+// Toggle between Visual SCADA view and Raw Data Table across tabs
 function toggleMrView(section, viewType, btn) {
-  const card = btn.closest(".hud-glass-card");
+  const card = btn.closest(".hud-glass-card, .dash-card, .audit-section-container, .audit-card-wrap");
   if (!card) return;
-  card.querySelectorAll(".view-toggle-btn").forEach(b => b.classList.remove("active"));
+  btn.parentElement.querySelectorAll(".view-toggle-btn").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   const visualEl = card.querySelector(".section-visual-view");
   const tableEl = card.querySelector(".section-table-view");
@@ -1223,6 +1223,24 @@ function toggleMrView(section, viewType, btn) {
   } else {
     if (visualEl) visualEl.style.display = "none";
     if (tableEl) tableEl.style.display = "block";
+  }
+}
+
+// Seamless interlock from dashboard to DRISHTI AI Copilot
+function prefillCopilotChat(promptText) {
+  const inputEl = document.getElementById("chat-input");
+  if (inputEl) {
+    inputEl.value = promptText;
+    inputEl.focus();
+    inputEl.style.transition = "box-shadow 0.3s ease";
+    inputEl.style.boxShadow = "0 0 14px rgba(255, 122, 0, 0.7)";
+    setTimeout(() => {
+      inputEl.style.boxShadow = "";
+    }, 1500);
+  }
+  const panel = document.querySelector(".copilot-panel");
+  if (panel && panel.classList.contains("collapsed")) {
+    panel.classList.remove("collapsed");
   }
 }
 

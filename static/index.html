@@ -2444,117 +2444,506 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
 
         <!-- Statutory Asset Integrity Compliance Register Section -->
         <div class="hud-detailed-section">
-          <div class="hud-drawer-content" id="hud-alerts-drawer-content" style="padding: 18px 0;">
-            <div style="margin-bottom: 20px;">
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Statutory Asset Integrity Compliance Register</div>
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Standard / Code</th>
-                    <th>Equipment Tag &amp; Location</th>
-                    <th>Diagnostic Finding</th>
-                    <th>Statutory Action Required</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style="background: rgba(239, 68, 68, 0.08);">
-                    <td><code>API 510 / OISD-129</code></td>
-                    <td><strong>CDU-Col-04</strong> (+4.2m bottom shell)</td>
-                    <td>Thickness 4.18 mm (-1.82 mm deficit vs t_min 6.00 mm)</td>
-                    <td>Mandatory in-situ Inconel-625 weld overlay cladding</td>
-                    <td><span class="status-badge-red">CRITICAL DEFICIT</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>API 570 / CSB-R32</code></td>
-                    <td><strong>Crude Heater Line</strong> (CDU-1)</td>
-                    <td>ASTM A106 Gr B in 384°C sour crude service</td>
-                    <td>PMI silicon check (Si &ge; 0.10 wt% sulfidation resistance)</td>
-                    <td><span class="status-badge-yellow">PRIORITY 1</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>PESO SMPV Rules</code></td>
-                    <td><strong>Mounded LPG Bullets</strong> (TK-101 to 104)</td>
-                    <td>4x 1,200 m³ pressurized bullets, hydraulic relief valid</td>
-                    <td>5-yr hydrotest &amp; acoustic emission log certified</td>
-                    <td><span class="status-badge-green">FULLY COMPLIANT</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>OISD-STD-117</code></td>
-                    <td><strong>Fire Protection Network</strong></td>
-                    <td>Deluge system &amp; foam pourers at Berth 8 &amp; Tank Farm</td>
-                    <td>Monthly 9.5 barg header pressure verification completed</td>
-                    <td><span class="status-badge-green">VERIFIED PASSED</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>CPCB / SPCB</code></td>
-                    <td><strong>CAAQMS Station 1 &amp; 2</strong></td>
-                    <td>Continuous PM2.5, SO2, NOx ambient analyzers</td>
-                    <td>99.2% uptime telemetry transmitted to CPCB portal</td>
-                    <td><span class="status-badge-green">CERTIFIED</span></td>
-                  </tr>
-                </tbody>
-              </table>
+          <div class="hud-drawer-content" id="hud-alerts-drawer-content" style="padding: 20px 24px;">
+            
+            <!-- Critical Interlock Callout Banner -->
+            <div class="statutory-interlock-banner">
+              <div class="interlock-banner-content">
+                <div class="interlock-badge">
+                  <span class="interlock-badge-dot"></span>
+                  Critical Interlock: API 510 Integrity ⇄ Spares Deficit
+                </div>
+                <div class="interlock-title">CDU-Col-04 Weld Overlay Cladding is Blocked by Inconel-625 Stock Shortfall</div>
+                <div class="interlock-desc">
+                  Statutory ultrasonic scan detected <strong>4.18 mm</strong> bottom shell thickness (<strong>-1.82 mm deficit</strong> vs API 510 retirement threshold of 6.00 mm). Mandatory in-situ weld overlay requires Inconel-625 TIG wire. Warehouse has only <strong>12 kg</strong> against minimum safety threshold of <strong>50 kg</strong> (<strong>-38 kg deficit</strong>, 15 days procurement lead time).
+                </div>
+              </div>
+              <button class="interlock-btn" onclick="prefillCopilotChat('Draft an emergency procurement approval note for 38 kg of Inconel 625 TIG Wire (INC-625-WELD-ROD) to satisfy statutory API 510 weld overlay on CDU-Col-04.')">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                ⚡ Draft Emergency PO with AI
+              </button>
             </div>
 
-            <div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Critical Equipment Spares &amp; Procurement Allocation</div>
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Part Number</th>
-                    <th>Description</th>
-                    <th>Equipment Tag</th>
-                    <th>Stock on Hand</th>
-                    <th>Min Reorder</th>
-                    <th>Lead Time</th>
-                    <th>Unit Cost</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style="background: rgba(239, 68, 68, 0.08);">
-                    <td><code>INC-625-WELD-ROD</code></td>
-                    <td>Inconel 625 TIG Wire 2.4mm</td>
-                    <td>CDU-COL-04</td>
-                    <td style="color: #EF4444; font-weight: 700;">12 kg</td>
-                    <td>50 kg</td>
-                    <td>15 days</td>
-                    <td>₹6,800/kg</td>
-                    <td><span class="status-badge-red">URGENT DEFICIT (-38 kg)</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>FSH-ED-6-600</code></td>
-                    <td>Fisher Plug Valve 6" CL600</td>
-                    <td>PV-CDU-201</td>
-                    <td style="color: #FBBF24; font-weight: 700;">1 unit</td>
-                    <td>2 units</td>
-                    <td>60 days</td>
-                    <td>₹8,50,000</td>
-                    <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>JC-8648-80</code></td>
-                    <td>John Crane Metal Seal 80mm</td>
-                    <td>P-CDU-BOTTOM</td>
-                    <td style="color: #FBBF24; font-weight: 700;">2 units</td>
-                    <td>4 units</td>
-                    <td>40 days</td>
-                    <td>₹4,10,000</td>
-                    <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
-                  </tr>
-                  <tr>
-                    <td><code>GSK-SPW-12-300</code></td>
-                    <td>Spiral Wound Gasket 12" CL300</td>
-                    <td>FLG-CDU-12</td>
-                    <td style="color: #FBBF24; font-weight: 700;">14 units</td>
-                    <td>50 units</td>
-                    <td>7 days</td>
-                    <td>₹3,800</td>
-                    <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
-                  </tr>
-                </tbody>
-              </table>
+            <!-- SECTION 1: Statutory Compliance Health Matrix -->
+            <div class="audit-section-container" style="margin-bottom: 28px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                <div>
+                  <div style="font-size: 14px; font-weight: 700; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+                    <span>Statutory Asset Integrity Compliance Register</span>
+                    <span class="status-badge-blue" style="font-size: 9.5px;">5 Frameworks Tracked</span>
+                  </div>
+                  <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+                    OISD-129, API 510, API 570, PESO SMPV, OISD-117 &amp; CPCB Environmental Surveillance
+                  </div>
+                </div>
+                <div style="display: flex; gap: 4px; background: rgba(255, 255, 255, 0.06); padding: 2px; border-radius: 6px;">
+                  <button class="view-toggle-btn active" onclick="toggleMrView('audits', 'visual', this)">Visual Cards</button>
+                  <button class="view-toggle-btn" onclick="toggleMrView('audits', 'table', this)">Raw Table</button>
+                </div>
+              </div>
+
+              <!-- Summary Status Strip -->
+              <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+                <span style="font-size: 10.5px; background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.28); padding: 4px 10px; border-radius: 6px; font-weight: 700;">
+                  ✔ 3 Compliant (60%)
+                </span>
+                <span style="font-size: 10.5px; background: rgba(245, 158, 11, 0.12); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.28); padding: 4px 10px; border-radius: 6px; font-weight: 700;">
+                  ▲ 1 Priority Surveillance
+                </span>
+                <span style="font-size: 10.5px; background: rgba(239, 68, 68, 0.12); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.28); padding: 4px 10px; border-radius: 6px; font-weight: 700;">
+                  ⚠ 1 Critical Deficit
+                </span>
+              </div>
+
+              <!-- VISUAL VIEW -->
+              <div class="section-visual-view">
+                <div class="audit-cards-grid">
+                  <!-- 1. API 510 / OISD-129 -->
+                  <div class="audit-card status-critical">
+                    <div>
+                      <div class="audit-card-top">
+                        <span class="audit-code-title">API 510 / OISD-129</span>
+                        <span class="status-badge-red">CRITICAL DEFICIT</span>
+                      </div>
+                      <div class="audit-equipment-name">CDU-Col-04 (+4.2m Bottom Shell)</div>
+                      <div class="audit-card-body">
+                        <div class="audit-metric-row">
+                          <span class="audit-metric-label">Ultrasonic Measured</span>
+                          <span class="audit-metric-val" style="color: #EF4444;">4.18 mm <span style="font-size: 10px; color: var(--text-dim);">(Req: 6.00 mm)</span></span>
+                        </div>
+                        <div class="audit-gauge-track">
+                          <div class="audit-gauge-fill" style="width: 70%; background: #EF4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-top: 2px;">
+                          <span style="color: #EF4444; font-weight: 700;">-1.82 mm below retirement</span>
+                          <span>Retirement: 6.00 mm</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="audit-card-footer">
+                      <span style="color: #EF4444; font-weight: 700;">Mandatory:</span>
+                      <span>In-situ Inconel-625 weld overlay cladding prior to next campaign</span>
+                    </div>
+                  </div>
+
+                  <!-- 2. API 570 / CSB-R32 -->
+                  <div class="audit-card status-priority">
+                    <div>
+                      <div class="audit-card-top">
+                        <span class="audit-code-title">API 570 / CSB-R32</span>
+                        <span class="status-badge-yellow">PRIORITY 1</span>
+                      </div>
+                      <div class="audit-equipment-name">Crude Heater Line (CDU-1)</div>
+                      <div class="audit-card-body">
+                        <div class="audit-metric-row">
+                          <span class="audit-metric-label">Metallurgy &amp; Service</span>
+                          <span class="audit-metric-val" style="color: #FBBF24;">ASTM A106 Gr B <span style="font-size: 10px; color: var(--text-dim);">(384°C sour)</span></span>
+                        </div>
+                        <div class="audit-gauge-track">
+                          <div class="audit-gauge-fill" style="width: 85%; background: #F59E0B; box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-top: 2px;">
+                          <span style="color: #10B981; font-weight: 600;">Silicon Check: Si 0.12 wt%</span>
+                          <span>Threshold: &ge; 0.10 wt%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="audit-card-footer">
+                      <span style="color: #F59E0B; font-weight: 700;">PMI Check:</span>
+                      <span>Sulfidation resistance verified; re-verify on scheduled turnaround</span>
+                    </div>
+                  </div>
+
+                  <!-- 3. PESO SMPV Rules -->
+                  <div class="audit-card status-compliant">
+                    <div>
+                      <div class="audit-card-top">
+                        <span class="audit-code-title">PESO SMPV Rules</span>
+                        <span class="status-badge-green">FULLY COMPLIANT</span>
+                      </div>
+                      <div class="audit-equipment-name">Mounded LPG Bullets (TK-101 to 104)</div>
+                      <div class="audit-card-body">
+                        <div class="audit-metric-row">
+                          <span class="audit-metric-label">Vessel Volume</span>
+                          <span class="audit-metric-val" style="color: #10B981;">4x 1,200 m³ Pressurized</span>
+                        </div>
+                        <div class="audit-gauge-track">
+                          <div class="audit-gauge-fill" style="width: 100%; background: #10B981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-top: 2px;">
+                          <span style="color: #10B981; font-weight: 600;">5-Yr Hydrotest Log Certified</span>
+                          <span>Valid through 2029</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="audit-card-footer">
+                      <span style="color: #10B981; font-weight: 700;">Statutory Status:</span>
+                      <span>Acoustic emission log verified; hydraulic relief valid</span>
+                    </div>
+                  </div>
+
+                  <!-- 4. OISD-STD-117 -->
+                  <div class="audit-card status-compliant">
+                    <div>
+                      <div class="audit-card-top">
+                        <span class="audit-code-title">OISD-STD-117</span>
+                        <span class="status-badge-green">VERIFIED PASSED</span>
+                      </div>
+                      <div class="audit-equipment-name">Fire Protection Network</div>
+                      <div class="audit-card-body">
+                        <div class="audit-metric-row">
+                          <span class="audit-metric-label">Header Ring Pressure</span>
+                          <span class="audit-metric-val" style="color: #10B981;">9.5 barg <span style="font-size: 10px; color: var(--text-dim);">(Target: &ge; 9.0)</span></span>
+                        </div>
+                        <div class="audit-gauge-track">
+                          <div class="audit-gauge-fill" style="width: 95%; background: #10B981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-top: 2px;">
+                          <span style="color: #10B981; font-weight: 600;">Monthly verification complete</span>
+                          <span>Design: 10.0 barg</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="audit-card-footer">
+                      <span style="color: #10B981; font-weight: 700;">Coverage:</span>
+                      <span>Deluge system &amp; foam pourers operational at Berth 8 &amp; Tank Farm</span>
+                    </div>
+                  </div>
+
+                  <!-- 5. CPCB / SPCB -->
+                  <div class="audit-card status-compliant">
+                    <div>
+                      <div class="audit-card-top">
+                        <span class="audit-code-title">CPCB / SPCB</span>
+                        <span class="status-badge-green">CERTIFIED</span>
+                      </div>
+                      <div class="audit-equipment-name">CAAQMS Stations 1 &amp; 2</div>
+                      <div class="audit-card-body">
+                        <div class="audit-metric-row">
+                          <span class="audit-metric-label">Central Telemetry Uptime</span>
+                          <span class="audit-metric-val" style="color: #10B981;">99.2% <span style="font-size: 10px; color: var(--text-dim);">(SLA: 95%)</span></span>
+                        </div>
+                        <div class="audit-gauge-track">
+                          <div class="audit-gauge-fill" style="width: 99.2%; background: #10B981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-top: 2px;">
+                          <span style="color: #10B981; font-weight: 600;">Continuous Live Uplink</span>
+                          <span>PM2.5, SO2, NOx Analyzers</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="audit-card-footer">
+                      <span style="color: #10B981; font-weight: 700;">Portal Status:</span>
+                      <span>Real-time environmental compliance data streamed to CPCB portal</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RAW TABLE VIEW -->
+              <div class="section-table-view" style="display: none; overflow-x: auto; margin-top: 10px;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Standard / Code</th>
+                      <th>Equipment Tag &amp; Location</th>
+                      <th>Diagnostic Finding</th>
+                      <th>Statutory Action Required</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="background: rgba(239, 68, 68, 0.08);">
+                      <td><code>API 510 / OISD-129</code></td>
+                      <td><strong>CDU-Col-04</strong> (+4.2m bottom shell)</td>
+                      <td>Thickness 4.18 mm (-1.82 mm deficit vs t_min 6.00 mm)</td>
+                      <td>Mandatory in-situ Inconel-625 weld overlay cladding</td>
+                      <td><span class="status-badge-red">CRITICAL DEFICIT</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>API 570 / CSB-R32</code></td>
+                      <td><strong>Crude Heater Line</strong> (CDU-1)</td>
+                      <td>ASTM A106 Gr B in 384°C sour crude service</td>
+                      <td>PMI silicon check (Si &ge; 0.10 wt% sulfidation resistance)</td>
+                      <td><span class="status-badge-yellow">PRIORITY 1</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>PESO SMPV Rules</code></td>
+                      <td><strong>Mounded LPG Bullets</strong> (TK-101 to 104)</td>
+                      <td>4x 1,200 m³ pressurized bullets, hydraulic relief valid</td>
+                      <td>5-yr hydrotest &amp; acoustic emission log certified</td>
+                      <td><span class="status-badge-green">FULLY COMPLIANT</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>OISD-STD-117</code></td>
+                      <td><strong>Fire Protection Network</strong></td>
+                      <td>Deluge system &amp; foam pourers at Berth 8 &amp; Tank Farm</td>
+                      <td>Monthly 9.5 barg header pressure verification completed</td>
+                      <td><span class="status-badge-green">VERIFIED PASSED</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>CPCB / SPCB</code></td>
+                      <td><strong>CAAQMS Station 1 &amp; 2</strong></td>
+                      <td>Continuous PM2.5, SO2, NOx ambient analyzers</td>
+                      <td>99.2% uptime telemetry transmitted to CPCB portal</td>
+                      <td><span class="status-badge-green">CERTIFIED</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- SECTION 2: Critical Equipment Spares & Procurement Allocation -->
+            <div class="audit-section-container">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                <div>
+                  <div style="font-size: 14px; font-weight: 700; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+                    <span>Critical Equipment Spares &amp; Procurement Allocation</span>
+                    <span class="status-badge-yellow" style="font-size: 9.5px;">Safety Stock Monitoring</span>
+                  </div>
+                  <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+                    Real-time warehouse inventory thresholds linked to upcoming turnaround commitments
+                  </div>
+                </div>
+                <div style="display: flex; gap: 4px; background: rgba(255, 255, 255, 0.06); padding: 2px; border-radius: 6px;">
+                  <button class="view-toggle-btn active" onclick="toggleMrView('spares', 'visual', this)">Visual Gauges</button>
+                  <button class="view-toggle-btn" onclick="toggleMrView('spares', 'table', this)">Raw Table</button>
+                </div>
+              </div>
+
+              <!-- Summary Status Strip -->
+              <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+                <span style="font-size: 10.5px; background: rgba(239, 68, 68, 0.12); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.28); padding: 4px 10px; border-radius: 6px; font-weight: 700;">
+                  🚨 1 Urgent Shortfall (-38 kg)
+                </span>
+                <span style="font-size: 10.5px; background: rgba(245, 158, 11, 0.12); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.28); padding: 4px 10px; border-radius: 6px; font-weight: 700;">
+                  ⚡ 3 Below Reorder Safety Level
+                </span>
+                <span style="font-size: 10.5px; background: rgba(56, 189, 248, 0.12); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.28); padding: 4px 10px; border-radius: 6px; font-weight: 700;">
+                  💰 Total Requisition Value: ₹13,76,800
+                </span>
+              </div>
+
+              <!-- VISUAL VIEW -->
+              <div class="section-visual-view">
+                <div class="spares-cards-grid">
+                  <!-- Spare 1: INC-625 -->
+                  <div class="spares-card stock-urgent">
+                    <div>
+                      <div class="spares-card-top">
+                        <div>
+                          <div class="spares-part-num">INC-625-WELD-ROD</div>
+                          <div class="spares-part-name">Inconel 625 TIG Wire 2.4mm</div>
+                        </div>
+                        <span class="status-badge-red" style="font-size: 9.5px;">URGENT DEFICIT</span>
+                      </div>
+
+                      <div class="spares-meter-section">
+                        <div class="spares-meter-header">
+                          <span style="color: var(--text-muted);">Stock on Hand: <strong style="color: #EF4444;">12 kg</strong></span>
+                          <span style="color: var(--text-dim);">Min Reorder: 50 kg (24%)</span>
+                        </div>
+                        <div class="spares-meter-track">
+                          <div class="spares-meter-fill" style="width: 24%; background: linear-gradient(90deg, #EF4444, #F87171); box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);"></div>
+                        </div>
+                        <div style="font-size: 10px; color: #EF4444; font-weight: 700; margin-top: 3px;">
+                          Deficit: -38 kg (Shortage blocks CDU-04 weld overlay)
+                        </div>
+                      </div>
+
+                      <div class="spares-chips-row">
+                        <span class="spares-chip">Tag: <strong style="color: #FF9E2C;">CDU-COL-04</strong></span>
+                        <span class="spares-chip">Lead Time: <strong style="color: #EF4444;">15 Days</strong></span>
+                        <span class="spares-chip">Unit: <strong>₹6,800/kg</strong></span>
+                      </div>
+                    </div>
+
+                    <div class="spares-action-row">
+                      <span style="font-size: 11px; color: #EF4444; font-weight: 700;">Est: ₹2,58,400</span>
+                      <button class="spares-requisition-btn" onclick="prefillCopilotChat('Create urgent purchase requisition for 38 kg Inconel 625 TIG wire (INC-625-WELD-ROD) at ₹6,800/kg to satisfy API 510 weld overlay on CDU-COL-04.')">
+                        ⚡ Requisition via AI
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Spare 2: Fisher Plug Valve -->
+                  <div class="spares-card stock-warning">
+                    <div>
+                      <div class="spares-card-top">
+                        <div>
+                          <div class="spares-part-num">FSH-ED-6-600</div>
+                          <div class="spares-part-name">Fisher Plug Valve 6" CL600</div>
+                        </div>
+                        <span class="status-badge-yellow" style="font-size: 9.5px;">REORDER REQUIRED</span>
+                      </div>
+
+                      <div class="spares-meter-section">
+                        <div class="spares-meter-header">
+                          <span style="color: var(--text-muted);">Stock on Hand: <strong style="color: #FBBF24;">1 Unit</strong></span>
+                          <span style="color: var(--text-dim);">Min Reorder: 2 Units (50%)</span>
+                        </div>
+                        <div class="spares-meter-track">
+                          <div class="spares-meter-fill" style="width: 50%; background: linear-gradient(90deg, #F59E0B, #FBBF24); box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);"></div>
+                        </div>
+                        <div style="font-size: 10px; color: #FBBF24; font-weight: 600; margin-top: 3px;">
+                          Deficit: -1 Unit (High lead time risk)
+                        </div>
+                      </div>
+
+                      <div class="spares-chips-row">
+                        <span class="spares-chip">Tag: <strong>PV-CDU-201</strong></span>
+                        <span class="spares-chip">Lead Time: <strong style="color: #FBBF24;">60 Days</strong></span>
+                        <span class="spares-chip">Unit: <strong>₹8,50,000</strong></span>
+                      </div>
+                    </div>
+
+                    <div class="spares-action-row">
+                      <span style="font-size: 11px; color: #FBBF24; font-weight: 700;">Est: ₹8,50,000</span>
+                      <button class="spares-requisition-btn" onclick="prefillCopilotChat('Draft reorder requisition for Fisher Plug Valve 6 CL600 (FSH-ED-6-600) for control loop PV-CDU-201. Lead time is 60 days.')">
+                        ⚡ Requisition via AI
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Spare 3: John Crane Metal Seal -->
+                  <div class="spares-card stock-warning">
+                    <div>
+                      <div class="spares-card-top">
+                        <div>
+                          <div class="spares-part-num">JC-8648-80</div>
+                          <div class="spares-part-name">John Crane Metal Seal 80mm</div>
+                        </div>
+                        <span class="status-badge-yellow" style="font-size: 9.5px;">REORDER REQUIRED</span>
+                      </div>
+
+                      <div class="spares-meter-section">
+                        <div class="spares-meter-header">
+                          <span style="color: var(--text-muted);">Stock on Hand: <strong style="color: #FBBF24;">2 Units</strong></span>
+                          <span style="color: var(--text-dim);">Min Reorder: 4 Units (50%)</span>
+                        </div>
+                        <div class="spares-meter-track">
+                          <div class="spares-meter-fill" style="width: 50%; background: linear-gradient(90deg, #F59E0B, #FBBF24); box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);"></div>
+                        </div>
+                        <div style="font-size: 10px; color: #FBBF24; font-weight: 600; margin-top: 3px;">
+                          Deficit: -2 Units (Bottom pump mechanical seal)
+                        </div>
+                      </div>
+
+                      <div class="spares-chips-row">
+                        <span class="spares-chip">Tag: <strong>P-CDU-BOTTOM</strong></span>
+                        <span class="spares-chip">Lead Time: <strong style="color: #FBBF24;">40 Days</strong></span>
+                        <span class="spares-chip">Unit: <strong>₹4,10,000</strong></span>
+                      </div>
+                    </div>
+
+                    <div class="spares-action-row">
+                      <span style="font-size: 11px; color: #FBBF24; font-weight: 700;">Est: ₹8,20,000</span>
+                      <button class="spares-requisition-btn" onclick="prefillCopilotChat('Draft PO requisition for 2 units of John Crane Metal Seal 80mm (JC-8648-80) for crude bottom pump P-CDU-BOTTOM.')">
+                        ⚡ Requisition via AI
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Spare 4: Spiral Wound Gasket -->
+                  <div class="spares-card stock-warning">
+                    <div>
+                      <div class="spares-card-top">
+                        <div>
+                          <div class="spares-part-num">GSK-SPW-12-300</div>
+                          <div class="spares-part-name">Spiral Wound Gasket 12" CL300</div>
+                        </div>
+                        <span class="status-badge-yellow" style="font-size: 9.5px;">REORDER REQUIRED</span>
+                      </div>
+
+                      <div class="spares-meter-section">
+                        <div class="spares-meter-header">
+                          <span style="color: var(--text-muted);">Stock on Hand: <strong style="color: #FBBF24;">14 Units</strong></span>
+                          <span style="color: var(--text-dim);">Min Reorder: 50 Units (28%)</span>
+                        </div>
+                        <div class="spares-meter-track">
+                          <div class="spares-meter-fill" style="width: 28%; background: linear-gradient(90deg, #F59E0B, #FBBF24); box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);"></div>
+                        </div>
+                        <div style="font-size: 10px; color: #FBBF24; font-weight: 600; margin-top: 3px;">
+                          Deficit: -36 Units (Critical piping flange gasket)
+                        </div>
+                      </div>
+
+                      <div class="spares-chips-row">
+                        <span class="spares-chip">Tag: <strong>FLG-CDU-12</strong></span>
+                        <span class="spares-chip">Lead Time: <strong style="color: #10B981;">7 Days</strong></span>
+                        <span class="spares-chip">Unit: <strong>₹3,800</strong></span>
+                      </div>
+                    </div>
+
+                    <div class="spares-action-row">
+                      <span style="font-size: 11px; color: #FBBF24; font-weight: 700;">Est: ₹1,36,800</span>
+                      <button class="spares-requisition-btn" onclick="prefillCopilotChat('Draft PO requisition for 36 units of Spiral Wound Gasket 12 CL300 (GSK-SPW-12-300) for CDU column piping joints.')">
+                        ⚡ Requisition via AI
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RAW TABLE VIEW -->
+              <div class="section-table-view" style="display: none; overflow-x: auto; margin-top: 10px;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Part Number</th>
+                      <th>Description</th>
+                      <th>Equipment Tag</th>
+                      <th>Stock on Hand</th>
+                      <th>Min Reorder</th>
+                      <th>Lead Time</th>
+                      <th>Unit Cost</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="background: rgba(239, 68, 68, 0.08);">
+                      <td><code>INC-625-WELD-ROD</code></td>
+                      <td>Inconel 625 TIG Wire 2.4mm</td>
+                      <td>CDU-COL-04</td>
+                      <td style="color: #EF4444; font-weight: 700;">12 kg</td>
+                      <td>50 kg</td>
+                      <td>15 days</td>
+                      <td>₹6,800/kg</td>
+                      <td><span class="status-badge-red">URGENT DEFICIT (-38 kg)</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>FSH-ED-6-600</code></td>
+                      <td>Fisher Plug Valve 6" CL600</td>
+                      <td>PV-CDU-201</td>
+                      <td style="color: #FBBF24; font-weight: 700;">1 unit</td>
+                      <td>2 units</td>
+                      <td>60 days</td>
+                      <td>₹8,50,000</td>
+                      <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>JC-8648-80</code></td>
+                      <td>John Crane Metal Seal 80mm</td>
+                      <td>P-CDU-BOTTOM</td>
+                      <td style="color: #FBBF24; font-weight: 700;">2 units</td>
+                      <td>4 units</td>
+                      <td>40 days</td>
+                      <td>₹4,10,000</td>
+                      <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>GSK-SPW-12-300</code></td>
+                      <td>Spiral Wound Gasket 12" CL300</td>
+                      <td>FLG-CDU-12</td>
+                      <td style="color: #FBBF24; font-weight: 700;">14 units</td>
+                      <td>50 units</td>
+                      <td>7 days</td>
+                      <td>₹3,800</td>
+                      <td><span class="status-badge-yellow">REORDER REQUIRED</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
