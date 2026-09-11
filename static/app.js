@@ -1209,6 +1209,23 @@ const CRUDE_ASSAYS = {
   }
 };
 
+// Toggle between Visual SCADA view and Raw Data Table in Main Refinery
+function toggleMrView(section, viewType, btn) {
+  const card = btn.closest(".hud-glass-card");
+  if (!card) return;
+  card.querySelectorAll(".view-toggle-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  const visualEl = card.querySelector(".section-visual-view");
+  const tableEl = card.querySelector(".section-table-view");
+  if (viewType === "visual") {
+    if (visualEl) visualEl.style.display = "block";
+    if (tableEl) tableEl.style.display = "none";
+  } else {
+    if (visualEl) visualEl.style.display = "none";
+    if (tableEl) tableEl.style.display = "block";
+  }
+}
+
 function switchCrudeAssay(assayName) {
   const assay = CRUDE_ASSAYS[assayName];
   if (!assay) return;
@@ -1236,6 +1253,9 @@ function switchCrudeAssay(assayName) {
 
   const basketLabel = document.getElementById("mr-basket-name");
   if (basketLabel) basketLabel.textContent = assayName;
+
+  const nameBadge = document.getElementById("assay-current-name-badge");
+  if (nameBadge) nameBadge.textContent = assayName;
 
   // Update Main Refinery Equalizer Bars in HUD
   const mainEq = document.getElementById("hud-main-equalizer-bars");
@@ -1265,7 +1285,6 @@ function switchCrudeAssay(assayName) {
 
     cutBar.innerHTML = assay.cuts.map(cut => {
       const shortName = cutNameMap[cut.class] || cut.name.split(' ')[0];
-      // If segment is very narrow (< 6%), omit text to avoid clipping
       const textContent = cut.pct >= 6.0 ? `${shortName} ${cut.pct.toFixed(1)}%` : "";
       return `<div class="cut-segment ${cut.class}" style="width: ${cut.pct}%;" title="${escapeHtml(cut.name)}: ${cut.pct.toFixed(1)}%">${textContent}</div>`;
     }).join("");
@@ -1276,7 +1295,71 @@ function switchCrudeAssay(assayName) {
       if (el) el.textContent = `${cut.pct.toFixed(1)}%`;
     });
   }
-// Rebuild Cut Table Body
+
+  // Calculate Distillate Quality Spectrum Summary
+  const cuts = assay.cuts || [];
+  let light = 0, mid = 0, heavy = 0;
+  cuts.forEach(c => {
+    if (c.class === "cut-lpg" || c.class === "cut-naphtha") light += c.pct;
+    else if (c.class === "cut-atf" || c.class === "cut-diesel") mid += c.pct;
+    else heavy += c.pct;
+  });
+  const elLight = document.getElementById("summary-light-ends");
+  const elMid = document.getElementById("summary-mid-distillates");
+  const elHeavy = document.getElementById("summary-heavy-ends");
+  if (elLight) elLight.textContent = `${light.toFixed(1)}%`;
+  if (elMid) elMid.textContent = `${mid.toFixed(1)}%`;
+  if (elHeavy) elHeavy.textContent = `${heavy.toFixed(1)}%`;
+
+  // Render Visual Yield Stream Cards
+  const visualContainer = document.getElementById("assay-visual-cuts-container");
+  if (visualContainer && cuts.length) {
+    const cutGradientMap = {
+      "cut-lpg": "linear-gradient(90deg, #0284C7, #38BDF8)",
+      "cut-naphtha": "linear-gradient(90deg, #2563EB, #60A5FA)",
+      "cut-atf": "linear-gradient(90deg, #D97706, #FBBF24)",
+      "cut-diesel": "linear-gradient(90deg, #059669, #10B981)",
+      "cut-vgo": "linear-gradient(90deg, #7C3AED, #A855F7)",
+      "cut-residue": "linear-gradient(90deg, #475569, #94A3B8)"
+    };
+    const cutColorMap = {
+      "cut-lpg": "#38BDF8",
+      "cut-naphtha": "#60A5FA",
+      "cut-atf": "#FBBF24",
+      "cut-diesel": "#10B981",
+      "cut-vgo": "#A855F7",
+      "cut-residue": "#94A3B8"
+    };
+
+    visualContainer.innerHTML = cuts.map(cut => {
+      const grad = cutGradientMap[cut.class] || "linear-gradient(90deg, #FF7A00, #FF9E2C)";
+      const dotColor = cutColorMap[cut.class] || "#FF9E2C";
+      return `
+        <div class="yield-stream-card ${cut.class}">
+          <div class="yield-stream-header">
+            <div class="yield-stream-info">
+              <span class="yield-color-dot" style="background: ${dotColor};"></span>
+              <span class="yield-stream-name">${escapeHtml(cut.name)}</span>
+              <span class="yield-stream-range">${escapeHtml(cut.range)}</span>
+            </div>
+            <div class="yield-stream-pct" style="color: ${dotColor};">
+              ${cut.pct.toFixed(1)}% <span class="yield-stream-unit">Vol</span>
+            </div>
+          </div>
+          <div class="yield-progress-track">
+            <div class="yield-progress-fill" style="width: ${cut.pct}%; background: ${grad};"></div>
+          </div>
+          <div class="yield-stream-footer">
+            <span class="yield-dest-arrow">➜</span>
+            <span class="yield-dest-label">Disposition:</span>
+            <span class="yield-dest-value">${escapeHtml(cut.unit)}</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // Rebuild Cut Table Body (for toggle view)
   const tbody = document.getElementById("assay-cut-table-body");
   if (tbody) {
     tbody.innerHTML = assay.cuts.map(cut => `

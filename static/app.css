@@ -3391,6 +3391,381 @@ code {
   color: #FFFFFF;
 }
 
+/* View Switcher Toggle (Visual vs Table) */
+.view-toggle-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.view-toggle-btn:hover {
+  color: #FFFFFF;
+}
+
+.view-toggle-btn.active {
+  background: rgba(255, 122, 0, 0.28);
+  color: #FF9E2C;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Visual Yield Stream Cards --- */
+.yield-stream-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-left: 3.5px solid #38BDF8;
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: all 0.2s ease;
+}
+
+.yield-stream-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.yield-stream-card.cut-lpg { border-left-color: #38BDF8; }
+.yield-stream-card.cut-naphtha { border-left-color: #60A5FA; }
+.yield-stream-card.cut-atf { border-left-color: #FBBF24; }
+.yield-stream-card.cut-diesel { border-left-color: #10B981; }
+.yield-stream-card.cut-vgo { border-left-color: #A855F7; }
+.yield-stream-card.cut-residue { border-left-color: #94A3B8; }
+
+.yield-stream-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+.yield-stream-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.yield-color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.yield-stream-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #F1F5F9;
+}
+
+.yield-stream-range {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+
+.yield-stream-pct {
+  font-size: 15px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.yield-stream-unit {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.yield-progress-track {
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 7px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.yield-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.yield-stream-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.yield-dest-arrow {
+  color: #FF9E2C;
+  font-weight: 700;
+}
+
+.yield-dest-label {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.yield-dest-value {
+  color: #E2E8F0;
+  font-weight: 600;
+}
+
+/* --- Visual Tower Silhouette & Ultrasonic Shell Integrity --- */
+.shell-visualizer-grid {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 12px;
+}
+
+@container workspace (max-width: 960px) {
+  .shell-visualizer-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.tower-silhouette-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 14px 10px;
+  min-height: 280px;
+  justify-content: space-between;
+}
+
+.tower-column-diagram {
+  width: 72px;
+  flex: 1;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.12) 0%, rgba(30, 41, 59, 0.4) 50%, rgba(239, 68, 68, 0.18) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-left-radius: 36px;
+  border-top-right-radius: 36px;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 4px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(255, 255, 255, 0.05);
+}
+
+.tower-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4px 2px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.tower-zone.zone-top {
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.tower-zone.zone-mid {
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.tower-zone.zone-bottom.critical {
+  background: rgba(239, 68, 68, 0.16);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.tower-zone-indicator {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.tower-zone-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+}
+
+.tower-zone-dot.pulse-dot {
+  background: #EF4444;
+  box-shadow: 0 0 8px #EF4444;
+  animation: pulseGlow 1.2s infinite;
+}
+
+.tower-zone-elev {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tower-zone-label {
+  font-size: 8.5px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 1px;
+}
+
+.tower-zone-val {
+  font-size: 9.5px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  margin-top: 1px;
+}
+
+.tower-zone-val.pass { color: #10B981; }
+.tower-zone-val.crit { color: #EF4444; }
+
+.tower-base-plate {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* CML Gauge Cards */
+.shell-gauges-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cml-gauge-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 8px 12px;
+  min-width: 0;
+}
+
+.cml-gauge-card.pass {
+  border-left: 3px solid #10B981;
+}
+
+.cml-gauge-card.critical {
+  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.25);
+  border-left: 3px solid #EF4444;
+}
+
+.cml-gauge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.cml-code {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 11px;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.cml-zone-tag {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-left: 6px;
+}
+
+.tolerance-bar-wrap {
+  width: 100%;
+}
+
+.tolerance-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 3px;
+  font-family: var(--font-mono);
+}
+
+.tolerance-track {
+  position: relative;
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: visible;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.tolerance-fill-actual {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.tolerance-fill-actual.crit {
+  background: linear-gradient(90deg, #DC2626, #EF4444);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.tolerance-fill-actual.pass {
+  background: linear-gradient(90deg, #059669, #10B981);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.tolerance-min-line {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: #F87171;
+  box-shadow: 0 0 5px #EF4444;
+  z-index: 2;
+}
+
+.min-line-tag {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  font-weight: 800;
+  color: #F87171;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+}
+
+.statutory-action-banner {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-top: 8px;
+}
+
 /* Copilot Toggle Pill in Header */
 .copilot-toggle-pill {
   background: rgba(18, 24, 38, 0.65);

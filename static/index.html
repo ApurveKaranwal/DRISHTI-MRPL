@@ -699,79 +699,289 @@
           </div>
         </div>
 
-        <!-- Detailed Crude Assay & NDT Survey Section -->
+        <!-- Detailed Crude Assay & NDT Survey Section (Visual SCADA by Default + Raw Grid Toggle) -->
         <div class="hud-detailed-section">
-          <div class="hud-drawer-content" id="hud-mr-drawer-content" style="padding: 18px 0;">
-            <div class="grid-2" style="gap: 20px; align-items: start;">
-              <div>
-                <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">Dynamic True Boiling Point (TBP) Distillation Yields</div>
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Fraction Name</th>
-                      <th>True Boiling Range</th>
-                      <th>Yield (Vol %)</th>
-                      <th>Primary Disposition</th>
-                    </tr>
-                  </thead>
-                  <tbody id="assay-cut-table-body"></tbody>
-                </table>
+          <div class="hud-drawer-content" id="hud-mr-drawer-content" style="padding: 16px;">
+            <div class="grid-2" style="gap: 18px; align-items: start;">
+              
+              <!-- LEFT: Visual TBP Distillation Yield Spectrum -->
+              <div class="hud-glass-card" style="padding: 18px; background: rgba(13, 17, 26, 0.72);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <div>
+                    <div style="font-size: 13.5px; font-weight: 800; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+                      <span>Dynamic True Boiling Point (TBP) Yields</span>
+                      <span class="status-badge-blue" id="assay-current-name-badge" style="font-size: 9.5px;">Arabian Light</span>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+                      Fractionation cut distribution across conversion units
+                    </div>
+                  </div>
+                  <!-- View Switcher Toggle -->
+                  <div style="display: flex; gap: 4px; background: rgba(255, 255, 255, 0.06); padding: 2px; border-radius: 6px;">
+                    <button class="view-toggle-btn active" onclick="toggleMrView('tbp', 'visual', this)">Visual</button>
+                    <button class="view-toggle-btn" onclick="toggleMrView('tbp', 'table', this)">Table</button>
+                  </div>
+                </div>
+
+                <!-- Distillates Summary Strip -->
+                <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                  <span style="font-size: 10px; background: rgba(56, 189, 248, 0.12); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.25); padding: 3px 8px; border-radius: 6px; font-weight: 700;">
+                    Light Ends (&lt;150°C): <strong id="summary-light-ends" style="font-family: var(--font-mono);">21.8%</strong>
+                  </span>
+                  <span style="font-size: 10px; background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.25); padding: 3px 8px; border-radius: 6px; font-weight: 700;">
+                    Mid Distillates (150-360°C): <strong id="summary-mid-distillates" style="font-family: var(--font-mono);">33.8%</strong>
+                  </span>
+                  <span style="font-size: 10px; background: rgba(168, 85, 247, 0.12); color: #C084FC; border: 1px solid rgba(168, 85, 247, 0.25); padding: 3px 8px; border-radius: 6px; font-weight: 700;">
+                    Heavy Ends (&gt;360°C): <strong id="summary-heavy-ends" style="font-family: var(--font-mono);">44.4%</strong>
+                  </span>
+                </div>
+
+                <!-- Visual View (Default) -->
+                <div class="section-visual-view" id="mr-tbp-visual-view">
+                  <div id="assay-visual-cuts-container" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Dynamically populated by switchCrudeAssay() -->
+                  </div>
+                </div>
+
+                <!-- Raw Table View (Toggleable) -->
+                <div class="section-table-view" id="mr-tbp-table-view" style="display: none;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Fraction Name</th>
+                        <th>Boiling Range</th>
+                        <th>Yield (Vol %)</th>
+                        <th>Primary Disposition</th>
+                      </tr>
+                    </thead>
+                    <tbody id="assay-cut-table-body"></tbody>
+                  </table>
+                </div>
               </div>
 
-              <div>
-                <div style="font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 8px;">CDU Column-04 Ultrasonic Shell Integrity (API 510)</div>
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>CML Point</th>
-                      <th>Elev / Orientation</th>
-                      <th>Nominal</th>
-                      <th>Measured</th>
-                      <th>API Min</th>
-                      <th>Deficit</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style="background: rgba(239, 68, 68, 0.1);">
-                      <td><code>CML 01-A</code></td>
-                      <td>+4.2m / 0° N</td>
-                      <td>12.0 mm</td>
-                      <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">4.20 mm</td>
-                      <td>6.00 mm</td>
-                      <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">-1.80 mm</td>
-                      <td><span class="status-badge-red">CRITICAL</span></td>
-                    </tr>
-                    <tr style="background: rgba(239, 68, 68, 0.08);">
-                      <td><code>CML 01-B</code></td>
-                      <td>+4.2m / 90° E</td>
-                      <td>12.0 mm</td>
-                      <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">4.18 mm</td>
-                      <td>6.00 mm</td>
-                      <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">-1.82 mm</td>
-                      <td><span class="status-badge-red">CRITICAL</span></td>
-                    </tr>
-                    <tr>
-                      <td><code>CML 02-A</code></td>
-                      <td>+8.5m / 0° N</td>
-                      <td>10.0 mm</td>
-                      <td style="font-weight: 700; font-family: var(--font-mono);">7.10 mm</td>
-                      <td>5.20 mm</td>
-                      <td style="color: #10B981; font-weight: 700; font-family: var(--font-mono);">+1.90 mm</td>
-                      <td><span class="status-badge-green">PASSED</span></td>
-                    </tr>
-                    <tr>
-                      <td><code>CML 03-A</code></td>
-                      <td>+16.2m / 0° N</td>
-                      <td>8.0 mm</td>
-                      <td style="font-weight: 700; font-family: var(--font-mono);">6.40 mm</td>
-                      <td>4.50 mm</td>
-                      <td style="color: #10B981; font-weight: 700; font-family: var(--font-mono);">+1.90 mm</td>
-                      <td><span class="status-badge-green">PASSED</span></td>
-                    </tr>
-                  </tbody>
-                </table>
+              <!-- RIGHT: Visual CDU Column-04 Shell Integrity & Tolerance Radar -->
+              <div class="hud-glass-card" style="padding: 18px; background: rgba(13, 17, 26, 0.72);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <div>
+                    <div style="font-size: 13.5px; font-weight: 800; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+                      <span>CDU Column-04 Shell Integrity</span>
+                      <span class="status-badge-red" style="font-size: 9.5px; animation: pulseGlow 1.8s infinite;">API 510 ALERT</span>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+                      Ultrasonic thickness profile across 20m atmospheric tower shell
+                    </div>
+                  </div>
+                  <!-- View Switcher Toggle -->
+                  <div style="display: flex; gap: 4px; background: rgba(255, 255, 255, 0.06); padding: 2px; border-radius: 6px;">
+                    <button class="view-toggle-btn active" onclick="toggleMrView('shell', 'visual', this)">Visual</button>
+                    <button class="view-toggle-btn" onclick="toggleMrView('shell', 'table', this)">Table</button>
+                  </div>
+                </div>
+
+                <!-- Visual View (Default) -->
+                <div class="section-visual-view" id="mr-shell-visual-view">
+                  <div class="shell-visualizer-grid">
+                    <!-- Column Silhouette with Elevation Levels -->
+                    <div class="tower-silhouette-wrap">
+                      <div class="tower-column-diagram">
+                        <div class="tower-zone zone-top">
+                          <div class="tower-zone-indicator">
+                            <span class="tower-zone-dot"></span>
+                            <span class="tower-zone-elev">+16.2m</span>
+                          </div>
+                          <div class="tower-zone-label">Overhead</div>
+                          <div class="tower-zone-val pass">6.40 mm</div>
+                        </div>
+
+                        <div class="tower-zone zone-mid">
+                          <div class="tower-zone-indicator">
+                            <span class="tower-zone-dot"></span>
+                            <span class="tower-zone-elev">+8.5m</span>
+                          </div>
+                          <div class="tower-zone-label">Heavy Gas Oil</div>
+                          <div class="tower-zone-val pass">7.10 mm</div>
+                        </div>
+
+                        <div class="tower-zone zone-bottom critical">
+                          <div class="tower-zone-indicator">
+                            <span class="tower-zone-dot pulse-dot"></span>
+                            <span class="tower-zone-elev">+4.2m</span>
+                          </div>
+                          <div class="tower-zone-label">Flash Zone</div>
+                          <div class="tower-zone-val crit">4.18 mm ⚠</div>
+                        </div>
+                      </div>
+                      <div class="tower-base-plate">Base (+0.0m)</div>
+                    </div>
+
+                    <!-- Tolerance Gauges for Each Inspection Point -->
+                    <div class="shell-gauges-col">
+                      <!-- CML 01-B: Critical -->
+                      <div class="cml-gauge-card critical">
+                        <div class="cml-gauge-header">
+                          <div>
+                            <span class="cml-code">CML 01-B</span>
+                            <span class="cml-zone-tag">+4.2m / 90° E (Flash Zone)</span>
+                          </div>
+                          <span class="status-badge-red">-1.82 mm DEFICIT</span>
+                        </div>
+                        <div class="tolerance-bar-wrap">
+                          <div class="tolerance-labels">
+                            <span>Measured: <strong style="color: #EF4444;">4.18 mm</strong></span>
+                            <span>API Min: <strong>6.00 mm</strong></span>
+                            <span>Nominal: 12.0 mm</span>
+                          </div>
+                          <div class="tolerance-track">
+                            <div class="tolerance-fill-actual crit" style="width: 34.8%;"></div>
+                            <div class="tolerance-min-line" style="left: 50%;">
+                              <span class="min-line-tag">6.0mm</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- CML 01-A: Critical -->
+                      <div class="cml-gauge-card critical">
+                        <div class="cml-gauge-header">
+                          <div>
+                            <span class="cml-code">CML 01-A</span>
+                            <span class="cml-zone-tag">+4.2m / 0° N (Flash Zone)</span>
+                          </div>
+                          <span class="status-badge-red">-1.80 mm DEFICIT</span>
+                        </div>
+                        <div class="tolerance-bar-wrap">
+                          <div class="tolerance-labels">
+                            <span>Measured: <strong style="color: #EF4444;">4.20 mm</strong></span>
+                            <span>API Min: <strong>6.00 mm</strong></span>
+                            <span>Nominal: 12.0 mm</span>
+                          </div>
+                          <div class="tolerance-track">
+                            <div class="tolerance-fill-actual crit" style="width: 35.0%;"></div>
+                            <div class="tolerance-min-line" style="left: 50%;">
+                              <span class="min-line-tag">6.0mm</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- CML 02-A: Passed -->
+                      <div class="cml-gauge-card pass">
+                        <div class="cml-gauge-header">
+                          <div>
+                            <span class="cml-code">CML 02-A</span>
+                            <span class="cml-zone-tag">+8.5m / 0° N (HGO Zone)</span>
+                          </div>
+                          <span class="status-badge-green">+1.90 mm SAFE</span>
+                        </div>
+                        <div class="tolerance-bar-wrap">
+                          <div class="tolerance-labels">
+                            <span>Measured: <strong style="color: #10B981;">7.10 mm</strong></span>
+                            <span>API Min: <strong>5.20 mm</strong></span>
+                            <span>Nominal: 10.0 mm</span>
+                          </div>
+                          <div class="tolerance-track">
+                            <div class="tolerance-fill-actual pass" style="width: 71.0%;"></div>
+                            <div class="tolerance-min-line" style="left: 52%;">
+                              <span class="min-line-tag">5.2mm</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- CML 03-A: Passed -->
+                      <div class="cml-gauge-card pass">
+                        <div class="cml-gauge-header">
+                          <div>
+                            <span class="cml-code">CML 03-A</span>
+                            <span class="cml-zone-tag">+16.2m / 0° N (Overhead)</span>
+                          </div>
+                          <span class="status-badge-green">+1.90 mm SAFE</span>
+                        </div>
+                        <div class="tolerance-bar-wrap">
+                          <div class="tolerance-labels">
+                            <span>Measured: <strong style="color: #10B981;">6.40 mm</strong></span>
+                            <span>API Min: <strong>4.50 mm</strong></span>
+                            <span>Nominal: 8.0 mm</span>
+                          </div>
+                          <div class="tolerance-track">
+                            <div class="tolerance-fill-actual pass" style="width: 80.0%;"></div>
+                            <div class="tolerance-min-line" style="left: 56.25%;">
+                              <span class="min-line-tag">4.5mm</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Statutory Action Banner -->
+                  <div class="statutory-action-banner">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <span style="font-size: 13px;">⚠️</span>
+                      <span style="font-size: 11px; font-weight: 700; color: #EF4444; text-transform: uppercase; letter-spacing: 0.5px;">Statutory Directive (API 510):</span>
+                    </div>
+                    <div style="font-size: 11px; color: rgba(255, 255, 255, 0.75); margin-top: 3px; line-height: 1.4;">
+                      Severe sulfidation thinning at Flash Zone (+4.2m) is <strong>1.82 mm below code retirement limit</strong>. Required Action: Apply <strong>309L SS weld overlay</strong> during turnaround; operating pressure derated by 12%.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Raw Table View (Toggleable) -->
+                <div class="section-table-view" id="mr-shell-table-view" style="display: none;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>CML Point</th>
+                        <th>Elev / Orientation</th>
+                        <th>Nominal</th>
+                        <th>Measured</th>
+                        <th>API Min</th>
+                        <th>Deficit</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style="background: rgba(239, 68, 68, 0.1);">
+                        <td><code>CML 01-A</code></td>
+                        <td>+4.2m / 0° N</td>
+                        <td>12.0 mm</td>
+                        <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">4.20 mm</td>
+                        <td>6.00 mm</td>
+                        <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">-1.80 mm</td>
+                        <td><span class="status-badge-red">CRITICAL</span></td>
+                      </tr>
+                      <tr style="background: rgba(239, 68, 68, 0.08);">
+                        <td><code>CML 01-B</code></td>
+                        <td>+4.2m / 90° E</td>
+                        <td>12.0 mm</td>
+                        <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">4.18 mm</td>
+                        <td>6.00 mm</td>
+                        <td style="color: #EF4444; font-weight: 700; font-family: var(--font-mono);">-1.82 mm</td>
+                        <td><span class="status-badge-red">CRITICAL</span></td>
+                      </tr>
+                      <tr>
+                        <td><code>CML 02-A</code></td>
+                        <td>+8.5m / 0° N</td>
+                        <td>10.0 mm</td>
+                        <td style="font-weight: 700; font-family: var(--font-mono);">7.10 mm</td>
+                        <td>5.20 mm</td>
+                        <td style="color: #10B981; font-weight: 700; font-family: var(--font-mono);">+1.90 mm</td>
+                        <td><span class="status-badge-green">PASSED</span></td>
+                      </tr>
+                      <tr>
+                        <td><code>CML 03-A</code></td>
+                        <td>+16.2m / 0° N</td>
+                        <td>8.0 mm</td>
+                        <td style="font-weight: 700; font-family: var(--font-mono);">6.40 mm</td>
+                        <td>4.50 mm</td>
+                        <td style="color: #10B981; font-weight: 700; font-family: var(--font-mono);">+1.90 mm</td>
+                        <td><span class="status-badge-green">PASSED</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
+
             </div>
           </div>
         </div>
