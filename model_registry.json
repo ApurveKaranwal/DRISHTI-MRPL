@@ -1,0 +1,138 @@
+{
+  "active_selection": {
+    "supervisor": "qwen3:8b",
+    "general": "qwen3:8b",
+    "reasoning": "deepseek-r1:1.5b",
+    "vision": "qwen3-vl:8b",
+    "code": "qwen2.5-coder:7b"
+  },
+  "models": {
+    "qwen3:8b": {
+      "capabilities": [
+        "text",
+        "reasoning"
+      ],
+      "roles": [
+        "supervisor",
+        "general",
+        "reasoning"
+      ],
+      "vram_estimate_gb": 4.8,
+      "context_window": 8192,
+      "temperature": 0.1,
+      "description": "Primary PSU supervisor for workflow planning, memorandum drafting, and grounded synthesis."
+    },
+    "qwen3-vl:8b": {
+      "capabilities": [
+        "text",
+        "vision"
+      ],
+      "roles": [
+        "vision"
+      ],
+      "vram_estimate_gb": 4.8,
+      "context_window": 4096,
+      "temperature": 0.0,
+      "description": "Multimodal visual inspection model for P&IDs, ultrasonic scans, and piping schematics."
+    },
+    "qwen2.5vl:3b": {
+      "capabilities": [
+        "text",
+        "vision"
+      ],
+      "roles": [
+        "vision"
+      ],
+      "vram_estimate_gb": 3.2,
+      "context_window": 2048,
+      "temperature": 0.0,
+      "description": "Ultra-lightweight multimodal vision model for edge/low-VRAM deployment."
+    },
+    "qwen2.5-coder:7b": {
+      "capabilities": [
+        "text",
+        "code"
+      ],
+      "roles": [
+        "code"
+      ],
+      "vram_estimate_gb": 4.2,
+      "context_window": 4096,
+      "temperature": 0.0,
+      "description": "Specialized code generation engine for process calculations, Darcy-Weisbach hydraulics, and NumPy/Matplotlib scripts."
+    },
+    "deepseek-r1:1.5b": {
+      "capabilities": [
+        "text",
+        "reasoning"
+      ],
+      "roles": [
+        "reasoning"
+      ],
+      "vram_estimate_gb": 1.5,
+      "context_window": 4096,
+      "temperature": 0.2,
+      "description": "Chain-of-thought model for root-cause analysis and equipment failure diagnostics."
+    },
+    "qwen2.5:7b": {
+      "capabilities": [
+        "text",
+        "reasoning"
+      ],
+      "roles": [
+        "supervisor",
+        "general"
+      ],
+      "vram_estimate_gb": 4.5,
+      "context_window": 4096,
+      "temperature": 0.1,
+      "description": "Structured prose generator for PSU memorandum drafting and technical summaries."
+    },
+    "qwen2.5vl:7b": {
+      "capabilities": [
+        "vision",
+        "text"
+      ],
+      "roles": [
+        "vision"
+      ],
+      "vram_estimate_gb": 4.0,
+      "context_window": 4096,
+      "temperature": 0.1,
+      "description": "User-registered model qwen2.5vl:7b"
+    },
+    "deepseek-r1:7b": {
+      "capabilities": [
+        "text"
+      ],
+      "roles": [
+        "general",
+        "reasoning",
+        "supervisor"
+      ],
+      "vram_estimate_gb": 4.0,
+      "context_window": 4096,
+      "temperature": 0.1,
+      "description": "User-registered model deepseek-r1:7b"
+    },
+    "BGE-M3:latest": {
+      "capabilities": [
+        "text"
+      ],
+      "roles": [
+        "general"
+      ],
+      "vram_estimate_gb": 4.0,
+      "context_window": 4096,
+      "temperature": 0.1,
+      "description": "User-registered model BGE-M3:latest"
+    }
+  },
+  "fallbacks": {
+    "supervisor": "qwen3:8b",
+    "general": "qwen3:8b",
+    "reasoning": "qwen3:8b",
+    "vision": "qwen2.5vl:3b",
+    "code": "qwen2.5-coder:7b"
+  }
+}

@@ -119,6 +119,7 @@ function switchTab(tabId) {
   }
   if (tabId === "reports") fetchDeliverables();
   if (tabId === "documents") fetchDocuments();
+  if (tabId === "settings") fetchDiscoveredModels();
   if (tabId === "analytics") {
     setTimeout(() => {
       executeInteractiveDarcy();
@@ -365,10 +366,26 @@ function renderModelModal(data) {
           </span>
         </div>
 
-        <div class="card-model-name-row">
+        <div class="card-model-name-row" style="margin-bottom: 8px;">
           <span class="card-model-name">${escapeHtml(p.model_id)}</span>
           <span class="card-model-param-chip">${meta.paramChip}</span>
         </div>
+
+        ${(p.available_models && p.available_models.length > 1) ? `
+          <div style="margin-bottom: 10px; background: rgba(0,0,0,0.25); padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.7;">Active Route Model</span>
+              <span style="font-size: 10px; color: #4ade80;">${p.available_models.length} Compatible</span>
+            </div>
+            <select onchange="handleModelSelection('${escapeHtml(p.name)}', this.value)" style="width: 100%; padding: 4px 6px; background: #181c24; color: #e2e8f0; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; font-size: 11px; font-family: monospace; outline: none; cursor: pointer;">
+              ${p.available_models.map(m => `
+                <option value="${escapeHtml(m.model_id)}" ${m.model_id === p.model_id ? 'selected' : ''}>
+                  ${escapeHtml(m.model_id)} ${m.is_installed ? '✓ Installed' : '(Not in Ollama)'}
+                </option>
+              `).join("")}
+            </select>
+          </div>
+        ` : ''}
 
         <div class="card-model-desc">${escapeHtml(p.description)}</div>
 
@@ -384,6 +401,25 @@ function renderModelModal(data) {
   }).join("");
 }
 
+async function handleModelSelection(role, modelId) {
+  try {
+    const res = await fetch("/api/models/select", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role: role, model_id: modelId })
+    });
+    const result = await res.json();
+    if (res.ok) {
+      console.log(`[ModelRouter] Switched ${role} to ${modelId}`);
+      await fetchModelRegistry();
+    } else {
+      alert(result.detail || "Failed to switch model");
+    }
+  } catch (err) {
+    console.error("Error switching model:", err);
+  }
+}
+
 function openModelRegistryModal() {
   const modal = document.getElementById("model-modal");
   if (modal) modal.classList.add("open");
@@ -393,6 +429,156 @@ function openModelRegistryModal() {
 function closeModelRegistryModal() {
   const modal = document.getElementById("model-modal");
   if (modal) modal.classList.remove("open");
+}
+
+// -----------------------------------------------------------------------------
+// New Model Detection — "New Model Detected" confirmation flow
+// -----------------------------------------------------------------------------
+const CAP_LABELS = { text: "Text", vision: "Vision", code: "Code", reasoning: "Reasoning" };
+const ROLE_LABELS = {
+  general: "General",
+  reasoning: "Reasoning",
+  code: "Code",
+  vision: "Vision",
+  supervisor: "Supervisor",
+};
+
+async function fetchDiscoveredModels() {
+  const emptyEl = document.getElementById("model-discovery-empty");
+  const listEl = document.getElementById("model-discovery-list");
+  const countEl = document.getElementById("model-discovery-count");
+  if (!listEl) return;
+
+  try {
+    const res = await fetch("/api/models/discover");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    renderDiscoveredModels(data.pending || []);
+  } catch (err) {
+    console.warn("Could not load /api/models/discover:", err);
+    if (emptyEl) {
+      emptyEl.style.display = "block";
+      emptyEl.textContent = "Could not reach the model discovery service.";
+    }
+    if (countEl) countEl.style.display = "none";
+  }
+}
+
+function renderDiscoveredModels(pending) {
+  const listEl = document.getElementById("model-discovery-list");
+  const countEl = document.getElementById("model-discovery-count");
+  if (!listEl) return;
+
+  if (countEl) {
+    if (pending.length > 0) {
+      countEl.style.display = "inline-block";
+      countEl.textContent = `${pending.length} Pending`;
+    } else {
+      countEl.style.display = "none";
+    }
+  }
+
+  if (!pending.length) {
+    listEl.innerHTML = `<div class="model-discover-empty" id="model-discovery-empty">No new models detected. Pull a model with Ollama and hit Rescan.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = `<div class="model-discover-list">${pending.map(renderDiscoveredModelCard).join("")}</div>`;
+}
+
+function renderDiscoveredModelCard(model) {
+  const safeId = escapeHtml(model.model_id);
+  const domId = safeId.replace(/[^a-zA-Z0-9]/g, "_");
+  const suggested = new Set(model.suggested_roles || []);
+
+  const capChips = [
+    ...(model.capabilities || []).map(c => ({ c, cls: "cap-chip-yes", glyph: "✓" })),
+    ...(model.uncertain_capabilities || []).map(c => ({ c, cls: "cap-chip-maybe", glyph: "?" })),
+    ...(model.not_detected || []).map(c => ({ c, cls: "cap-chip-no", glyph: "✗" })),
+  ].map(({ c, cls, glyph }) => `<span class="cap-chip ${cls}">${glyph} ${escapeHtml(CAP_LABELS[c] || c)}</span>`).join("");
+
+  const meta = [model.parameter_size, model.quantization].filter(Boolean).join(" • ");
+  const roles = model.available_roles || ["general", "reasoning", "code", "vision", "supervisor"];
+
+  const roleChips = roles.map(role => {
+    const checked = suggested.has(role);
+    return `
+      <label class="role-chip ${checked ? 'checked' : ''}" data-model="${domId}">
+        <input type="checkbox" value="${escapeHtml(role)}" ${checked ? 'checked' : ''} onchange="onRoleChipToggle(this)">
+        <span>${escapeHtml(ROLE_LABELS[role] || role)}</span>
+      </label>
+    `;
+  }).join("");
+
+  return `
+    <div class="model-discover-item" id="discover-item-${domId}" data-model-id="${safeId}">
+      <div class="model-discover-item-top">
+        <span class="model-discover-name">${safeId}</span>
+        ${meta ? `<span class="model-discover-meta">${escapeHtml(meta)}</span>` : ''}
+      </div>
+      <div class="model-discover-caps">${capChips}</div>
+      <div class="model-discover-roles-label">Add this model to:</div>
+      <div class="model-discover-roles">${roleChips}</div>
+      <div class="model-discover-actions">
+        <button class="ghost-btn" onclick="dismissDiscoveredModel('${safeId}', '${domId}')">Not Now</button>
+        <button class="primary-btn" onclick="confirmDiscoveredModel('${safeId}', '${domId}')">Add Model</button>
+      </div>
+    </div>
+  `;
+}
+
+function onRoleChipToggle(checkbox) {
+  const label = checkbox.closest(".role-chip");
+  if (label) label.classList.toggle("checked", checkbox.checked);
+}
+
+async function confirmDiscoveredModel(modelId, domId) {
+  const item = document.getElementById(`discover-item-${domId}`);
+  if (!item) return;
+
+  const roles = Array.from(item.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+  if (!roles.length) {
+    alert("Select at least one role before adding this model.");
+    return;
+  }
+
+  const addBtn = item.querySelector(".primary-btn");
+  if (addBtn) { addBtn.disabled = true; addBtn.textContent = "Adding…"; }
+
+  try {
+    const res = await fetch("/api/models/confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model_id: modelId, roles: roles }),
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.detail || "Failed to register model");
+
+    item.remove();
+    await fetchDiscoveredModels();
+    await fetchModelRegistry();
+  } catch (err) {
+    alert(err.message || "Failed to add model");
+    if (addBtn) { addBtn.disabled = false; addBtn.textContent = "Add Model"; }
+  }
+}
+
+async function dismissDiscoveredModel(modelId, domId) {
+  const item = document.getElementById(`discover-item-${domId}`);
+  try {
+    await fetch("/api/models/dismiss", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model_id: modelId }),
+    });
+    if (item) item.remove();
+    const listEl = document.getElementById("model-discovery-list");
+    if (listEl && !listEl.querySelector(".model-discover-item")) {
+      renderDiscoveredModels([]);
+    }
+  } catch (err) {
+    console.warn("Failed to dismiss model:", err);
+  }
 }
 
 // -----------------------------------------------------------------------------

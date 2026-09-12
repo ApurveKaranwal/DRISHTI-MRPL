@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DRISHTI-MRPL — Sovereign Industrial AI Workbench</title>
-  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/app.css?v=3">
 </head>
 <body>
 
@@ -1203,6 +1203,24 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="dash-card" id="model-discovery-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">New Models Detected</div>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+                Models pulled into Ollama that aren't in the registry yet
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="status-badge-yellow" id="model-discovery-count" style="display: none;">0 Pending</span>
+              <a class="card-link" onclick="fetchDiscoveredModels()">Rescan</a>
+            </div>
+          </div>
+          <div id="model-discovery-list">
+            <div class="model-discover-empty" id="model-discovery-empty">Scanning for new models…</div>
+          </div>
         </div>
       </div>
     </section>
@@ -2508,6 +2526,6 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
 
 </div>
 
-<script src="/static/app.js"></script>
+<script src="/static/app.js?v=3"></script>
 </body>
 </html>
