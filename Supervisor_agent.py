@@ -23,6 +23,8 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
+import traceback
 import uuid
 from datetime import datetime, timezone
 from dataclasses import dataclass
@@ -505,6 +507,15 @@ class SupervisorAgent:
             self.settings.report_dir
         )
 
+    @property
+    def active_model(self) -> str:
+        """Dynamically resolve active supervisor planning model from ModelRouter."""
+        try:
+            from model_router import get_model_router
+            return get_model_router().get_model("supervisor", default=self.LLM_MODEL)
+        except Exception:
+            return self.LLM_MODEL
+
     # -----------------------------------------------------------------------
     # LOCAL LLM
     # -----------------------------------------------------------------------
@@ -515,11 +526,13 @@ class SupervisorAgent:
         json_mode: bool = False,
         max_tokens: int = 1500,
         temperature: float = 0.1,
+        model: str | None = None,
     ) -> str:
         """Call the local Supervisor LLM through Ollama HTTP API."""
 
+        active_model = model or self.active_model
         payload: dict[str, Any] = {
-            "model": self.LLM_MODEL,
+            "model": active_model,
             "messages": messages,
             "stream": False,
             "options": {
@@ -532,14 +545,44 @@ class SupervisorAgent:
         if json_mode:
             payload["format"] = "json"
 
-        timeout_sec = float(os.getenv("LLM_TIMEOUT", "180.0"))
-        response = requests.post(
-            f"{self.OLLAMA_URL}/api/chat",
-            json=payload,
-            timeout=timeout_sec,
-        )
-        response.raise_for_status()
-        data = response.json()
+        timeout_sec = float(os.getenv("LLM_TIMEOUT", "210.0"))
+
+        try:
+            response = requests.post(
+                f"{self.OLLAMA_URL}/api/chat",
+                json=payload,
+                timeout=timeout_sec,
+            )
+        except requests.exceptions.ConnectionError as err:
+            raise RuntimeError(
+                f"Cannot connect to Ollama at {self.OLLAMA_URL} "
+                f"(model='{active_model}'). Is 'ollama serve' running? "
+                f"Underlying error: {err}"
+            ) from err
+        except requests.exceptions.Timeout as err:
+            raise RuntimeError(
+                f"Ollama did not respond within {timeout_sec:.0f}s for model "
+                f"'{active_model}'. This usually means the model is still "
+                f"loading (cold start) or the host is overloaded. Raise "
+                f"LLM_TIMEOUT or check 'ollama ps' / server logs. "
+                f"Underlying error: {err}"
+            ) from err
+
+        if response.status_code != 200:
+            raise RuntimeError(
+                f"Ollama returned HTTP {response.status_code} for model "
+                f"'{active_model}' at {self.OLLAMA_URL}/api/chat. "
+                f"Response body: {response.text[:500]}"
+            )
+
+        try:
+            data = response.json()
+        except ValueError as err:
+            raise RuntimeError(
+                f"Ollama returned a non-JSON response for model "
+                f"'{active_model}': {response.text[:500]}"
+            ) from err
+
         msg = data.get("message", {})
         content = msg.get("content", "")
         if not content and "thinking" in msg:
@@ -559,6 +602,162 @@ class SupervisorAgent:
             return resp.status_code == 200
         except Exception:
             return False
+
+    def diagnose_llm(self) -> dict[str, Any]:
+        """
+        Runs a step-by-step diagnostic against the local Ollama service to
+        pinpoint exactly why the Supervisor LLM is not responding.
+
+        Unlike _llm_available(), this never just returns True/False — it
+        checks reachability, model installation, and an actual (small,
+        fast) generation call, and returns a human-readable diagnosis at
+        whichever step fails. Never raises.
+        """
+        report: dict[str, Any] = {
+            "ollama_url": self.OLLAMA_URL,
+            "target_model": self.active_model,
+            "checks": [],
+            "diagnosis": "",
+        }
+
+        def add_check(name: str, ok: bool, detail: str) -> None:
+            report["checks"].append({"check": name, "ok": ok, "detail": detail})
+
+        # 1. Is Ollama reachable at all?
+        try:
+            resp = requests.get(f"{self.OLLAMA_URL}/api/tags", timeout=5.0)
+        except requests.exceptions.ConnectionError as err:
+            add_check("ollama_reachable", False, f"Connection refused/unreachable: {err}")
+            report["diagnosis"] = (
+                f"Cannot connect to Ollama at {self.OLLAMA_URL}. Ollama is most "
+                "likely not running, or OLLAMA_URL points at the wrong host/port. "
+                "Start it with 'ollama serve' (or check your service manager), "
+                "or verify the OLLAMA_URL environment variable."
+            )
+            return report
+        except requests.exceptions.Timeout as err:
+            add_check("ollama_reachable", False, f"Timed out: {err}")
+            report["diagnosis"] = (
+                "Ollama did not respond to a basic health check within 5s. "
+                "The host may be overloaded, hung, or restarting. Check system "
+                "resources (CPU/RAM/VRAM) and Ollama's own logs."
+            )
+            return report
+        except Exception as err:
+            add_check("ollama_reachable", False, str(err))
+            report["diagnosis"] = f"Unexpected error reaching Ollama: {err}"
+            return report
+
+        if resp.status_code != 200:
+            add_check("ollama_reachable", False, f"HTTP {resp.status_code}: {resp.text[:300]}")
+            report["diagnosis"] = (
+                f"Ollama responded but with an unexpected status "
+                f"({resp.status_code}). Check the Ollama server logs."
+            )
+            return report
+
+        try:
+            installed_models = [m.get("name", "") for m in resp.json().get("models", [])]
+        except Exception as err:
+            add_check("ollama_reachable", False, f"Could not parse /api/tags response: {err}")
+            report["diagnosis"] = f"Ollama's /api/tags response was not valid JSON: {err}"
+            return report
+
+        add_check(
+            "ollama_reachable",
+            True,
+            f"Ollama responded in <5s. Installed models: {installed_models or '(none)'}"
+        )
+
+        # 2. Is the model this role would actually route to installed?
+        target_model = self.active_model
+        target_installed = target_model in installed_models or any(
+            m.lower().startswith(target_model.split(":")[0].lower()) for m in installed_models
+        )
+        add_check(
+            "target_model_installed",
+            target_installed,
+            (
+                f"'{target_model}' found in installed models."
+                if target_installed else
+                f"'{target_model}' NOT found in installed models: {installed_models or '(none)'}"
+            )
+        )
+        if not target_installed:
+            report["diagnosis"] = (
+                f"Ollama is running, but the model the router selected "
+                f"('{target_model}') is not pulled. Run: ollama pull {target_model}. "
+                f"(Check model_registry.json 'active_selection' if this is "
+                f"not the model you expect.)"
+            )
+            return report
+
+        # 3. Can we actually get a completion from it? (small, fast probe)
+        try:
+            t0 = time.time()
+            probe_timeout = min(float(os.getenv("LLM_TIMEOUT", "210.0")), 45.0)
+            probe_resp = requests.post(
+                f"{self.OLLAMA_URL}/api/chat",
+                json={
+                    "model": target_model,
+                    "messages": [{"role": "user", "content": "Reply with only the word: OK"}],
+                    "stream": False,
+                    "options": {"num_predict": 5, "temperature": 0.0},
+                },
+                timeout=probe_timeout,
+            )
+            elapsed = time.time() - t0
+
+            if probe_resp.status_code != 200:
+                add_check(
+                    "generation_probe",
+                    False,
+                    f"HTTP {probe_resp.status_code} after {elapsed:.1f}s: {probe_resp.text[:400]}"
+                )
+                report["diagnosis"] = (
+                    f"Ollama returned an error ({probe_resp.status_code}) when "
+                    f"generating with '{target_model}'. Response body: "
+                    f"{probe_resp.text[:400]}"
+                )
+                return report
+
+            content = probe_resp.json().get("message", {}).get("content", "")
+            add_check(
+                "generation_probe",
+                True,
+                f"Model responded in {elapsed:.1f}s with: {content[:80]!r}"
+            )
+            report["diagnosis"] = (
+                f"LLM is healthy: Ollama is reachable, '{target_model}' is "
+                f"installed, and it generated a response in {elapsed:.1f}s. "
+                "If requests are still failing, check LLM_TIMEOUT (currently "
+                f"{os.getenv('LLM_TIMEOUT', '210.0')}s) against how long real "
+                "prompts take at full length/context."
+            )
+
+        except requests.exceptions.Timeout:
+            add_check(
+                "generation_probe",
+                False,
+                f"Probe request timed out after {probe_timeout:.0f}s"
+            )
+            report["diagnosis"] = (
+                f"Ollama is reachable and '{target_model}' is installed, but "
+                f"even a 5-token generation timed out after {probe_timeout:.0f}s. "
+                "This almost always means either (a) the model is doing a slow "
+                "cold-start load into memory on first use, (b) the host doesn't "
+                "have enough RAM/VRAM for this model and is swapping heavily, or "
+                "(c) another request is already occupying the model. Check "
+                "'ollama ps' and the Ollama server logs, and try again once the "
+                "model shows as loaded."
+            )
+        except Exception as err:
+            add_check("generation_probe", False, f"{type(err).__name__}: {err}")
+            report["diagnosis"] = (
+                f"Unexpected error during the generation probe: {err}"
+            )
+
+        return report
 
     # -----------------------------------------------------------------------
     # LAZY WORKER INITIALIZATION
@@ -2307,12 +2506,19 @@ Files explicitly supplied: {files or []}
         self,
         request: str,
         results: list[dict[str, Any]],
-    ) -> str:
+    ) -> tuple[str, bool]:
         """
         Synthesizes grounded worker results using qwen3:8b.
 
         If the LLM is unavailable, returns a deterministic worker-result
         response instead of failing the complete request.
+
+        Returns:
+            (answer_text, used_llm) — used_llm is False whenever the
+            deterministic fallback was used for ANY reason (offline,
+            exception, empty response), so callers can report the mode
+            truthfully instead of assuming success just because Ollama
+            was reachable at the start of the request.
         """
 
         evidence = json.dumps(
@@ -2331,9 +2537,15 @@ Files explicitly supplied: {files or []}
             return self._build_fallback_response(
                 request,
                 results
-            )
+            ), False
 
         try:
+            reasoning_model = self.active_model
+            try:
+                from model_router import get_model_router
+                reasoning_model = get_model_router().get_model("reasoning", default=self.active_model)
+            except Exception:
+                pass
 
             resp = self._llm_chat(
                 [
@@ -2355,6 +2567,7 @@ Files explicitly supplied: {files or []}
                 ],
                 max_tokens=750,
                 temperature=0.15,
+                model=reasoning_model,
             )
 
             cleaned = re.sub(
@@ -2366,8 +2579,14 @@ Files explicitly supplied: {files or []}
 
             final_text = cleaned or resp.strip()
             if not final_text:
-                return self._build_fallback_response(request, results)
-            return final_text
+                self.auditor.log_event(
+                    "RESPONSE_LLM_FAILURE",
+                    "localhost",
+                    f"Supervisor response LLM '{reasoning_model}' returned an empty response. "
+                    "Using deterministic worker-result response."
+                )
+                return self._build_fallback_response(request, results), False
+            return final_text, True
 
         except Exception as error:
 
@@ -2375,8 +2594,9 @@ Files explicitly supplied: {files or []}
                 "RESPONSE_LLM_FAILURE",
                 "localhost",
                 (
-                    f"Supervisor response LLM '{self.LLM_MODEL}' "
+                    f"Supervisor response LLM '{reasoning_model}' "
                     f"failed: {error}. "
+                    f"Traceback: {traceback.format_exc(limit=3)} "
                     "Using deterministic worker-result response."
                 )
             )
@@ -2384,7 +2604,7 @@ Files explicitly supplied: {files or []}
             return self._build_fallback_response(
                 request,
                 results
-            )
+            ), False
 
     # -----------------------------------------------------------------------
     # REPORT
@@ -2516,8 +2736,9 @@ Files explicitly supplied: {files or []}
                 request,
                 results
             )
+            used_llm_for_response = False
         else:
-            answer = self.respond(
+            answer, used_llm_for_response = self.respond(
                 request,
                 results
             )
@@ -2537,7 +2758,42 @@ Files explicitly supplied: {files or []}
             self.auditor.get_telemetry()
         )
 
-        is_llm_mode = llm_online and not plan.get("fallback_mode")
+        # NOTE: is_llm_mode reflects what ACTUALLY happened, not just whether
+        # Ollama answered a health ping at the start of the request. Planning
+        # and response synthesis are independent LLM calls that can each
+        # succeed or fail; both must have used the LLM for this to be True.
+        planning_used_llm = llm_online and not plan.get("fallback_mode")
+        is_llm_mode = planning_used_llm and used_llm_for_response
+
+        if is_llm_mode:
+            reason = (
+                f"Ollama is online: LLM '{self.LLM_MODEL}' generated the plan "
+                "and synthesized the grounded response."
+            )
+        elif not llm_online:
+            reason = (
+                f"Ollama was unreachable at {self.OLLAMA_URL} when the request "
+                "started. Deterministic fallback matched keywords to execute "
+                "agents and returned direct outputs. Call diagnose_llm() for "
+                "a detailed root-cause check."
+            )
+        elif not planning_used_llm:
+            reason = (
+                "Ollama was reachable, but LLM-based planning failed or "
+                "produced invalid output, so a deterministic keyword planner "
+                "was used instead. Check the audit log for a 'PLANNING_FALLBACK' "
+                "or 'LLM_FAILURE' event with the underlying error, or call "
+                "diagnose_llm() for a detailed root-cause check."
+            )
+        else:
+            reason = (
+                "Ollama was reachable and planning succeeded via the LLM, but "
+                "final response synthesis failed (e.g. timeout, error, or "
+                "empty output), so a deterministic worker-result response was "
+                "returned instead. Check the audit log for a "
+                "'RESPONSE_LLM_FAILURE' event with the underlying error, or "
+                "call diagnose_llm() for a detailed root-cause check."
+            )
 
         return {
             "plan": plan,
@@ -2548,11 +2804,7 @@ Files explicitly supplied: {files or []}
             "routing": {
                 "mode": "llm_orchestrated" if is_llm_mode else "deterministic_offline_fallback",
                 "model_id": self.LLM_MODEL if is_llm_mode else "keyword_heuristic_planner",
-                "reason": (
-                    f"Ollama is online: LLM '{self.LLM_MODEL}' generated the plan and synthesized the grounded response."
-                    if is_llm_mode
-                    else "Deterministic fallback matched keywords to execute agents and returned direct outputs."
-                )
+                "reason": reason,
             }
         }
 
@@ -2571,6 +2823,8 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "request",
+        nargs="?",
+        default=None,
         help="Natural-language request for the supervisor"
     )
 
@@ -2581,15 +2835,36 @@ if __name__ == "__main__":
         help="A user-supplied local file (repeatable)"
     )
 
-    args = parser.parse_args()
-
-    print(
-        json.dumps(
-            SupervisorAgent().handle(
-                args.request,
-                args.file
-            ),
-            indent=2,
-            default=str
+    parser.add_argument(
+        "--diagnose",
+        action="store_true",
+        help=(
+            "Skip the normal request flow and just run a step-by-step "
+            "check of Ollama reachability, model installation, and a "
+            "live generation probe, printing a diagnosis of any failure."
         )
     )
+
+    args = parser.parse_args()
+
+    if args.diagnose:
+        print(
+            json.dumps(
+                SupervisorAgent().diagnose_llm(),
+                indent=2,
+                default=str
+            )
+        )
+    elif args.request:
+        print(
+            json.dumps(
+                SupervisorAgent().handle(
+                    args.request,
+                    args.file
+                ),
+                indent=2,
+                default=str
+            )
+        )
+    else:
+        parser.error("either a 'request' or --diagnose is required")

@@ -906,6 +906,152 @@ code {
   background: var(--accent-purple-hover);
 }
 
+.primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ghost-btn {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ghost-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-heading);
+  border-color: var(--border-highlight);
+}
+
+/* New Model Detected (Model Discovery) */
+.model-discover-empty {
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 14px 4px;
+  text-align: center;
+}
+
+.model-discover-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.model-discover-item {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.model-discover-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.model-discover-name {
+  font-family: monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.model-discover-meta {
+  font-size: 10.5px;
+  color: var(--text-dim);
+}
+
+.model-discover-caps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.cap-chip {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.cap-chip-yes {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--color-success);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+.cap-chip-maybe {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--color-warning);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.cap-chip-no {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--text-dim);
+  border: 1px solid rgba(100, 116, 139, 0.24);
+}
+
+.model-discover-roles-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.model-discover-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.role-chip input[type="checkbox"] {
+  accent-color: var(--accent-purple);
+  cursor: pointer;
+  margin: 0;
+}
+
+.role-chip.checked {
+  background: rgba(255, 122, 0, 0.12);
+  color: var(--text-heading);
+  border-color: rgba(255, 122, 0, 0.35);
+}
+
+.model-discover-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 /* ==============================================================================
    DRISHTI AI WORKBENCH PANEL (UNIFIED SCADA DARK GLASSMORPHISM)
    Seamlessly matched with sidebar & workspace header design language.

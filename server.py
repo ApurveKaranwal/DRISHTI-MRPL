@@ -13,6 +13,7 @@ import math
 import mimetypes
 import os
 import shutil
+import threading
 import time
 import uuid
 from pathlib import Path
@@ -23,7 +24,7 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 import requests
 
@@ -729,9 +730,33 @@ async def list_documents():
     return docs_metadata
 
 
+class ModelSelectPayload(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+    role: str
+    model_id: str
+
+
+class ModelRegisterPayload(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+    model_id: str
+    roles: List[str]
+    capabilities: List[str] = []
+    description: str = ""
+    vram_estimate_gb: float = 4.0
+    context_window: int = 4096
+    temperature: float = 0.1
+    set_as_active: bool = False
+
+
 @app.get("/api/models")
 async def list_models():
-    """Returns the model registry and active hardware VRAM budget."""
+    """Returns the model registry, dynamic role mappings, and active hardware VRAM budget."""
+    try:
+        from model_router import get_model_router
+        router = get_model_router()
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=f"ModelRouter unavailable: {err}")
+
     ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
     ollama_ok = False
     available = []
@@ -743,54 +768,41 @@ async def list_models():
     except Exception:
         pass
 
-    supervisor_model = supervisor.LLM_MODEL
-    
     def check_installed(target_id: str) -> bool:
         prefix = target_id.split(":")[0].lower()
         return target_id in available or any(prefix in m.lower() for m in available)
 
-    profiles_data = [
-        {
-            "name": "general",
-            "model_id": supervisor_model,
-            "fallback_id": "deterministic_keyword_fallback",
-            "vram_estimate_gb": 4.8,
-            "description": "Supervisor LLM for workflow planning, PSU memorandums, and result synthesis across refinery workers.",
-            "is_installed": check_installed(supervisor_model),
-        },
-        {
-            "name": "vision",
-            "model_id": "qwen3-vl:8b",
-            "fallback_id": "tesseract_ocr_local",
-            "vram_estimate_gb": 4.8,
-            "description": "Multimodal visual inspection model for ultrasonic NDT scans, corrosion defect mapping, and P&ID diagrams.",
-            "is_installed": check_installed("qwen3-vl:8b"),
-        },
-        {
-            "name": "code",
-            "model_id": "qwen2.5-coder:7b",
-            "fallback_id": "python_sandbox_local",
-            "vram_estimate_gb": 4.2,
-            "description": "Specialized code generation engine for process calculations, Darcy-Weisbach hydraulics, and NumPy/Matplotlib scripts.",
-            "is_installed": check_installed("qwen2.5-coder:7b"),
-        },
-        {
-            "name": "reasoning",
-            "model_id": "deepseek-r1:1.5b",
-            "fallback_id": "rule_based_rca",
-            "vram_estimate_gb": 1.5,
-            "description": "Distilled reasoning model for Root-Cause Analysis (RCA) and equipment failure investigation.",
-            "is_installed": check_installed("deepseek-r1:1.5b"),
-        },
-        {
-            "name": "embedding",
-            "model_id": "bge-m3:latest",
-            "fallback_id": "sqlite_bm25_local",
-            "vram_estimate_gb": 0.6,
-            "description": "Dense semantic vector retrieval engine for standards (OISD, API 510) and P&ID engineering schematics.",
-            "is_installed": check_installed("bge-m3:latest") or check_installed("nomic-embed-text"),
-        },
+    # Build profiles dynamically from ModelRouter
+    roles_meta = [
+        ("general", "deterministic_keyword_fallback", "Supervisor LLM for workflow planning, PSU memorandums, and result synthesis."),
+        ("vision", "tesseract_ocr_local", "Multimodal visual inspection model for ultrasonic NDT scans, corrosion defect mapping, and P&ID diagrams."),
+        ("code", "python_sandbox_local", "Specialized code generation engine for process calculations, Darcy-Weisbach hydraulics, and NumPy/Matplotlib scripts."),
+        ("reasoning", "rule_based_rca", "Distilled reasoning model for Root-Cause Analysis (RCA) and equipment failure investigation."),
+        ("embedding", "sqlite_bm25_local", "Dense semantic vector retrieval engine for standards (OISD, API 510) and P&ID engineering schematics."),
     ]
+
+    profiles_data = []
+    for role_name, fallback_id, default_desc in roles_meta:
+        if role_name == "embedding":
+            active_id = "bge-m3:latest"
+            avail_for_role = [{"model_id": "bge-m3:latest", "is_installed": check_installed("bge-m3") or True}]
+            cfg = {"vram_estimate_gb": 0.6, "description": default_desc}
+        else:
+            active_id = router.get_model(role_name)
+            cfg = router.get_model_config(role_name)
+            avail_for_role = router.get_available_models_for_role(role_name)
+            for m in avail_for_role:
+                m["is_installed"] = check_installed(m["model_id"])
+
+        profiles_data.append({
+            "name": role_name,
+            "model_id": active_id,
+            "fallback_id": fallback_id,
+            "vram_estimate_gb": cfg.get("vram_estimate_gb", 4.0),
+            "description": cfg.get("description", default_desc),
+            "is_installed": check_installed(active_id),
+            "available_models": avail_for_role,
+        })
 
     gpu_info = auditor.get_telemetry().get("hardware", {}).get("gpu", {})
     target_hw = gpu_info.get("name") if gpu_info.get("detected") else "On-Premises Local Compute"
@@ -798,11 +810,222 @@ async def list_models():
     return {
         "ollama_available": ollama_ok,
         "active_models_in_ollama": available,
+        "active_selection": router.get_full_registry_status().get("active_selection", {}),
         "profiles": profiles_data,
         "vram_budget_gb": 6.0,
         "target_hardware": target_hw,
         "current_mode": "Production Ollama" if ollama_ok else "Sovereign Offline Mode (Deterministic Fallback Active)",
     }
+
+
+@app.post("/api/models/select")
+async def select_model(payload: ModelSelectPayload):
+    """Dynamically switches the active model for an operational role in ModelRouter."""
+    try:
+        from model_router import get_model_router
+        router = get_model_router()
+        ok, msg = router.set_active_model(payload.role, payload.model_id)
+        if not ok:
+            raise HTTPException(status_code=400, detail=msg)
+        return {
+            "status": "success",
+            "message": msg,
+            "role": payload.role,
+            "active_model": payload.model_id,
+            "active_selection": router.get_full_registry_status().get("active_selection", {}),
+        }
+    except HTTPException:
+        raise
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=str(err))
+
+
+@app.post("/api/models/register")
+async def register_model(payload: ModelRegisterPayload):
+    """Registers a new model into the system registry with designated capabilities and roles."""
+    try:
+        from model_router import get_model_router
+        router = get_model_router()
+        ok, msg = router.register_model(
+            model_id=payload.model_id,
+            roles=payload.roles,
+            capabilities=payload.capabilities,
+            description=payload.description,
+            vram_estimate_gb=payload.vram_estimate_gb,
+            context_window=payload.context_window,
+            temperature=payload.temperature,
+            set_as_active_for_roles=payload.set_as_active,
+        )
+        if not ok:
+            raise HTTPException(status_code=400, detail=msg)
+        return {"status": "success", "message": msg, "model_id": payload.model_id}
+    except HTTPException:
+        raise
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=str(err))
+
+
+class ModelConfirmPayload(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+    model_id: str
+    roles: List[str]
+    capabilities: Optional[List[str]] = None
+    description: str = ""
+    set_as_active: bool = False
+
+
+class ModelDismissPayload(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+    model_id: str
+
+
+class ModelPullPayload(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+    model_id: str
+
+
+# In-memory tracking for background `ollama pull` jobs. Keyed by model_id.
+# {"state": "pulling"|"done"|"error", "status": <ollama status text>,
+#  "percent": float|None, "error": str|None}
+_pull_jobs: dict[str, dict[str, Any]] = {}
+_pull_jobs_lock = threading.Lock()
+
+
+def _run_ollama_pull(model_id: str) -> None:
+    """Streams an `ollama pull` and records progress into _pull_jobs. Runs in a worker thread."""
+    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+    with _pull_jobs_lock:
+        _pull_jobs[model_id] = {"state": "pulling", "status": "starting", "percent": 0.0, "error": None}
+
+    try:
+        resp = requests.post(
+            f"{ollama_url}/api/pull",
+            json={"name": model_id, "stream": True},
+            stream=True,
+            timeout=None,
+        )
+        if resp.status_code != 200:
+            raise RuntimeError(f"Ollama returned HTTP {resp.status_code} for '{model_id}'")
+
+        for line in resp.iter_lines():
+            if not line:
+                continue
+            try:
+                chunk = json.loads(line)
+            except Exception:
+                continue
+
+            if chunk.get("error"):
+                raise RuntimeError(chunk["error"])
+
+            status_text = chunk.get("status", "")
+            completed = chunk.get("completed")
+            total = chunk.get("total")
+            percent = round((completed / total) * 100, 1) if completed and total else None
+
+            with _pull_jobs_lock:
+                job = _pull_jobs.setdefault(model_id, {})
+                job["state"] = "pulling"
+                job["status"] = status_text
+                if percent is not None:
+                    job["percent"] = percent
+                job["error"] = None
+
+        with _pull_jobs_lock:
+            _pull_jobs[model_id] = {"state": "done", "status": "success", "percent": 100.0, "error": None}
+
+    except Exception as err:
+        with _pull_jobs_lock:
+            _pull_jobs[model_id] = {"state": "error", "status": "failed", "percent": None, "error": str(err)}
+
+
+@app.post("/api/models/pull")
+async def pull_model(payload: ModelPullPayload):
+    """
+    Starts `ollama pull <model_id>` in the background and returns immediately.
+    Poll /api/models/pull/status?model_id=... for progress, then call
+    /api/models/discover once state is "done" to pick it up for confirmation.
+    """
+    model_id = payload.model_id.strip()
+    if not model_id:
+        raise HTTPException(status_code=400, detail="model_id is required.")
+
+    with _pull_jobs_lock:
+        existing = _pull_jobs.get(model_id)
+        if existing and existing.get("state") == "pulling":
+            return {"status": "already_pulling", "model_id": model_id}
+
+    asyncio.create_task(asyncio.to_thread(_run_ollama_pull, model_id))
+    return {"status": "started", "model_id": model_id}
+
+
+@app.get("/api/models/pull/status")
+async def pull_model_status(model_id: str):
+    """Returns the current progress of a background pull job for model_id."""
+    with _pull_jobs_lock:
+        job = _pull_jobs.get(model_id)
+    if not job:
+        return {"model_id": model_id, "state": "idle"}
+    return {"model_id": model_id, **job}
+
+
+@app.get("/api/models/discover")
+async def discover_models():
+    """
+    Scans Ollama for installed models not yet in the registry and returns a
+    predicted-capabilities payload for each, ready for a "New Model Detected"
+    confirmation card. Dismissed models are excluded until re-surfaced.
+    """
+    try:
+        from model_intake import scan_for_new_models
+        pending = await asyncio.to_thread(scan_for_new_models)
+        return {"pending": pending, "count": len(pending)}
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=f"Model discovery failed: {err}")
+
+
+@app.post("/api/models/confirm")
+async def confirm_discovered_model(payload: ModelConfirmPayload):
+    """
+    Confirms a detected model with the user's chosen (possibly edited)
+    roles and registers it — the only step that actually writes to the
+    registry after a "New Model Detected" prompt.
+    """
+    try:
+        from model_intake import confirm_model
+        ok, msg = confirm_model(
+            model_id=payload.model_id,
+            roles=payload.roles,
+            capabilities=payload.capabilities,
+            description=payload.description,
+            set_as_active_for_roles=payload.set_as_active,
+        )
+        if not ok:
+            raise HTTPException(status_code=400, detail=msg)
+
+        from model_router import get_model_router
+        return {
+            "status": "success",
+            "message": msg,
+            "model_id": payload.model_id,
+            "roles": payload.roles,
+            "active_selection": get_model_router().get_full_registry_status().get("active_selection", {}),
+        }
+    except HTTPException:
+        raise
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=str(err))
+
+
+@app.post("/api/models/dismiss")
+async def dismiss_discovered_model(payload: ModelDismissPayload):
+    """User chose 'not now' on a detected model — stop prompting for it."""
+    try:
+        from model_intake import dismiss_model
+        dismiss_model(payload.model_id)
+        return {"status": "success", "model_id": payload.model_id}
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=str(err))
 
 
 # Mount static assets

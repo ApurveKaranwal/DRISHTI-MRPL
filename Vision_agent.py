@@ -120,10 +120,16 @@ class VisionWorker:
 
     def _run_vlm(self, image_bytes: bytes, source_label: str = "") -> str:
         try:
+            try:
+                from model_router import get_model_router
+                vlm_model = get_model_router().get_model("vision", default=self.settings.vlm_model)
+            except Exception:
+                vlm_model = self.settings.vlm_model
+
             response = requests.post(
                 f"{self.settings.ollama_url}/api/chat",
                 json={
-                    "model": self.settings.vlm_model,
+                    "model": vlm_model,
                     "messages": [
                         {
                             "role": "system",
