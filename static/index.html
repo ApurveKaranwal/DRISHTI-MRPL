@@ -1030,25 +1030,56 @@
                 Statutory deliverables, executive board memos, and calculation workbooks
               </div>
             </div>
-            <span class="status-badge-green">DuckDB Engine</span>
+            <span class="status-badge-green" id="reports-engine-badge">DuckDB Engine</span>
           </div>
 
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>File Name</th>
-                <th>Type</th>
-                <th>Size</th>
-                <th>Date</th>
-                
-              </tr>
-            </thead>
-            <tbody id="deliverables-tbody">
-              <tr>
-                <td colspan="5" style="text-align: center; color: var(--text-dim); padding: 20px;">Loading reports...</td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- Summary Metric Strip -->
+          <div class="file-stats-strip" id="reports-stats-strip">
+            <!-- Dynamic stats populated by app.js -->
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="file-toolbar">
+            <div class="file-search-wrap">
+              <svg class="file-search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" class="file-search-input" id="reports-search-input" placeholder="Search reports by filename, format, or date..." oninput="filterReports()">
+              <button class="file-search-clear" id="reports-search-clear" onclick="clearReportsSearch()" style="display: none;">&times;</button>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="filter-pills-row" id="reports-filter-pills">
+              <button class="filter-pill-btn active" data-filter="all" onclick="setReportsFilter('all', this)">All</button>
+              <button class="filter-pill-btn" data-filter="docx" onclick="setReportsFilter('docx', this)">📄 Word Memos (.docx)</button>
+              <button class="filter-pill-btn" data-filter="pptx" onclick="setReportsFilter('pptx', this)">📊 Presentations (.pptx)</button>
+              <button class="filter-pill-btn" data-filter="xlsx" onclick="setReportsFilter('xlsx', this)">📈 Workbooks (.xlsx/.csv)</button>
+              <button class="filter-pill-btn" data-filter="md" onclick="setReportsFilter('md', this)">📝 AI Reports (.md)</button>
+              <button class="filter-pill-btn" data-filter="py" onclick="setReportsFilter('py', this)">⚡ Scripts (.py)</button>
+            </div>
+
+            <div style="font-size: 11px; color: var(--text-dim);" id="reports-count-label">Showing all reports</div>
+          </div>
+
+          <div style="overflow-x: auto; margin-top: 10px;">
+            <table class="data-table file-data-table">
+              <thead>
+                <tr>
+                  <th style="min-width: 260px;">Deliverable Document</th>
+                  <th style="width: 100px;">Format</th>
+                  <th style="width: 140px;">Category</th>
+                  <th style="width: 90px;">Size</th>
+                  <th style="width: 110px;">Created</th>
+                  <th style="width: 160px; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="deliverables-tbody">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--text-dim); padding: 20px;">Loading reports...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -1271,90 +1302,59 @@ Total Pressure Drop: 0.486 bar (48.6 kPa)<br>
             <div>
               <div class="card-title">Indexed Documents &amp; Standards</div>
               <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
-                Verified local operational dataset repository &amp; statutory codes
+                Verified local operational dataset repository &amp; statutory engineering codes
               </div>
             </div>
-            <span class="status-badge-green">Local In-Memory</span>
+            <span class="status-badge-green" id="docs-engine-badge">Local In-Memory</span>
           </div>
 
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Document</th>
-                <th>Category</th>
-                <th>Engine</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="documents-tbody">
-              <tr>
-                <td><code>ppac_mrpl_monthly_crude_processing.csv</code></td>
-                <td>MoPNG / PPAC Ready Reckoner (MRPL Monthly Crude Processing FY 24-26)</td>
-                <td>DuckDB</td>
-                <td><span class="status-badge-green">Active</span></td>
-              </tr>
-              <tr>
-                <td><code>ppac_mrpl_petroleum_production_slate.csv</code></td>
-                <td>MoPNG / PPAC Finished Products Slate (HSD, MS, ATF, LPG, PP)</td>
-                <td>DuckDB</td>
-                <td><span class="status-badge-green">Active</span></td>
-              </tr>
-              <tr>
-                <td><code>ppac_psu_refineries_benchmark.csv</code></td>
-                <td>PPAC PSU Refineries Comparative Benchmark (MRPL vs IOCL/BPCL/HPCL)</td>
-                <td>DuckDB</td>
-                <td><span class="status-badge-green">Active</span></td>
-              </tr>
-              <tr>
-                <td><code>pid_sample_open_dataset.png</code></td>
-                <td>Open P&amp;ID Dataset (Piping &amp; Instrumentation Diagram)</td>
-                <td>Vision Cache</td>
-                <td><span class="status-badge-green">Active</span></td>
-              </tr>
-              <tr>
-                <td><code>pid_process_piping_01.jpg</code></td>
-                <td>Open P&amp;ID Dataset (High-Res Engineering Schematic)</td>
-                <td>Vision Cache</td>
-                <td><span class="status-badge-green">Active</span></td>
-              </tr>
-              <tr>
-                <td><code>csb_chevron_api_recommendation.pdf</code></td>
-                <td>US Chemical Safety Board (Refinery Sulfidation &amp; API 939-C)</td>
-                <td>SQLite BM25</td>
-                <td><span class="status-badge-green">Active</span></td>
-              </tr>
-              <tr>
-                <td><code>real_cdu_ultrasonic_thickness_scan.pdf</code></td>
-                <td>MRPL NDT Ultrasonic Thickness Report (12 CML Points)</td>
-                <td>PyMuPDF + OCR</td>
-                <td><span class="status-badge-green">Active</span></td>
-              </tr>
-              <tr>
-                <td><code>real_crude_oil_assays.csv</code></td>
-                <td>Crude Assays (Arab Light, Maya, Brent TBP Distillation Cuts)</td>
-                <td>DuckDB</td>
-                <td><span class="status-badge-green">Active</span></td>
-              </tr>
-              <tr>
-                <td><code>asme_pipe_schedules_astm_a106.csv</code></td>
-                <td>ASME B36.10M / ASTM A106 Pipe Schedules (1/2" - 24")</td>
-                <td>DuckDB</td>
-                <td><span class="status-badge-green">Active</span></td>
-              </tr>
-              <tr>
-                <td><code>refinery_equipment_spares_catalog.csv</code></td>
-                <td>Refinery OEM Spares (Fisher Valves, John Crane Seals)</td>
-                <td>DuckDB</td>
-                <td><span class="status-badge-green">Active</span></td>
-              </tr>
-              <tr>
-                <td><code>api_510_inspection_code_statutory.md</code></td>
-                <td>API 510 Sec 7 Minimum Required Thickness Formula</td>
-                <td>SQLite BM25</td>
-                <td><span class="status-badge-green">Active</span></td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- Summary Metric Strip -->
+          <div class="file-stats-strip" id="docs-stats-strip">
+            <!-- Dynamic stats populated by app.js -->
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="file-toolbar">
+            <div class="file-search-wrap">
+              <svg class="file-search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" class="file-search-input" id="docs-search-input" placeholder="Search datasets, P&amp;ID drawings, standards..." oninput="filterDocuments()">
+              <button class="file-search-clear" id="docs-search-clear" onclick="clearDocsSearch()" style="display: none;">&times;</button>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="filter-pills-row" id="docs-filter-pills">
+              <button class="filter-pill-btn active" data-filter="all" onclick="setDocsFilter('all', this)">All Documents</button>
+              <button class="filter-pill-btn" data-filter="pid" onclick="setDocsFilter('pid', this)">📐 P&amp;ID Drawings</button>
+              <button class="filter-pill-btn" data-filter="crude" onclick="setDocsFilter('crude', this)">🛢️ Crude Assays</button>
+              <button class="filter-pill-btn" data-filter="ndt" onclick="setDocsFilter('ndt', this)">📋 NDT &amp; Safety</button>
+              <button class="filter-pill-btn" data-filter="asme" onclick="setDocsFilter('asme', this)">📏 ASME &amp; Spares</button>
+              <button class="filter-pill-btn" data-filter="ppac" onclick="setDocsFilter('ppac', this)">📊 PPAC Slates</button>
+            </div>
+
+            <div style="font-size: 11px; color: var(--text-dim);" id="docs-count-label">Showing all documents</div>
+          </div>
+
+          <div style="overflow-x: auto; margin-top: 10px;">
+            <table class="data-table file-data-table">
+              <thead>
+                <tr>
+                  <th style="min-width: 260px;">Document Title &amp; File</th>
+                  <th style="width: 140px;">Category</th>
+                  <th style="width: 100px;">Format</th>
+                  <th style="width: 130px;">Engine</th>
+                  <th style="width: 110px;">Status</th>
+                  <th style="width: 140px; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="documents-tbody">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--text-dim); padding: 20px;">Loading indexed documents...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>

@@ -4485,3 +4485,256 @@ code {
   color: #FFFFFF;
   border-color: #FF7A00;
 }
+
+/* ==========================================================================
+   FILE EXPLORER, SEARCH & FILTER STYLES (REPORTS & DOCUMENTS TABS)
+   ========================================================================== */
+
+/* File Toolbar & Search */
+.file-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+}
+
+.file-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
+}
+
+.file-search-icon {
+  position: absolute;
+  left: 11px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+
+.file-search-input {
+  width: 100%;
+  background: rgba(10, 15, 26, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-size: 11.5px;
+  padding: 8px 30px 8px 32px;
+  box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.file-search-input:focus {
+  border-color: #FF7A00;
+  box-shadow: 0 0 12px rgba(255, 122, 0, 0.3);
+  background: rgba(10, 15, 26, 0.95);
+}
+
+.file-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.file-search-clear {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.file-search-clear:hover {
+  color: #FFFFFF;
+}
+
+/* Filter Pills */
+.filter-pills-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-pill-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.filter-pill-btn.active {
+  background: rgba(255, 122, 0, 0.2);
+  color: #FF9E2C;
+  border-color: rgba(255, 122, 0, 0.5);
+  box-shadow: 0 2px 8px rgba(255, 122, 0, 0.2);
+}
+
+/* Stats summary strip */
+.file-stats-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.file-stat-chip {
+  font-size: 10.5px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.file-stat-chip strong {
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+}
+
+/* File Badges & Icons */
+.file-format-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.4px;
+}
+
+.file-format-badge.fmt-docx {
+  background: rgba(59, 130, 246, 0.14);
+  color: #60A5FA;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.file-format-badge.fmt-pptx {
+  background: rgba(245, 158, 11, 0.14);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.file-format-badge.fmt-xlsx {
+  background: rgba(16, 185, 129, 0.14);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.file-format-badge.fmt-csv {
+  background: rgba(6, 182, 212, 0.14);
+  color: #22D3EE;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.file-format-badge.fmt-pdf {
+  background: rgba(239, 68, 68, 0.14);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.file-format-badge.fmt-md {
+  background: rgba(168, 85, 247, 0.14);
+  color: #C084FC;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.file-format-badge.fmt-py {
+  background: rgba(56, 189, 248, 0.14);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.file-format-badge.fmt-img {
+  background: rgba(236, 72, 153, 0.14);
+  color: #F472B6;
+  border: 1px solid rgba(236, 72, 153, 0.3);
+}
+
+.file-category-pill {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px 7px;
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+
+.ask-ai-link-btn {
+  background: rgba(255, 122, 0, 0.12);
+  color: #FF9E2C;
+  border: 1px solid rgba(255, 122, 0, 0.3);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+}
+
+.ask-ai-link-btn:hover {
+  background: rgba(255, 122, 0, 0.25);
+  color: #FFFFFF;
+  border-color: #FF7A00;
+}
+
+/* Empty State */
+.empty-file-state {
+  text-align: center;
+  padding: 36px 20px;
+  color: var(--text-dim);
+}
+
+.empty-file-state p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.empty-file-reset-btn {
+  background: rgba(255, 122, 0, 0.15);
+  color: #FF9E2C;
+  border: 1px solid rgba(255, 122, 0, 0.35);
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.empty-file-reset-btn:hover {
+  background: rgba(255, 122, 0, 0.3);
+  color: #FFFFFF;
+}

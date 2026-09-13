@@ -871,11 +871,18 @@ const appendBotResponse = renderBotResponse;
 // -----------------------------------------------------------------------------
 // Deliverables Fetcher & UI Drawer
 // -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Deliverables Fetcher & UI Drawer & Reports Explorer
+// -----------------------------------------------------------------------------
+let cachedDeliverablesList = [];
+let currentReportsFilter = "all";
+
 async function fetchDeliverables() {
   try {
     const res = await fetch("/api/deliverables");
     const data = await res.json();
     const list = data.deliverables || [];
+    cachedDeliverablesList = list;
 
     const delivBadge = document.getElementById("copilot-deliverables-label");
     if (delivBadge) {
@@ -910,72 +917,443 @@ async function fetchDeliverables() {
       }
     }
 
-    // Reports tab table
-    const tbody = document.getElementById("deliverables-tbody");
-    if (tbody) {
-      if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: 20px;">No reports generated yet.</td></tr>';
-      } else {
-        tbody.innerHTML = list.map(f => {
-          const dateStr = new Date(f.modified * 1000).toLocaleDateString();
-          return `
-            <tr>
-              <td><strong>${escapeHtml(f.name)}</strong></td>
-              <td>${getFileIcon(f.extension)}</td>
-              <td>${f.size_kb} KB</td>
-              <td style="color: var(--text-muted);">${dateStr}</td>
-              <td><a class="download-link-btn" href="${f.url}" download>Download</a></td>
-            </tr>
-          `;
-        }).join("");
-      }
-    }
+    // Update summary metric strip on Reports tab
+    updateReportsStats(list);
+
+    // Render reports table with active filters
+    filterReports();
 
   } catch (err) {
     console.error("Error fetching deliverables:", err);
   }
 }
 
-function getFileIcon(ext) {
+function updateReportsStats(list) {
+  const strip = document.getElementById("reports-stats-strip");
+  if (!strip) return;
+
+  const totalCount = list.length;
+  const docxCount = list.filter(f => (f.extension || "").toLowerCase() === ".docx").length;
+  const pptxCount = list.filter(f => (f.extension || "").toLowerCase() === ".pptx").length;
+  const xlsxCount = list.filter(f => [".xlsx", ".csv"].includes((f.extension || "").toLowerCase())).length;
+  const mdCount = list.filter(f => (f.extension || "").toLowerCase() === ".md").length;
+  const pyCount = list.filter(f => (f.extension || "").toLowerCase() === ".py").length;
+  const totalMB = (list.reduce((acc, f) => acc + (f.size_kb || 0), 0) / 1024).toFixed(1);
+
+  strip.innerHTML = `
+    <div class="file-stat-chip">
+      <span class="stat-chip-num">${totalCount}</span>
+      <span class="stat-chip-label">Total Reports</span>
+    </div>
+    <div class="file-stat-chip">
+      <span class="stat-chip-num" style="color: #60A5FA;">${docxCount}</span>
+      <span class="stat-chip-label">Word Memos</span>
+    </div>
+    <div class="file-stat-chip">
+      <span class="stat-chip-num" style="color: #FBBF24;">${pptxCount}</span>
+      <span class="stat-chip-label">Presentations</span>
+    </div>
+    <div class="file-stat-chip">
+      <span class="stat-chip-num" style="color: #34D399;">${xlsxCount}</span>
+      <span class="stat-chip-label">Workbooks</span>
+    </div>
+    <div class="file-stat-chip">
+      <span class="stat-chip-num" style="color: #C084FC;">${mdCount}</span>
+      <span class="stat-chip-label">AI Reports</span>
+    </div>
+    <div class="file-stat-chip">
+      <span class="stat-chip-num" style="color: #38BDF8;">${totalMB} MB</span>
+      <span class="stat-chip-label">Storage Volume</span>
+    </div>
+  `;
+}
+
+function getReadableReportMeta(f) {
+  const name = f.name || "";
+  const ext = (f.extension || "").toLowerCase();
+
+  let title = name;
+  let subtitle = "";
+  let category = "Deliverable";
+  let catColor = "#94A3B8";
+
+  if (name.startsWith("MRPL_Approval_Note_")) {
+    const id = name.replace("MRPL_Approval_Note_", "").replace(/\.[^/.]+$/, "");
+    title = "MRPL Statutory Approval Note";
+    subtitle = `Statutory Compliance • Ref #${id}`;
+    category = "Board Deliverable";
+    catColor = "#60A5FA";
+  } else if (name.startsWith("MRPL_Calc_Sheet_")) {
+    const id = name.replace("MRPL_Calc_Sheet_", "").replace(/\.[^/.]+$/, "");
+    title = "Turnaround Engineering Calc Sheet";
+    subtitle = `Mass/Energy Balance & Hydraulics • Ref #${id}`;
+    category = "Workbook";
+    catColor = "#34D399";
+  } else if (name.startsWith("MRPL_Executive_Brief_")) {
+    const id = name.replace("MRPL_Executive_Brief_", "").replace(/\.[^/.]+$/, "");
+    title = "Executive Board Briefing Deck";
+    subtitle = `C-Suite Strategic Deck • Ref #${id}`;
+    category = "Presentation";
+    catColor = "#FBBF24";
+  } else if (name.startsWith("supervisor_report_")) {
+    const match = name.match(/supervisor_report_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})_([a-f0-9]+)/);
+    if (match) {
+      const dt = `${match[1]}-${match[2]}-${match[3]} ${match[4]}:${match[5]}`;
+      title = "AI Supervisor Shift Investigation Report";
+      subtitle = `Shift Execution • ${dt} • Hash #${match[7]}`;
+    } else {
+      title = "AI Supervisor Operational Report";
+      subtitle = name;
+    }
+    category = "AI Shift Report";
+    catColor = "#C084FC";
+  } else if (name.startsWith("MRPL_AirGap_Certificate_")) {
+    const id = name.replace("MRPL_AirGap_Certificate_", "").replace(/\.[^/.]+$/, "");
+    title = "Air-Gap Cryptographic Security Seal";
+    subtitle = `Session SHA-256 Digest #${id}`;
+    category = "Audit Certificate";
+    catColor = "#38BDF8";
+  } else if (ext === ".py") {
+    title = name.replace(/\.py$/i, "").replace(/_/g, " ").toUpperCase();
+    subtitle = "Sandboxed Python Engineering Model";
+    category = "Sandbox Script";
+    catColor = "#38BDF8";
+  } else if (ext === ".png" || ext === ".jpg") {
+    title = name.replace(/\.[^/.]+$/, "").replace(/_/g, " ");
+    subtitle = "Engineering Sandbox Plot / Diagram";
+    category = "Figure / Plot";
+    catColor = "#F472B6";
+  } else {
+    title = name.replace(/\.[^/.]+$/, "").replace(/_/g, " ");
+    subtitle = name;
+  }
+
+  return { title, subtitle, category, catColor };
+}
+
+function setReportsFilter(filterType, btnEl) {
+  currentReportsFilter = filterType;
+  if (btnEl) {
+    document.querySelectorAll("#reports-filter-pills .filter-pill-btn").forEach(b => b.classList.remove("active"));
+    btnEl.classList.add("active");
+  }
+  filterReports();
+}
+
+function clearReportsSearch() {
+  const input = document.getElementById("reports-search-input");
+  if (input) {
+    input.value = "";
+    filterReports();
+  }
+}
+
+function resetReportsFilter() {
+  clearReportsSearch();
+  const allBtn = document.querySelector("#reports-filter-pills .filter-pill-btn[data-filter='all']");
+  if (allBtn) setReportsFilter("all", allBtn);
+}
+
+function filterReports() {
+  const tbody = document.getElementById("deliverables-tbody");
+  const countLabel = document.getElementById("reports-count-label");
+  const clearBtn = document.getElementById("reports-search-clear");
+  const query = (document.getElementById("reports-search-input")?.value || "").toLowerCase().trim();
+
+  if (clearBtn) {
+    clearBtn.style.display = query.length > 0 ? "block" : "none";
+  }
+
+  let filtered = cachedDeliverablesList.filter(f => {
+    const ext = (f.extension || "").toLowerCase();
+
+    // Filter pill check
+    if (currentReportsFilter === "docx" && ext !== ".docx") return false;
+    if (currentReportsFilter === "pptx" && ext !== ".pptx") return false;
+    if (currentReportsFilter === "xlsx" && !([".xlsx", ".csv"].includes(ext))) return false;
+    if (currentReportsFilter === "md" && ext !== ".md") return false;
+    if (currentReportsFilter === "py" && ext !== ".py") return false;
+
+    // Search query check
+    if (query) {
+      const meta = getReadableReportMeta(f);
+      const name = (f.name || "").toLowerCase();
+      const title = meta.title.toLowerCase();
+      const sub = meta.subtitle.toLowerCase();
+      const cat = meta.category.toLowerCase();
+      const dateStr = new Date(f.modified * 1000).toLocaleDateString().toLowerCase();
+      const match = name.includes(query) || title.includes(query) || sub.includes(query) || cat.includes(query) || ext.includes(query) || dateStr.includes(query);
+      if (!match) return false;
+    }
+
+    return true;
+  });
+
+  if (countLabel) {
+    if (query || currentReportsFilter !== "all") {
+      countLabel.textContent = `Showing ${filtered.length} of ${cachedDeliverablesList.length} reports`;
+    } else {
+      countLabel.textContent = `Showing all ${cachedDeliverablesList.length} reports`;
+    }
+  }
+
+  if (!tbody) return;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          <div class="empty-file-state">
+            <p>No deliverables match your search or filter criteria.</p>
+            <button class="empty-file-reset-btn" onclick="resetReportsFilter()">Reset Filter &amp; Search</button>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(f => {
+    const meta = getReadableReportMeta(f);
+    const dateStr = new Date(f.modified * 1000).toLocaleDateString(undefined, {
+      year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+    });
+    const formatBadge = getFileFormatBadge(f.extension);
+
+    return `
+      <tr>
+        <td>
+          <div style="font-weight: 700; color: #F1F5F9; font-size: 12.5px;">${escapeHtml(meta.title)}</div>
+          <div style="font-size: 11px; color: var(--text-dim); margin-top: 3px; font-family: var(--font-mono);">
+            ${escapeHtml(meta.subtitle)}
+          </div>
+        </td>
+        <td>${formatBadge}</td>
+        <td>
+          <span class="file-category-pill" style="color: ${meta.catColor}; border-color: ${meta.catColor}40;">
+            ${escapeHtml(meta.category)}
+          </span>
+        </td>
+        <td style="font-family: var(--font-mono); font-size: 11.5px; color: #CBD5E1;">${f.size_kb} KB</td>
+        <td style="color: var(--text-muted); font-size: 11px;">${dateStr}</td>
+        <td style="text-align: right; white-space: nowrap;">
+          <a class="download-link-btn" href="${f.url}" download title="Download file to local workstation">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download
+          </a>
+          <button class="ask-ai-link-btn" onclick="queryDeliverableInCopilot('${escapeHtml(f.name)}')" title="Ask AI Copilot to analyze this report">
+            ⚡ Ask AI
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function getFileFormatBadge(ext) {
   const clean = (ext || "").toLowerCase().trim();
-  if (clean === ".docx") return '<span style="font-weight: 700; color: #60A5FA; font-size: 10px;">DOCX</span>';
-  if (clean === ".xlsx") return '<span style="font-weight: 700; color: #34D399; font-size: 10px;">XLSX</span>';
-  if (clean === ".pptx") return '<span style="font-weight: 700; color: #FBBF24; font-size: 10px;">PPTX</span>';
-  if (clean === ".png" || clean === ".jpg" || clean === ".jpeg") return '<span style="font-weight: 700; color: #C084FC; font-size: 10px;">PNG</span>';
-  return '<span style="font-weight: 700; color: #94A3B8; font-size: 10px;">FILE</span>';
+  if (clean === ".docx") return '<span class="file-format-badge fmt-docx">DOCX</span>';
+  if (clean === ".xlsx") return '<span class="file-format-badge fmt-xlsx">XLSX</span>';
+  if (clean === ".csv") return '<span class="file-format-badge fmt-csv">CSV</span>';
+  if (clean === ".pptx") return '<span class="file-format-badge fmt-pptx">PPTX</span>';
+  if (clean === ".pdf") return '<span class="file-format-badge fmt-pdf">PDF</span>';
+  if (clean === ".md") return '<span class="file-format-badge fmt-md">MD</span>';
+  if (clean === ".py") return '<span class="file-format-badge fmt-py">PY</span>';
+  if (clean === ".png" || clean === ".jpg" || clean === ".jpeg") return '<span class="file-format-badge fmt-img">PNG</span>';
+  return `<span class="file-format-badge">${clean.replace(".", "").toUpperCase() || "FILE"}</span>`;
+}
+
+function getFileIcon(ext) {
+  return getFileFormatBadge(ext);
+}
+
+function queryDeliverableInCopilot(filename) {
+  const input = document.getElementById("copilot-input");
+  if (input) {
+    input.value = `Analyze and summarize deliverable ${filename}, extracting key findings, anomalies, and statutory recommendations.`;
+    input.focus();
+  }
 }
 
 // -----------------------------------------------------------------------------
 // Documents Fetcher & Repository Registry
 // -----------------------------------------------------------------------------
+let cachedDocumentsList = [];
+let currentDocsFilter = "all";
+
 async function fetchDocuments() {
   try {
     const res = await fetch("/api/documents");
     if (!res.ok) return;
     const docs = await res.json();
-    const tbody = document.getElementById("documents-tbody");
-    if (!tbody || !Array.isArray(docs)) return;
+    if (!Array.isArray(docs)) return;
+    cachedDocumentsList = docs;
 
-    tbody.innerHTML = docs.map(d => {
-      const isDuckDB = d.format === "CSV";
-      const isVision = d.format === "PNG" || d.format === "JPG";
-      const engine = isDuckDB ? "DuckDB" : (isVision ? "Vision Cache" : "SQLite BM25 / RAG");
-      const statusClass = d.exists ? "green" : "orange";
-      const statusText = d.exists ? `Active (${d.size_kb} KB)` : "Missing";
-      return `
-        <tr>
-          <td>
-            <code>${escapeHtml(d.name)}</code>
-            <div style="font-size: 10.5px; color: var(--text-dim); margin-top: 3px;">${escapeHtml(d.title || "")}</div>
-          </td>
-          <td>${escapeHtml(d.category || "Dataset")}</td>
-          <td><span style="font-weight: 600; color: #38BDF8;">${engine}</span></td>
-          <td><span class="status-badge-${statusClass}">${statusText}</span></td>
-        </tr>
-      `;
-    }).join("");
+    updateDocumentsStats(docs);
+    filterDocuments();
   } catch (err) {
     console.warn("Could not load /api/documents:", err);
+  }
+}
+
+function updateDocumentsStats(docs) {
+  const strip = document.getElementById("docs-stats-strip");
+  if (!strip) return;
+
+  const totalCount = docs.length;
+  const pidCount = docs.filter(d => (d.category || "").includes("P&ID")).length;
+  const crudeCount = docs.filter(d => (d.category || "").includes("Crude")).length;
+  const safetyCount = docs.filter(d => (d.category || "").includes("Standard") || (d.category || "").includes("NDT")).length;
+  const sparesCount = docs.filter(d => (d.category || "").includes("Spares") || (d.category || "").includes("Pipe")).length;
+  const totalMB = (docs.reduce((acc, d) => acc + (d.size_kb || 0), 0) / 1024).toFixed(1);
+
+  strip.innerHTML = `
+    <div class="file-stat-chip">
+      <span class="stat-chip-num">${totalCount}</span>
+      <span class="stat-chip-label">Indexed Documents</span>
+    </div>
+    <div class="file-stat-chip">
+      <span class="stat-chip-num" style="color: #EC4899;">${pidCount}</span>
+      <span class="stat-chip-label">P&amp;ID Schemes</span>
+    </div>
+    <div class="file-stat-chip">
+      <span class="stat-chip-num" style="color: #FBBF24;">${crudeCount}</span>
+      <span class="stat-chip-label">Crude Assays</span>
+    </div>
+    <div class="file-stat-chip">
+      <span class="stat-chip-num" style="color: #F87171;">${safetyCount}</span>
+      <span class="stat-chip-label">Safety &amp; Codes</span>
+    </div>
+    <div class="file-stat-chip">
+      <span class="stat-chip-num" style="color: #34D399;">${sparesCount}</span>
+      <span class="stat-chip-label">Spares &amp; Pipes</span>
+    </div>
+    <div class="file-stat-chip">
+      <span class="stat-chip-num" style="color: #38BDF8;">${totalMB} MB</span>
+      <span class="stat-chip-label">Verified Storage</span>
+    </div>
+  `;
+}
+
+function setDocsFilter(filterType, btnEl) {
+  currentDocsFilter = filterType;
+  if (btnEl) {
+    document.querySelectorAll("#docs-filter-pills .filter-pill-btn").forEach(b => b.classList.remove("active"));
+    btnEl.classList.add("active");
+  }
+  filterDocuments();
+}
+
+function clearDocsSearch() {
+  const input = document.getElementById("docs-search-input");
+  if (input) {
+    input.value = "";
+    filterDocuments();
+  }
+}
+
+function resetDocsFilter() {
+  clearDocsSearch();
+  const allBtn = document.querySelector("#docs-filter-pills .filter-pill-btn[data-filter='all']");
+  if (allBtn) setDocsFilter("all", allBtn);
+}
+
+function filterDocuments() {
+  const tbody = document.getElementById("documents-tbody");
+  const countLabel = document.getElementById("docs-count-label");
+  const clearBtn = document.getElementById("docs-search-clear");
+  const query = (document.getElementById("docs-search-input")?.value || "").toLowerCase().trim();
+
+  if (clearBtn) {
+    clearBtn.style.display = query.length > 0 ? "block" : "none";
+  }
+
+  let filtered = cachedDocumentsList.filter(d => {
+    const cat = (d.category || "").toLowerCase();
+    const name = (d.name || "").toLowerCase();
+    const fmt = (d.format || "").toLowerCase();
+
+    // Filter pill check
+    if (currentDocsFilter === "pid" && !cat.includes("p&id")) return false;
+    if (currentDocsFilter === "crude" && !cat.includes("crude")) return false;
+    if (currentDocsFilter === "ndt" && !(cat.includes("ndt") || cat.includes("standard") || cat.includes("safety"))) return false;
+    if (currentDocsFilter === "asme" && !(cat.includes("pipe") || cat.includes("spares"))) return false;
+    if (currentDocsFilter === "ppac" && !(name.includes("ppac") || cat.includes("production") || name.includes("slate"))) return false;
+
+    // Search query check
+    if (query) {
+      const title = (d.title || "").toLowerCase();
+      const desc = (d.description || "").toLowerCase();
+      const match = name.includes(query) || title.includes(query) || desc.includes(query) || cat.includes(query) || fmt.includes(query);
+      if (!match) return false;
+    }
+
+    return true;
+  });
+
+  if (countLabel) {
+    if (query || currentDocsFilter !== "all") {
+      countLabel.textContent = `Showing ${filtered.length} of ${cachedDocumentsList.length} documents`;
+    } else {
+      countLabel.textContent = `Showing all ${cachedDocumentsList.length} documents`;
+    }
+  }
+
+  if (!tbody) return;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          <div class="empty-file-state">
+            <p>No indexed documents match your search or filter criteria.</p>
+            <button class="empty-file-reset-btn" onclick="resetDocsFilter()">Reset Filter &amp; Search</button>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(d => {
+    const isDuckDB = d.format === "CSV";
+    const isVision = d.format === "PNG" || d.format === "JPG";
+    const engine = isDuckDB ? "DuckDB (In-Memory)" : (isVision ? "Vision Cache" : "PyMuPDF / RAG");
+    const statusClass = d.exists ? "green" : "orange";
+    const statusText = d.exists ? `Active (${d.size_kb} KB)` : "Offline";
+    const fmtBadge = getFileFormatBadge("." + (d.format || "file").toLowerCase());
+
+    return `
+      <tr>
+        <td>
+          <div style="font-weight: 700; color: #F1F5F9; font-size: 12.5px;">${escapeHtml(d.title || d.name)}</div>
+          <div style="font-size: 11px; color: var(--text-dim); margin-top: 3px; font-family: var(--font-mono);">
+            <code>${escapeHtml(d.name)}</code> &bull; ${escapeHtml(d.description || "")}
+          </div>
+        </td>
+        <td>
+          <span class="file-category-pill">${escapeHtml(d.category || "Dataset")}</span>
+        </td>
+        <td>${fmtBadge}</td>
+        <td><span style="font-weight: 600; font-size: 11px; color: #38BDF8;">${engine}</span></td>
+        <td><span class="status-badge-${statusClass}">${statusText}</span></td>
+        <td style="text-align: right; white-space: nowrap;">
+          <a class="download-link-btn" href="/api/download/${encodeURIComponent(d.name)}?source=data" download title="Download raw dataset">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Get
+          </a>
+          <button class="ask-ai-link-btn" onclick="queryDocInCopilot('${escapeHtml(d.name)}')" title="Query this document in Copilot">
+            ⚡ Query
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function queryDocInCopilot(filename) {
+  const input = document.getElementById("copilot-input");
+  if (input) {
+    input.value = `Query verified operational document ${filename} for engineering parameters, design criteria, and specifications.`;
+    input.focus();
   }
 }
 
