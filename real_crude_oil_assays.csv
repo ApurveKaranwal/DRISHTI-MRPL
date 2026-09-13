@@ -1,9 +1,0 @@
-crude_name,origin_country,api_gravity,density_15c_kg_m3,sulfur_wt_pct,tan_mg_koh_g,pour_point_c,viscosity_40c_cst,rvp_bar,lpg_vol_pct,light_naphtha_vol_pct,heavy_naphtha_vol_pct,kerosene_vol_pct,diesel_ago_vol_pct,vgo_vol_pct,residue_565c_vol_pct
-Arabian Light,Saudi Arabia,32.8,861.2,1.97,0.12,-21.0,5.3,0.28,2.4,7.8,11.6,12.3,21.5,30.3,14.1
-Arabian Heavy,Saudi Arabia,27.9,887.6,2.85,0.24,-18.0,15.2,0.25,1.8,5.2,9.1,10.4,18.2,29.8,25.5
-Brent Blend,United Kingdom,38.3,833.3,0.37,0.08,-6.0,3.4,0.32,3.1,9.4,14.2,13.8,23.6,22.1,13.8
-Bonny Light,Nigeria,35.3,848.3,0.14,0.18,2.0,3.9,0.35,2.8,8.6,15.4,14.5,25.2,23.0,10.5
-Maya Heavy,Mexico,21.8,923.0,3.52,0.42,-9.0,32.8,0.22,1.5,4.3,7.5,8.8,16.4,33.0,28.5
-Basrah Medium,Iraq,29.2,880.5,2.7,0.15,-15.0,11.4,0.26,2.0,6.1,10.5,11.2,19.8,28.9,21.5
-Murban,UAE,40.5,822.7,0.78,0.05,-24.0,2.85,0.38,3.8,11.2,16.5,15.1,24.5,20.4,8.5
-Mangala,India (Rajasthan),29.0,881.6,0.12,0.35,30.0,28.5,0.15,1.2,3.5,7.8,9.2,22.1,38.2,18.0
