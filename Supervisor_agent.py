@@ -671,8 +671,9 @@ class SupervisorAgent:
 
         # 2. Is the model this role would actually route to installed?
         target_model = self.active_model
+        target_base = target_model.split(":")[0].lower()
         target_installed = target_model in installed_models or any(
-            m.lower().startswith(target_model.split(":")[0].lower()) for m in installed_models
+            m.split(":")[0].lower() == target_base for m in installed_models
         )
         add_check(
             "target_model_installed",
@@ -1002,7 +1003,7 @@ Files explicitly supplied: {files or []}
                     "LLM_FAILURE",
                     "localhost",
                     (
-                        f"Supervisor planning LLM '{self.LLM_MODEL}' "
+                        f"Supervisor planning LLM '{self.active_model}' "
                         f"failed: {error}. "
                         "Switching to deterministic fallback."
                     )
@@ -2565,7 +2566,9 @@ Files explicitly supplied: {files or []}
                             f"Worker results: {evidence}",
                     },
                 ],
-                max_tokens=750,
+                # Reasoning models (e.g. deepseek-r1) need extra budget for
+                # their internal <think> scratchpad before producing output.
+                max_tokens=2048 if "r1" in reasoning_model.lower() else 750,
                 temperature=0.15,
                 model=reasoning_model,
             )
@@ -2663,7 +2666,7 @@ Files explicitly supplied: {files or []}
             f"(External WAN Bytes: "
             f"{telemetry['outbound_internet_bytes']})\n"
             f"**Supervisor LLM:** "
-            f"`{self.LLM_MODEL}`\n"
+            f"`{self.active_model}`\n"
             f"**Sovereign Audit Signature:** "
             f"`{cert['sha256_audit_signature']}`\n\n"
             f"## User Query\n\n"
@@ -2767,7 +2770,7 @@ Files explicitly supplied: {files or []}
 
         if is_llm_mode:
             reason = (
-                f"Ollama is online: LLM '{self.LLM_MODEL}' generated the plan "
+                f"Ollama is online: LLM '{self.active_model}' generated the plan "
                 "and synthesized the grounded response."
             )
         elif not llm_online:

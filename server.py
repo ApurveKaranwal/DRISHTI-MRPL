@@ -770,7 +770,7 @@ async def list_models():
 
     def check_installed(target_id: str) -> bool:
         prefix = target_id.split(":")[0].lower()
-        return target_id in available or any(prefix in m.lower() for m in available)
+        return target_id in available or any(m.split(":")[0].lower() == prefix for m in available)
 
     # Build profiles dynamically from ModelRouter
     roles_meta = [
@@ -785,7 +785,7 @@ async def list_models():
     for role_name, fallback_id, default_desc in roles_meta:
         if role_name == "embedding":
             active_id = "bge-m3:latest"
-            avail_for_role = [{"model_id": "bge-m3:latest", "is_installed": check_installed("bge-m3") or True}]
+            avail_for_role = [{"model_id": "bge-m3:latest", "is_installed": check_installed("bge-m3")}]
             cfg = {"vram_estimate_gb": 0.6, "description": default_desc}
         else:
             active_id = router.get_model(role_name)
@@ -921,7 +921,7 @@ def _run_ollama_pull(model_id: str) -> None:
             status_text = chunk.get("status", "")
             completed = chunk.get("completed")
             total = chunk.get("total")
-            percent = round((completed / total) * 100, 1) if completed and total else None
+            percent = round((completed / total) * 100, 1) if (completed is not None and total and total > 0) else None
 
             with _pull_jobs_lock:
                 job = _pull_jobs.setdefault(model_id, {})
@@ -954,6 +954,7 @@ async def pull_model(payload: ModelPullPayload):
         existing = _pull_jobs.get(model_id)
         if existing and existing.get("state") == "pulling":
             return {"status": "already_pulling", "model_id": model_id}
+        _pull_jobs[model_id] = {"state": "pulling", "status": "starting", "percent": 0.0, "error": None}
 
     asyncio.create_task(asyncio.to_thread(_run_ollama_pull, model_id))
     return {"status": "started", "model_id": model_id}
@@ -963,7 +964,7 @@ async def pull_model(payload: ModelPullPayload):
 async def pull_model_status(model_id: str):
     """Returns the current progress of a background pull job for model_id."""
     with _pull_jobs_lock:
-        job = _pull_jobs.get(model_id)
+        job = dict(_pull_jobs.get(model_id, {}))
     if not job:
         return {"model_id": model_id, "state": "idle"}
     return {"model_id": model_id, **job}

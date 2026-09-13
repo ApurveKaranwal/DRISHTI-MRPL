@@ -63,7 +63,9 @@ class ModelRouter:
                     with open(self.registry_file, "r", encoding="utf-8") as f:
                         self._registry_data = json.load(f)
                 except Exception as err:
-                    logger.error(f"Error loading model registry: {err}. Using memory cache.")
+                    logger.error(f"Error loading model registry: {err}. Falling back to default registry.")
+                    if not self._registry_data:
+                        self._registry_data = self._create_default_registry()
             return self._registry_data
 
     def _save_registry_unlocked(self) -> None:
@@ -159,7 +161,7 @@ class ModelRouter:
                 self._installed_cache_time = now
                 return self._installed_cache
         except Exception:
-            pass
+            self._installed_cache = []
         self._installed_cache_time = now
         return self._installed_cache
 
@@ -171,7 +173,7 @@ class ModelRouter:
         if model_id in installed:
             return True
         prefix = model_id.split(":")[0].lower()
-        return any(m.lower().startswith(prefix) for m in installed)
+        return any(m.split(":")[0].lower() == prefix for m in installed)
 
     # -----------------------------------------------------------------------
     # Model Routing Resolution
@@ -309,8 +311,8 @@ class ModelRouter:
                 models_status[mid] = status
 
             return {
-                "active_selection": self._registry_data.get("active_selection", {}),
-                "fallbacks": self._registry_data.get("fallbacks", {}),
+                "active_selection": dict(self._registry_data.get("active_selection", {})),
+                "fallbacks": dict(self._registry_data.get("fallbacks", {})),
                 "models": models_status,
                 "installed_in_ollama": installed,
             }

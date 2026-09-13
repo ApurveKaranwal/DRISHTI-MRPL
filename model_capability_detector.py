@@ -156,6 +156,10 @@ def detect_capabilities(model_id: str) -> CapabilityPrediction:
         if conf == "low":
             prediction.signals_used.append(f"name pattern suggests '{capability}'")
 
+    # All language models produce text — default to at least low confidence
+    # so the UI doesn't show it as absent.
+    combined.setdefault("text", "high" if show_data else "low")
+
     # Anything with no positive signal at all is an explicit "none" (✗),
     # not just absent, so the UI can render it.
     for capability in CAPABILITY_ROLE_MAP:

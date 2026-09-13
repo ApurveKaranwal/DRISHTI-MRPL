@@ -119,12 +119,13 @@ class VisionWorker:
             )
 
     def _run_vlm(self, image_bytes: bytes, source_label: str = "") -> str:
+        vlm_model = self.settings.vlm_model
         try:
             try:
                 from model_router import get_model_router
-                vlm_model = get_model_router().get_model("vision", default=self.settings.vlm_model)
+                vlm_model = get_model_router().get_model("vision", default=self.settings.vlm_model, check_installed=True)
             except Exception:
-                vlm_model = self.settings.vlm_model
+                pass
 
             response = requests.post(
                 f"{self.settings.ollama_url}/api/chat",
@@ -162,7 +163,7 @@ class VisionWorker:
 
         except Exception:
             return (
-                "[VLM Notice: Local Qwen3-VL model unavailable. "
+                f"[VLM Notice: Local vision model ({vlm_model}) unavailable. "
                 "Live visual understanding could not be performed.]"
             )
 
