@@ -68,19 +68,21 @@ class ModelRouter:
                         self._registry_data = self._create_default_registry()
             return self._registry_data
 
-    def _save_registry_unlocked(self) -> None:
+    def _save_registry_unlocked(self) -> bool:
         try:
             temp_path = self.registry_file.with_suffix(".tmp")
             with open(temp_path, "w", encoding="utf-8") as f:
                 json.dump(self._registry_data, f, indent=2)
             temp_path.replace(self.registry_file)
+            return True
         except Exception as err:
             logger.error(f"Failed to persist model registry: {err}")
+            return False
 
-    def save_registry(self) -> None:
+    def save_registry(self) -> bool:
         """Flushes registry data to disk."""
         with self._file_lock:
-            self._save_registry_unlocked()
+            return self._save_registry_unlocked()
 
     def _create_default_registry(self) -> dict[str, Any]:
         return {
@@ -148,22 +150,25 @@ class ModelRouter:
 
     def get_installed_ollama_models(self, force_refresh: bool = False) -> list[str]:
         """Queries local Ollama /api/tags to list installed model names."""
-        now = time.time()
-        if not force_refresh and (now - self._installed_cache_time < self._cache_ttl_seconds):
-            return self._installed_cache
+        with self._file_lock:
+            now = time.time()
+            if not force_refresh and (now - self._installed_cache_time < self._cache_ttl_seconds):
+                return list(self._installed_cache)
 
         ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
+        new_cache = []
         try:
             resp = requests.get(f"{ollama_url}/api/tags", timeout=1.0)
             if resp.status_code == 200:
                 models = [m.get("name", "") for m in resp.json().get("models", [])]
-                self._installed_cache = [m for m in models if m]
-                self._installed_cache_time = now
-                return self._installed_cache
+                new_cache = [m for m in models if m]
         except Exception:
-            self._installed_cache = []
-        self._installed_cache_time = now
-        return self._installed_cache
+            new_cache = []
+
+        with self._file_lock:
+            self._installed_cache = new_cache
+            self._installed_cache_time = time.time()
+            return list(self._installed_cache)
 
     def is_model_installed(self, model_id: str) -> bool:
         """Checks if a target model is installed in local Ollama."""
@@ -172,7 +177,10 @@ class ModelRouter:
             return False
         if model_id in installed:
             return True
-        prefix = model_id.split(":")[0].lower()
+        model_id_lower = model_id.lower()
+        if any(m.lower() == model_id_lower for m in installed):
+            return True
+        prefix = model_id_lower.split(":")[0]
         return any(m.split(":")[0].lower() == prefix for m in installed)
 
     # -----------------------------------------------------------------------
@@ -225,7 +233,7 @@ class ModelRouter:
                 "context_window": cfg.get("context_window", 4096),
                 "vram_estimate_gb": cfg.get("vram_estimate_gb", 4.0),
                 "description": cfg.get("description", ""),
-                "capabilities": cfg.get("capabilities", []),
+                "capabilities": list(cfg.get("capabilities", [])),
             }
 
     def get_available_models_for_role(self, role: str) -> list[dict[str, Any]]:
@@ -237,6 +245,8 @@ class ModelRouter:
                 roles = mdata.get("roles", [])
                 if role in roles:
                     entry = dict(mdata)
+                    entry["capabilities"] = list(mdata.get("capabilities", []))
+                    entry["roles"] = list(mdata.get("roles", []))
                     entry["model_id"] = mid
                     entry["is_active"] = (self._registry_data.get("active_selection", {}).get(role) == mid)
                     results.append(entry)
@@ -261,7 +271,8 @@ class ModelRouter:
                 self._registry_data["active_selection"] = {}
 
             self._registry_data["active_selection"][role] = model_id
-            self._save_registry_unlocked()
+            if not self._save_registry_unlocked():
+                return False, f"Failed to persist active model for role '{role}' to disk."
             logger.info(f"Active model for role '{role}' updated to '{model_id}'.")
             return True, f"Active model for role '{role}' set to '{model_id}'."
 
@@ -296,7 +307,8 @@ class ModelRouter:
                 for r in roles:
                     self._registry_data["active_selection"][r] = model_id
 
-            self._save_registry_unlocked()
+            if not self._save_registry_unlocked():
+                return False, f"Failed to persist model '{model_id}' registration to disk."
             logger.info(f"Model '{model_id}' registered successfully with roles: {roles}.")
             return True, f"Model '{model_id}' registered successfully."
 

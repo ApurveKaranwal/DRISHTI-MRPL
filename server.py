@@ -871,6 +871,9 @@ class ModelConfirmPayload(BaseModel):
     roles: List[str]
     capabilities: Optional[List[str]] = None
     description: str = ""
+    vram_estimate_gb: float = 4.0
+    context_window: int = 4096
+    temperature: float = 0.1
     set_as_active: bool = False
 
 
@@ -999,6 +1002,9 @@ async def confirm_discovered_model(payload: ModelConfirmPayload):
             roles=payload.roles,
             capabilities=payload.capabilities,
             description=payload.description,
+            vram_estimate_gb=payload.vram_estimate_gb,
+            context_window=payload.context_window,
+            temperature=payload.temperature,
             set_as_active_for_roles=payload.set_as_active,
         )
         if not ok:

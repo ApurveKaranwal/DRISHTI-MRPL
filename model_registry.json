@@ -114,18 +114,6 @@
       "context_window": 4096,
       "temperature": 0.1,
       "description": "User-registered model deepseek-r1:7b"
-    },
-    "BGE-M3:latest": {
-      "capabilities": [
-        "text"
-      ],
-      "roles": [
-        "general"
-      ],
-      "vram_estimate_gb": 4.0,
-      "context_window": 4096,
-      "temperature": 0.1,
-      "description": "User-registered model BGE-M3:latest"
     }
   },
   "fallbacks": {

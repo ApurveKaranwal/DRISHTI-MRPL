@@ -69,18 +69,38 @@ class ModelDiscovery:
         """
         with self._lock:
             router = get_model_router()
-            installed = set(router.get_installed_ollama_models(force_refresh=force_refresh))
-            registered = set(router.get_full_registry_status()["models"].keys())
+            installed = router.get_installed_ollama_models(force_refresh=force_refresh)
+            registered_dict = router.get_full_registry_status().get("models", {})
+            registered_keys = set(registered_dict.keys())
             dismissed = set(self._state.get("dismissed", []))
 
-            unregistered = installed - registered - dismissed
+            registered_lower = {k.lower() for k in registered_keys}
+            registered_bases = {k.split(":")[0].lower() for k in registered_keys}
+            dismissed_lower = {k.lower() for k in dismissed}
+
+            unregistered = []
+            for m in installed:
+                m_lower = m.lower()
+                if m_lower in registered_lower or m in registered_keys:
+                    continue
+                if m_lower in dismissed_lower or m in dismissed:
+                    continue
+                # If model is tag :latest, check if base model is already registered
+                base = m_lower.split(":")[0]
+                tag = m_lower.split(":")[1] if ":" in m_lower else ""
+                if tag == "latest" and base in registered_bases:
+                    continue
+                unregistered.append(m)
+
             return sorted(unregistered)
 
     def dismiss(self, model_id: str) -> None:
         """User chose 'not now' / 'ignore' for a detected model."""
         with self._lock:
-            if model_id not in self._state["dismissed"]:
-                self._state["dismissed"].append(model_id)
+            dismissed = self._state.get("dismissed", [])
+            if not any(m.lower() == model_id.lower() for m in dismissed):
+                dismissed.append(model_id)
+                self._state["dismissed"] = dismissed
                 self._save_state()
                 logger.info(f"Model '{model_id}' dismissed from discovery prompts.")
 
@@ -94,8 +114,9 @@ class ModelDiscovery:
             if model_id is None:
                 self._state["dismissed"] = []
             else:
+                target_lower = model_id.lower()
                 self._state["dismissed"] = [
-                    m for m in self._state.get("dismissed", []) if m != model_id
+                    m for m in self._state.get("dismissed", []) if m.lower() != target_lower
                 ]
             self._save_state()
 

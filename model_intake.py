@@ -75,6 +75,9 @@ def confirm_model(
     roles: list[str],
     capabilities: list[str] | None = None,
     description: str = "",
+    vram_estimate_gb: float = 4.0,
+    context_window: int = 4096,
+    temperature: float = 0.1,
     set_as_active_for_roles: bool = False,
 ) -> tuple[bool, str]:
     """
@@ -97,6 +100,9 @@ def confirm_model(
         roles=roles,
         capabilities=capabilities,
         description=description or f"User-registered model {model_id}",
+        vram_estimate_gb=vram_estimate_gb,
+        context_window=context_window,
+        temperature=temperature,
         set_as_active_for_roles=set_as_active_for_roles,
     )
 

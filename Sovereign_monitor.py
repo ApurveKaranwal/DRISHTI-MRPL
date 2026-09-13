@@ -97,7 +97,10 @@ class SovereignNetworkAuditor:
 
         try:
             proc = psutil.Process()
-            connections = proc.connections(kind="inet")
+            if hasattr(proc, "net_connections"):
+                connections = proc.net_connections(kind="inet")
+            else:
+                connections = proc.connections(kind="inet")
         except Exception:
             try:
                 connections = psutil.net_connections(kind="inet")[:20]
