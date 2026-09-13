@@ -150,9 +150,9 @@ class ModelRouter:
         if not force_refresh and (now - self._installed_cache_time < self._cache_ttl_seconds):
             return self._installed_cache
 
-        ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+        ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
         try:
-            resp = requests.get(f"{ollama_url}/api/tags", timeout=2.0)
+            resp = requests.get(f"{ollama_url}/api/tags", timeout=1.0)
             if resp.status_code == 200:
                 models = [m.get("name", "") for m in resp.json().get("models", [])]
                 self._installed_cache = [m for m in models if m]
@@ -160,6 +160,7 @@ class ModelRouter:
                 return self._installed_cache
         except Exception:
             pass
+        self._installed_cache_time = now
         return self._installed_cache
 
     def is_model_installed(self, model_id: str) -> bool:

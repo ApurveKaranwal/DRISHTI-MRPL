@@ -24,7 +24,7 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 import requests
 
@@ -731,11 +731,13 @@ async def list_documents():
 
 
 class ModelSelectPayload(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
     role: str
     model_id: str
 
 
 class ModelRegisterPayload(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
     model_id: str
     roles: List[str]
     capabilities: List[str] = []
@@ -864,6 +866,7 @@ async def register_model(payload: ModelRegisterPayload):
 
 
 class ModelConfirmPayload(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
     model_id: str
     roles: List[str]
     capabilities: Optional[List[str]] = None
@@ -872,10 +875,12 @@ class ModelConfirmPayload(BaseModel):
 
 
 class ModelDismissPayload(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
     model_id: str
 
 
 class ModelPullPayload(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
     model_id: str
 
 
