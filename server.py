@@ -757,7 +757,7 @@ async def list_models():
     except Exception as err:
         raise HTTPException(status_code=500, detail=f"ModelRouter unavailable: {err}")
 
-    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+    ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
     ollama_ok = False
     available = []
     try:
@@ -893,7 +893,7 @@ _pull_jobs_lock = threading.Lock()
 
 def _run_ollama_pull(model_id: str) -> None:
     """Streams an `ollama pull` and records progress into _pull_jobs. Runs in a worker thread."""
-    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+    ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
     with _pull_jobs_lock:
         _pull_jobs[model_id] = {"state": "pulling", "status": "starting", "percent": 0.0, "error": None}
 

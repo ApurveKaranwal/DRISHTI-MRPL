@@ -43,3 +43,13 @@ data/uploads/*
 # Logs and temporary files
 *.log
 *.tmp
+
+# Test and Runtime artifacts
+.pytest_cache/
+model_discovery_state.json
+
+# Output root-level artifacts (preserve subdirectory structure)
+outputs/*
+!outputs/.gitkeep
+!outputs/reports/
+!outputs/sandbox/

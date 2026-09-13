@@ -22,7 +22,7 @@ for label, model_id, prompt in MODELS:
     t0 = time.time()
     try:
         resp = requests.post(
-            "http://localhost:11434/api/generate",
+            "http://127.0.0.1:11434/api/generate",
             json={"model": model_id, "prompt": prompt, "stream": False, "options": {"num_predict": 60}},
             timeout=60,
         )

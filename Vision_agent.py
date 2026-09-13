@@ -40,7 +40,7 @@ class VisionSettings:
 
     ollama_url: str = os.getenv(
         "OLLAMA_URL",
-        "http://localhost:11434"
+        "http://127.0.0.1:11434"
     )
 
     vlm_model: str = os.getenv(

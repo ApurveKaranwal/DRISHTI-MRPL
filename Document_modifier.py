@@ -77,7 +77,7 @@ class ModificationError(RuntimeError):
 
 @dataclass(frozen=True)
 class ModifierSettings:
-    output_dir: Path = Path("./outputs")
+    output_dir: Path = Path("./outputs/sandbox")
     # insert_image operations must reference a file inside this directory.
     # None disables insert_image entirely (safer default than "allow anything").
     allowed_upload_dir: Path | None = None

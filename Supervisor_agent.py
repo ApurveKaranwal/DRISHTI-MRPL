@@ -469,7 +469,7 @@ class SupervisorAgent:
     """Routes user requests to local workers and synthesizes grounded results."""
 
     LLM_MODEL = "qwen3:8b"
-    OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+    OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
 
     def __init__(
         self,

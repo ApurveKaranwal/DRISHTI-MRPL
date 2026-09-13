@@ -75,7 +75,7 @@ class CapabilityPrediction:
 
 def _query_ollama_show(model_id: str, timeout: float = 4.0) -> dict[str, Any] | None:
     """Calls Ollama's /api/show for model metadata. Returns None on any failure."""
-    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+    ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
     try:
         resp = requests.post(f"{ollama_url}/api/show", json={"name": model_id}, timeout=timeout)
         if resp.status_code == 200:
