@@ -3,6 +3,12 @@
 Executes Python scripts in an isolated subprocess with timeout protection,
 captures stdout/stderr, tracks execution time, saves generated plots/artifacts,
 and enforces security AST scans to prevent dangerous system calls.
+
+Security model:
+  - WHITELIST approach: only explicitly allowed modules/builtins may be used
+  - Script names are sanitized to prevent path traversal
+  - Subprocess runs with stripped environment (no secrets/tokens)
+  - Subprocess CWD is restricted to the sandbox directory
 """
 
 from __future__ import annotations
@@ -35,16 +41,69 @@ class SandboxExecutionError(RuntimeError):
     pass
 
 
-# Disallowed AST calls/modules to protect the workstation and enforce air-gap
-BLOCKED_MODULES = {
-    "pty", "winreg", "webbrowser", "http.server", "socket", "urllib.request",
-    "requests", "http.client", "ftplib", "smtplib", "telnetlib", "asyncio.subprocess",
-    "multiprocessing", "ctypes"
+# ── Security Whitelist Configuration ──────────────────────────────────────────
+# Only modules in this set may be imported. Everything else is blocked.
+ALLOWED_MODULES = {
+    # Standard library — safe, no I/O or system mutation
+    "math", "cmath", "decimal", "fractions", "statistics", "random",
+    "itertools", "functools", "operator", "collections", "heapq", "bisect",
+    "copy", "pprint", "textwrap", "string", "re", "struct", "array",
+    "datetime", "time", "calendar", "zoneinfo",
+    "json", "csv", "io", "base64", "hashlib", "hmac",
+    "dataclasses", "typing", "types", "abc", "enum", "contextlib",
+    "warnings", "traceback", "logging", "numbers",
+    "pathlib",  # read-only path construction
+    # Scientific / engineering — the primary use-case
+    "numpy", "pandas", "scipy", "scipy.optimize", "scipy.interpolate",
+    "scipy.integrate", "scipy.signal", "scipy.stats", "scipy.linalg",
+    "scipy.spatial", "scipy.constants",
+    "matplotlib", "matplotlib.pyplot", "matplotlib.figure",
+    "matplotlib.ticker", "matplotlib.dates", "matplotlib.patches",
+    "matplotlib.colors", "matplotlib.cm",
+    "seaborn", "plotly", "plotly.express", "plotly.graph_objects",
+    "sklearn", "sklearn.linear_model", "sklearn.preprocessing",
+    "sklearn.metrics", "sklearn.cluster",
+    "sympy",
+    "openpyxl",
+    # CoolProp for thermo engineering calculations
+    "CoolProp", "CoolProp.CoolProp",
 }
-BLOCKED_CALLS = {
+
+# Builtin function names that MUST NOT appear as bare calls
+BLOCKED_BUILTINS = {
+    "exec", "eval", "compile", "__import__", "getattr", "setattr",
+    "delattr", "globals", "locals", "vars", "dir",
+    "breakpoint", "exit", "quit",
+}
+
+# Attribute-level calls that are always blocked regardless of the receiver
+BLOCKED_ATTR_CALLS = {
     "system", "popen", "spawn", "rmdir", "removedirs", "unlink", "kill",
-    "shutdown", "format_drive", "fork", "execv", "execve"
+    "shutdown", "fork", "execv", "execve", "remove", "rename", "replace",
+    "write", "writelines", "truncate",  # block file writes via handles
+    "Popen", "run", "call", "check_output", "check_call",  # subprocess.*
 }
+
+# Environment variable keys stripped from the subprocess (secrets, tokens, etc.)
+_DANGEROUS_ENV_PREFIXES = (
+    "SECRET", "TOKEN", "PASSWORD", "API_KEY", "AWS_", "AZURE_", "GCP_",
+    "OPENAI", "ANTHROPIC", "HF_TOKEN", "HUGGING", "GITHUB_TOKEN",
+    "DATABASE_URL", "REDIS_URL", "MONGO", "POSTGRES",
+)
+
+
+def _safe_env() -> dict[str, str]:
+    """Returns a stripped copy of os.environ with secrets and dangerous vars removed."""
+    safe = {}
+    for key, val in os.environ.items():
+        key_upper = key.upper()
+        if any(key_upper.startswith(prefix) or key_upper == prefix for prefix in _DANGEROUS_ENV_PREFIXES):
+            continue
+        safe[key] = val
+    # Force matplotlib to non-interactive backend and UTF-8
+    safe["MPLBACKEND"] = "Agg"
+    safe["PYTHONIOENCODING"] = "utf-8"
+    return safe
 
 
 class CodeSandboxWorker:
@@ -55,32 +114,81 @@ class CodeSandboxWorker:
         self.settings.sandbox_dir.mkdir(parents=True, exist_ok=True)
 
     def _validate_ast_security(self, code: str) -> None:
-        """Statically inspects Python code AST for prohibited calls before execution."""
+        """Statically inspects Python code AST for prohibited calls before execution.
+
+        Uses a WHITELIST approach:
+          - Imports: only modules in ALLOWED_MODULES are permitted
+          - Calls: bare calls to BLOCKED_BUILTINS are rejected
+          - Attribute calls: methods in BLOCKED_ATTR_CALLS are rejected
+          - open() as a bare builtin is explicitly blocked
+        """
         try:
             tree = ast.parse(code)
         except SyntaxError as err:
             raise SandboxExecutionError(f"Syntax error in script: {err}") from err
 
         for node in ast.walk(tree):
-            # Check imports
+            # ── Import validation (whitelist) ──
             if isinstance(node, ast.Import):
                 for alias in node.names:
-                    if alias.name in BLOCKED_MODULES:
-                        raise SecurityViolationError(f"Prohibited module import: '{alias.name}'")
-            elif isinstance(node, ast.ImportFrom):
-                if node.module in BLOCKED_MODULES:
-                    raise SecurityViolationError(f"Prohibited module import: '{node.module}'")
+                    top_module = alias.name.split(".")[0]
+                    if alias.name not in ALLOWED_MODULES and top_module not in ALLOWED_MODULES:
+                        raise SecurityViolationError(
+                            f"Prohibited module import: '{alias.name}'. "
+                            f"Only whitelisted scientific/engineering modules are allowed."
+                        )
 
-            # Check function calls
+            elif isinstance(node, ast.ImportFrom):
+                if node.module:
+                    top_module = node.module.split(".")[0]
+                    if node.module not in ALLOWED_MODULES and top_module not in ALLOWED_MODULES:
+                        raise SecurityViolationError(
+                            f"Prohibited module import: '{node.module}'. "
+                            f"Only whitelisted scientific/engineering modules are allowed."
+                        )
+
+            # ── Call validation ──
             elif isinstance(node, ast.Call):
                 func_name = ""
                 if isinstance(node.func, ast.Name):
                     func_name = node.func.id
+                    # Block dangerous builtins
+                    if func_name in BLOCKED_BUILTINS:
+                        raise SecurityViolationError(
+                            f"Security violation: Prohibited builtin call '{func_name}'"
+                        )
+                    # Block bare open() — file I/O from user scripts
+                    if func_name == "open":
+                        raise SecurityViolationError(
+                            "Security violation: Direct file I/O via open() is not allowed. "
+                            "Use pandas or numpy for data loading."
+                        )
                 elif isinstance(node.func, ast.Attribute):
                     func_name = node.func.attr
-                
-                if func_name in BLOCKED_CALLS:
-                    raise SecurityViolationError(f"Security violation: Prohibited call '{func_name}'")
+                    if func_name in BLOCKED_ATTR_CALLS:
+                        raise SecurityViolationError(
+                            f"Security violation: Prohibited method call '.{func_name}()'"
+                        )
+
+    @staticmethod
+    def _sanitize_script_name(name: str | None, run_id: str) -> str:
+        """Sanitizes script_name to prevent path traversal and injection.
+
+        Returns a safe basename with only alphanumerics, underscores, hyphens, and dots.
+        """
+        if not name:
+            return f"run_{run_id}.py"
+        # Strip any directory components — use only the final filename part
+        base = Path(name).name
+        # Remove any characters that aren't safe
+        safe = "".join(c for c in base if c.isalnum() or c in ("_", "-", "."))
+        # Ensure it ends with .py
+        if not safe.endswith(".py"):
+            safe += ".py"
+        # Fallback if empty after sanitization
+        if safe == ".py":
+            safe = f"run_{run_id}.py"
+        return safe
 
     def execute_code(
         self,
@@ -95,13 +203,21 @@ class CodeSandboxWorker:
         # 1. Pre-execution static security scan
         self._validate_ast_security(code)
 
-        # 2. Prepare temporary script file
+        # 2. Prepare temporary script file (sanitized name, no traversal)
         run_id = uuid.uuid4().hex[:8]
-        safe_name = script_name or f"run_{run_id}.py"
+        safe_name = self._sanitize_script_name(script_name, run_id)
         script_file = self.settings.sandbox_dir / safe_name
-        
-        # Ensure outputs/sandbox exists
+
+        # Ensure sandbox directory exists
         self.settings.sandbox_dir.mkdir(parents=True, exist_ok=True)
+
+        # Verify the resolved path is inside sandbox_dir (defense in depth)
+        resolved_script = script_file.resolve()
+        resolved_sandbox = self.settings.sandbox_dir.resolve()
+        if not str(resolved_script).startswith(str(resolved_sandbox)):
+            raise SecurityViolationError(
+                "Script path escapes sandbox directory. Possible path traversal attack."
+            )
 
         # Snapshot existing files in sandbox_dir to detect newly created artifacts
         before_files = set(self.settings.sandbox_dir.iterdir())
@@ -109,7 +225,7 @@ class CodeSandboxWorker:
         # Write script
         script_file.write_text(code, encoding="utf-8")
 
-        # 3. Subprocess execution
+        # 3. Subprocess execution with stripped env and sandbox-restricted CWD
         start_time = time.perf_counter()
         timed_out = False
         try:
@@ -118,8 +234,8 @@ class CodeSandboxWorker:
                 capture_output=True,
                 text=True,
                 timeout=self.settings.timeout_seconds,
-                cwd=str(Path.cwd()),  # Run relative to project root so outputs/ paths resolve
-                env={**os.environ, "PYTHONIOENCODING": "utf-8", "MPLBACKEND": "Agg"}
+                cwd=str(self.settings.sandbox_dir.resolve()),  # Restrict CWD to sandbox
+                env=_safe_env(),  # Stripped environment — no secrets
             )
             stdout = process.stdout
             stderr = process.stderr

@@ -87,13 +87,7 @@ class SovereignNetworkAuditor:
         """Scans current process and system socket connections."""
         active = []
         if not _PSUTIL_AVAILABLE:
-            return [{
-                "protocol": "TCP",
-                "local_address": "127.0.0.1:11434",
-                "remote_address": "127.0.0.1 (Ollama Local)",
-                "status": "ESTABLISHED",
-                "classification": "LOCAL_LOOPBACK",
-            }]
+            return []
 
         try:
             proc = psutil.Process()
@@ -118,7 +112,10 @@ class SovereignNetworkAuditor:
                     classification = "INTERNAL_LOOPBACK_OR_LAN"
                 else:
                     classification = "EXTERNAL_WAN_ALERT"
-                    self._external_violations += 1
+                    if not hasattr(self, "_violating_endpoints"):
+                        self._violating_endpoints = set()
+                    self._violating_endpoints.add(remote_ip)
+                    self._external_violations = len(self._violating_endpoints)
 
             active.append({
                 "fd": c.fd,
@@ -253,13 +250,19 @@ class SovereignNetworkAuditor:
         """Returns current air-gap, sovereignty, and real-time hardware metrics."""
         active_sockets = self.scan_active_sockets()
         external_count = sum(1 for s in active_sockets if s.get("classification") == "EXTERNAL_WAN_ALERT")
-        external_count += self._external_violations
+        if hasattr(self, "_violating_endpoints"):
+            external_count = max(external_count, len(self._violating_endpoints))
+        else:
+            external_count += self._external_violations
+
+        # Real outbound byte accounting: 0 if no external violations, or real tracked byte delta
+        outbound_bytes = getattr(self, "_external_bytes_total", 0)
 
         return {
             "session_id": self.session_id,
             "is_air_gapped": external_count == 0,
             "external_wan_calls": external_count,
-            "outbound_internet_bytes": 0 if external_count == 0 else 1024,
+            "outbound_internet_bytes": outbound_bytes,
             "total_internal_calls": self._total_internal_calls,
             "active_sockets": active_sockets,
             "sovereignty_status": "100% AIR-GAPPED / ON-PREMISES" if external_count == 0 else "WARNING: EXTERNAL TRAFFIC DETECTED",
@@ -277,7 +280,7 @@ class SovereignNetworkAuditor:
             "session_start_utc": self.session_start.isoformat(),
             "session_end_utc": datetime.now(timezone.utc).isoformat(),
             "is_air_gapped": telemetry["is_air_gapped"],
-            "external_wan_bytes_transferred": 0,
+            "external_wan_bytes_transferred": telemetry["outbound_internet_bytes"],
             "total_internal_tool_calls": telemetry["total_internal_calls"],
             "verification_statement": (
                 "This certifies that 100% of LLM inferences, RAG vector searches, "
