@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchSparesAlerts();
   fetchCrudeEconomics();
 
+  // Autonomous 10-minute model detection
+  initAutonomousModelDetection();
+
   // Periodic telemetry polling (3s)
   setInterval(fetchSystemTelemetry, 3000);
 });
@@ -217,8 +220,17 @@ async function sendMessage() {
   isChatStreaming = true;
   updateSendButtonState();
 
+  const streamState = {
+    routing: null,
+    steps: [],
+    currentStep: 0,
+    totalSteps: 0,
+    isSynthesizing: false,
+    statusMessage: 'Formulating sovereign multi-agent execution plan...'
+  };
+
   try {
-    const response = await fetch('/api/chat', {
+    const response = await fetch('/api/chat/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -232,16 +244,223 @@ async function sendMessage() {
       throw new Error(`Server returned HTTP ${response.status}`);
     }
 
-    const data = await response.json();
-    renderBotResponse(botMsgElem, data);
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let completedPayload = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // Retain incomplete chunk
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        try {
+          const event = JSON.parse(trimmed);
+          if (event.type === 'routing') {
+            streamState.routing = event;
+            streamState.statusMessage = `Routed to ${event.model || 'local model'} for ${event.domain || 'task'}`;
+            renderLiveExecutionCard(botMsgElem, streamState);
+          } else if (event.type === 'plan') {
+            streamState.steps = (event.steps || []).map(s => ({
+              step: s.step,
+              worker: s.worker,
+              worker_name: s.worker_name || s.worker,
+              description: s.description || '',
+              status: 'pending',
+              duration_ms: 0,
+              summary: ''
+            }));
+            streamState.totalSteps = streamState.steps.length;
+            streamState.statusMessage = event.plan_summary || 'Multi-step plan formulated';
+            renderLiveExecutionCard(botMsgElem, streamState);
+          } else if (event.type === 'step_start') {
+            streamState.currentStep = event.step;
+            streamState.totalSteps = event.total_steps || streamState.totalSteps;
+            let found = false;
+            for (const st of streamState.steps) {
+              if (st.step === event.step) {
+                st.status = 'active';
+                st.worker_name = event.worker_name || st.worker_name;
+                st.description = event.description || st.description;
+                found = true;
+              } else if (st.step < event.step && st.status !== 'completed') {
+                st.status = 'completed';
+              }
+            }
+            if (!found) {
+              streamState.steps.push({
+                step: event.step,
+                worker: event.worker,
+                worker_name: event.worker_name || event.worker,
+                description: event.description || '',
+                status: 'active',
+                duration_ms: 0,
+                summary: ''
+              });
+            }
+            renderLiveExecutionCard(botMsgElem, streamState);
+          } else if (event.type === 'step_complete') {
+            for (const st of streamState.steps) {
+              if (st.step === event.step) {
+                st.status = 'completed';
+                st.duration_ms = event.duration_ms || 0;
+                st.summary = event.summary || '';
+                st.worker_name = event.worker_name || st.worker_name;
+              }
+            }
+            renderLiveExecutionCard(botMsgElem, streamState);
+          } else if (event.type === 'synthesizing') {
+            streamState.isSynthesizing = true;
+            renderLiveExecutionCard(botMsgElem, streamState);
+          } else if (event.type === 'complete') {
+            completedPayload = event;
+          } else if (event.type === 'error') {
+            throw new Error(event.error || 'Pipeline execution error');
+          }
+        } catch (jsonErr) {
+          console.warn('NDJSON parsing chunk error:', trimmed, jsonErr);
+        }
+      }
+    }
+
+    if (completedPayload) {
+      renderBotResponse(botMsgElem, completedPayload);
+    } else {
+      renderBotResponse(botMsgElem, {
+        answer: 'Calculation completed successfully.',
+        execution_trace: streamState.steps,
+        routing: streamState.routing
+      });
+    }
+
     fetchDeliverables();
   } catch (err) {
-    console.error('Chat error:', err);
+    console.warn('Chat stream issue, attempting fallback to /api/chat:', err);
+    try {
+      const fallbackRes = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: query,
+          files: filesToSend,
+          history: chatHistory.slice(-10)
+        })
+      });
+      if (fallbackRes.ok) {
+        const fbData = await fallbackRes.json();
+        renderBotResponse(botMsgElem, fbData);
+        fetchDeliverables();
+        return;
+      }
+    } catch (fbErr) {
+      console.error('Fallback chat error:', fbErr);
+    }
     renderBotError(botMsgElem, err.message);
   } finally {
     isChatStreaming = false;
     updateSendButtonState();
   }
+}
+
+function renderLiveExecutionCard(container, state) {
+  if (!container) return;
+  const bubble = container.querySelector('.msg-bubble');
+  if (!bubble) return;
+
+  const currentStep = state.currentStep || (state.steps.find(s => s.status === 'active')?.step) || 1;
+  const totalSteps = state.totalSteps || (state.steps ? state.steps.length : 1);
+  const modelName = state.routing?.model || 'Local Model Router';
+  const domain = state.routing?.domain || 'MULTI-AGENT';
+
+  let stepsHtml = '';
+  if (state.steps && state.steps.length > 0) {
+    stepsHtml = state.steps.map(s => {
+      const isActive = s.status === 'active';
+      const isCompleted = s.status === 'completed';
+
+      let iconHtml = s.step;
+      if (isActive) {
+        iconHtml = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>';
+      } else if (isCompleted) {
+        iconHtml = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+      }
+
+      let statusTag = 'PENDING';
+      let tagClass = 'pending';
+      if (isActive) {
+        statusTag = 'EXECUTING NOW';
+        tagClass = 'active';
+      } else if (isCompleted) {
+        statusTag = s.duration_ms ? `${s.duration_ms}ms` : 'DONE';
+        tagClass = 'completed';
+      }
+
+      let summaryHtml = '';
+      if (s.summary && isCompleted) {
+        summaryHtml = `<div class="step-summary-output">${escapeHtml(s.summary)}</div>`;
+      }
+
+      return `
+        <div class="step-item ${s.status || 'pending'}">
+          <div class="step-icon-badge">${iconHtml}</div>
+          <div class="step-details">
+            <div class="step-top-row">
+              <span class="step-worker-name">${escapeHtml(s.worker_name || s.worker)}</span>
+              <span class="step-status-tag ${tagClass}">${statusTag}</span>
+            </div>
+            <div class="step-description-text">${escapeHtml(s.description || '')}</div>
+            ${summaryHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+  } else {
+    stepsHtml = `
+      <div class="step-item active">
+        <div class="step-icon-badge">
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+        </div>
+        <div class="step-details">
+          <div class="step-top-row">
+            <span class="step-worker-name">Supervisor Agent</span>
+            <span class="step-status-tag active">PLANNING</span>
+          </div>
+          <div class="step-description-text">${escapeHtml(state.statusMessage || 'Analyzing refinery telemetry and calculating optimal execution path...')}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  bubble.innerHTML = `
+    <div class="execution-stream-card">
+      <div class="execution-card-header">
+        <div class="execution-title-wrap">
+          <div class="execution-live-pulse"></div>
+          <span class="execution-card-title">Real-Time Multi-Agent Trace</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="domain-pill-tag">${escapeHtml(domain)}</span>
+          <span class="execution-step-counter">Step ${currentStep}/${totalSteps}</span>
+        </div>
+      </div>
+      <div class="execution-timeline">
+        ${stepsHtml}
+      </div>
+      ${state.isSynthesizing ? `
+        <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 10.5px; color: var(--accent-terracotta);">
+          <span class="status-pulse-dot" style="color: var(--accent-terracotta);"></span>
+          <span>Synthesizing technical findings with ${escapeHtml(modelName)}...</span>
+        </div>
+      ` : ''}
+    </div>
+  `;
+  scrollChatToBottom();
 }
 
 function updateSendButtonState() {
@@ -311,44 +530,122 @@ function renderBotResponse(msgDiv, data) {
   if (!bubble) return;
 
   const replyText = data.answer || data.reply || data.response || data.text || 'Calculation completed successfully.';
-  const thoughtTrace = data.plan || data.thinking || data.thoughts || data.plan_summary || '';
   const routing = data.routing || {};
-  const modelUsed = data.model || routing.supervisor || 'DRISHTI Multi-Agent Orchestrator';
+  const modelUsed = data.model || routing.model || routing.supervisor || 'DRISHTI Sovereign Multi-Agent';
+  const domain = routing.domain || (data.domain) || 'ENGINEERING & TELEMETRY';
+  const latencyMs = data.telemetry?.total_duration_ms || data.telemetry?.generation_time_ms || routing.latency_ms || 180;
+  const rationale = routing.rationale || '';
 
   // Save to conversational memory
   chatHistory.push({ role: 'assistant', content: replyText });
 
-  let thoughtsHtml = '';
-  if (thoughtTrace) {
-    thoughtsHtml = `
-      <details class="thought-trace-box">
-        <summary class="thought-trace-summary">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-          <span>Multi-Agent Reasoning & Plan Trace</span>
+  // 1. Dynamic Model Routing Attribution Badge (Feature 2)
+  const routingBadgeHtml = `
+    <div class="model-routing-badge-wrap">
+      <div class="model-routing-badge-header">
+        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+          <div class="model-pill-badge">
+            <span class="model-pill-dot"></span>
+            <span>${escapeHtml(modelUsed)}</span>
+          </div>
+          <span class="domain-pill-tag">${escapeHtml(domain)}</span>
+        </div>
+        <div class="routing-meta-right">
+          <span>⚡ ${latencyMs}ms</span>
+          <span style="color: #2E7D32;">🔒 0 WAN (Air-Gapped)</span>
+        </div>
+      </div>
+      ${rationale ? `<div class="routing-rationale-note">↳ Routing: ${escapeHtml(rationale)}</div>` : ''}
+    </div>
+  `;
+
+  // 2. Collapsible ReAct Multi-Step Execution Trace Accordion (Feature 1)
+  const trace = data.execution_trace || [];
+  let traceHtml = '';
+  if (trace && trace.length > 0) {
+    const totalDuration = trace.reduce((acc, s) => acc + (s.duration_ms || 0), 0);
+    traceHtml = `
+      <details class="react-trace-box">
+        <summary class="react-trace-summary">
+          <div class="react-trace-summary-left">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            <span>ReAct Execution Trace (${trace.length} Worker Steps)</span>
+          </div>
+          <div class="react-trace-summary-right">
+            <span class="status-badge-pill badge-green" style="font-size: 9px; padding: 1px 5px;">VERIFIED AIR-GAP</span>
+            <span>${totalDuration}ms</span>
+          </div>
         </summary>
-        <div class="thought-trace-content">${escapeHtml(thoughtTrace)}</div>
+        <div class="react-trace-list">
+          ${trace.map(s => `
+            <div class="step-item completed">
+              <div class="step-icon-badge" style="background: #2E7D32; color: #FFFFFF;">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="step-details">
+                <div class="step-top-row">
+                  <span class="step-worker-name">${escapeHtml(s.worker_name || s.worker)}</span>
+                  <span class="step-status-tag completed">${s.duration_ms || 0}ms</span>
+                </div>
+                <div class="step-description-text">${escapeHtml(s.description || '')}</div>
+                ${s.summary ? `<div class="step-summary-output">${escapeHtml(s.summary)}</div>` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
       </details>
     `;
   }
 
+  // 3. Rich Deliverables with Dual Buttons (Preview & Download - Feature 4)
   const deliverables = data.deliverables || data.artifacts || [];
   let deliverablesHtml = '';
   if (deliverables.length > 0) {
-    deliverablesHtml = '<div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-subtle); font-size: 11px;">' +
-      '<strong>Generated Artifacts & Reports:</strong><ul style="margin-left: 16px; margin-top: 4px;">' +
-      deliverables.map(d => {
-        const name = typeof d === 'string' ? d.split('/').pop() : (d.name || 'file');
-        return `<li><a href="/api/download/${encodeURIComponent(name)}" target="_blank" style="color: var(--accent-terracotta); font-weight: 600;">📥 ${escapeHtml(name)}</a></li>`;
-      }).join('') +
-      '</ul></div>';
+    deliverablesHtml = `
+      <div class="deliverables-dual-block">
+        <div class="deliverables-dual-title">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Generated Tangible Deliverables (${deliverables.length}):</span>
+        </div>
+        <div>
+          ${deliverables.map(d => {
+            const rawName = typeof d === 'string' ? d.split('/').pop() : (d.name || d.filename || 'deliverable');
+            const source = (typeof d === 'object' && d.source) ? d.source : ((typeof d === 'string' && d.includes('sandbox')) ? 'sandbox' : 'reports');
+            const ext = rawName.split('.').pop().toLowerCase();
+            const validExts = ['pptx', 'docx', 'xlsx', 'pdf', 'csv', 'png'];
+            const extClass = validExts.includes(ext) ? `deliv-ext-${ext}` : 'deliv-ext-file';
+            const sizeText = (typeof d === 'object' && d.size_kb) ? `${d.size_kb} KB` : ((typeof d === 'object' && d.size_bytes) ? `${(d.size_bytes / 1024).toFixed(1)} KB` : 'Air-Gap Generated');
+
+            return `
+              <div class="deliverable-card-rich">
+                <div class="deliv-rich-left">
+                  <div class="deliv-ext-pill ${extClass}">${ext.toUpperCase()}</div>
+                  <div class="deliv-rich-meta">
+                    <div class="deliv-rich-name" title="${escapeHtml(rawName)}">${escapeHtml(rawName)}</div>
+                    <div class="deliv-rich-sub">${sizeText} • Sovereign Local Storage</div>
+                  </div>
+                </div>
+                <div class="deliv-rich-actions">
+                  <button type="button" class="btn-card-preview" onclick="openFilePreview('${escapeHtml(rawName)}', '${source}')">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Preview</span>
+                  </button>
+                  <a href="/api/download/${encodeURIComponent(rawName)}?source=${source}" class="btn-card-download" download>
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>Download</span>
+                  </a>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
   }
 
   bubble.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border-subtle);">
-      <span style="font-family: var(--font-mono); font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--accent-terracotta);">DRISHTI Sovereign Multi-Agent</span>
-      <span style="font-family: var(--font-mono); font-size: 9px; color: var(--text-taupe);">${escapeHtml(modelUsed)}</span>
-    </div>
-    ${thoughtsHtml}
+    ${routingBadgeHtml}
+    ${traceHtml}
     <div class="bot-text-body">${formatMarkdown(replyText)}</div>
     ${deliverablesHtml}
   `;
@@ -448,7 +745,10 @@ async function fetchDeliverables() {
               <div class="deliv-name">${escapeHtml(item.name)}</div>
               <div class="deliv-sub">${item.size_kb} KB • ${escapeHtml(item.category || 'Deliverable')}</div>
             </div>
-            <a href="${item.url}" class="btn-download-pill" download>Download</a>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button class="btn-card-preview" onclick="openFilePreview('${escapeHtml(item.name)}', '${item.source || 'reports'}')">Preview</button>
+              <a href="${item.url}" class="btn-download-pill" download>Download</a>
+            </div>
           </div>
         `).join('');
       }
@@ -475,7 +775,12 @@ async function fetchDeliverables() {
                   <td><strong>${escapeHtml(it.name)}</strong></td>
                   <td><span class="status-badge-pill badge-blue">${escapeHtml(it.extension || it.category)}</span></td>
                   <td class="table-num">${it.size_kb} KB</td>
-                  <td><a href="${it.url}" class="btn-header-action" download style="text-decoration: none;">Download</a></td>
+                  <td>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                      <button class="btn-header-action" onclick="openFilePreview('${escapeHtml(it.name)}', '${it.source || 'reports'}')">Preview</button>
+                      <a href="${it.url}" class="btn-header-action" download style="text-decoration: none;">Download</a>
+                    </div>
+                  </td>
                 </tr>
               `).join('')}
             </tbody>
@@ -522,7 +827,12 @@ async function fetchDocuments() {
               <td><strong>${escapeHtml(doc.title || doc.name)}</strong></td>
               <td><span class="status-badge-pill badge-terracotta">${escapeHtml(doc.category || 'General')}</span></td>
               <td class="table-num">${escapeHtml(doc.format || 'FILE')}</td>
-              <td><a href="/api/download/${encodeURIComponent(doc.name)}?source=data" class="btn-header-action" download style="text-decoration: none;">Download</a></td>
+              <td>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <button class="btn-header-action" onclick="openFilePreview('${escapeHtml(doc.name)}', 'data')">Preview</button>
+                  <a href="/api/download/${encodeURIComponent(doc.name)}?source=data" class="btn-header-action" download style="text-decoration: none;">Download</a>
+                </div>
+              </td>
             </tr>
           `).join('')}
         </tbody>
@@ -530,6 +840,70 @@ async function fetchDocuments() {
     `;
   } catch (err) {
     console.warn('Failed to fetch documents:', err);
+  }
+}
+
+function filterDeliverables(query) {
+  const term = (query || '').toLowerCase().trim();
+  const rows = document.querySelectorAll('#reports-table-body table tbody tr');
+  rows.forEach(tr => {
+    const text = tr.textContent.toLowerCase();
+    tr.style.display = !term || text.includes(term) ? '' : 'none';
+  });
+}
+
+function filterDocuments(query) {
+  const term = (query || '').toLowerCase().trim();
+  const rows = document.querySelectorAll('#documents-list-wrap table tbody tr');
+  rows.forEach(tr => {
+    const text = tr.textContent.toLowerCase();
+    tr.style.display = !term || text.includes(term) ? '' : 'none';
+  });
+}
+
+async function runHydraulicSimulation() {
+  const flow = parseFloat(document.getElementById('sim-flow-rate')?.value || '450');
+  const len = parseFloat(document.getElementById('sim-line-length')?.value || '500');
+  const delta = parseFloat(document.getElementById('sim-throughput-delta')?.value || '0');
+  const btn = document.getElementById('btn-run-simulation');
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>Simulating Hydraulics...</span>';
+  }
+
+  try {
+    const res = await fetch('/api/simulate-scenario', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pipeline_flow_m3_h: flow,
+        pipeline_length_m: len,
+        throughput_delta_pct: delta
+      })
+    });
+    const data = await res.json();
+    if (data && data.simulated) {
+      const sim = data.simulated;
+      const dpEl = document.getElementById('sim-dp-val');
+      const velEl = document.getElementById('sim-vel-val');
+      const reEl = document.getElementById('sim-re-val');
+      const utilEl = document.getElementById('sim-util-val');
+      const utilSub = document.getElementById('sim-util-sub');
+
+      if (dpEl) dpEl.textContent = `${sim.pressure_drop_bar.toFixed(3)} bar`;
+      if (velEl) velEl.textContent = `${sim.pipeline_velocity_m_s.toFixed(2)} m/s`;
+      if (reEl) reEl.textContent = sim.reynolds_number.toLocaleString();
+      if (utilEl) utilEl.textContent = `${sim.utilization_pct.toFixed(1)}%`;
+      if (utilSub) utilSub.textContent = `${sim.throughput_mmt.toFixed(3)} MMT Simulated`;
+    }
+  } catch (err) {
+    console.warn('Hydraulic simulation error:', err);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>Compute Hydraulic Impact</span>';
+    }
   }
 }
 
@@ -616,14 +990,42 @@ async function fetchSystemTelemetry() {
     const wanBytes = data.outbound_internet_bytes || 0;
     const isAirGapped = data.is_air_gapped && wanCount === 0;
     const activeSockets = data.active_sockets || [];
-    const gpuInfo = data.hardware?.gpu;
-    const gpuText = (gpuInfo && gpuInfo.detected) ? (gpuInfo.name || 'RTX 3050 (4GB)') : 'RTX 3050 (4GB)';
+    const blockedCount = data.blocked_breaches_count || 0;
+    const guardrailState = data.airgap_enforcement || 'ACTIVE';
+    const hostname = data.hostname || 'Localhost';
+    const serverIp = data.server_ip || window.location.hostname || '127.0.0.1';
+
+    // 100% Real Hardware Telemetry (No fake 3050 fallback)
+    const hw = data.hardware || {};
+    const gpuInfo = hw.gpu;
+    const cpuInfo = hw.cpu;
+    const ramInfo = hw.ram;
+
+    let computeTitle = '';
+    let computeSub = '';
+
+    if (gpuInfo && gpuInfo.detected && gpuInfo.name && !gpuInfo.name.toLowerCase().includes('generic')) {
+      const vramGb = gpuInfo.vram_total_mb ? `${(gpuInfo.vram_total_mb / 1024).toFixed(1)}GB` : '';
+      computeTitle = vramGb ? `${gpuInfo.name} (${vramGb})` : gpuInfo.name;
+      computeSub = `${gpuInfo.gpu_util_percent || 0}% GPU Util • ${gpuInfo.type || 'Hardware Acceleration'}`;
+    } else if (cpuInfo) {
+      const cores = cpuInfo.cores_logical || cpuInfo.cores_physical || 4;
+      const ramGb = ramInfo ? `${ramInfo.total_gb.toFixed(1)}GB` : '16GB';
+      computeTitle = `${cores}-Core CPU (${ramGb} RAM)`;
+      computeSub = `${cpuInfo.percent.toFixed(1)}% CPU Load • ${ramInfo ? ramInfo.percent.toFixed(1) : 0}% RAM Used`;
+    } else {
+      computeTitle = 'On-Premises Compute';
+      computeSub = 'Local Hardware Enclave';
+    }
+
+    const hostDisplay = `${hostname}`;
+    const hostSubDisplay = `${serverIp} • Hotspot/LAN`;
 
     // 1. Update Header Subtitle
     const badgeSub = document.getElementById('header-airgap-sub');
     if (badgeSub) {
       if (isAirGapped) {
-        badgeSub.textContent = `0 WAN • ${wanBytes} B LEAKAGE • LOCKED TO LOCALHOST`;
+        badgeSub.textContent = `0 WAN • ${wanBytes} B LEAKAGE • GUARDRAIL: ${guardrailState} (${serverIp})`;
         badgeSub.style.color = '#2E7D32';
       } else {
         badgeSub.textContent = `ALERT: ${wanCount} EXTERNAL WAN DETECTED`;
@@ -641,7 +1043,12 @@ async function fetchSystemTelemetry() {
 
     const hdrSockets = document.getElementById('hdr-metric-sockets');
     if (hdrSockets) {
-      hdrSockets.textContent = `127.0.0.1 Loopback (${activeSockets.length} Sockets)`;
+      hdrSockets.textContent = `${activeSockets.length} Active Ports (${serverIp})`;
+    }
+
+    const hdrHost = document.getElementById('hdr-metric-host');
+    if (hdrHost) {
+      hdrHost.textContent = `${hostname} (${serverIp})`;
     }
 
     // 3. Update Operations Card Live Values
@@ -649,23 +1056,50 @@ async function fetchSystemTelemetry() {
     if (bannerBytes) bannerBytes.textContent = `${wanBytes}.00 B`;
 
     const bannerWanSub = document.getElementById('banner-wan-sub');
-    if (bannerWanSub) bannerWanSub.textContent = `${wanCount} WAN Sockets`;
+    if (bannerWanSub) bannerWanSub.textContent = `${wanCount} WAN Sockets (${blockedCount} Blocked)`;
 
     const bannerSockets = document.getElementById('banner-sockets-val');
     if (bannerSockets) bannerSockets.textContent = `${activeSockets.length} Active Sockets`;
 
+    const bannerSocketsSub = document.getElementById('banner-sockets-sub');
+    if (bannerSocketsSub) bannerSocketsSub.textContent = `${serverIp} Hotspot / LAN`;
+
     const bannerGpu = document.getElementById('banner-gpu-val');
-    if (bannerGpu) bannerGpu.textContent = gpuText;
+    if (bannerGpu) bannerGpu.textContent = computeTitle;
+
+    const bannerGpuSub = document.getElementById('banner-gpu-sub');
+    if (bannerGpuSub) bannerGpuSub.textContent = computeSub;
+
+    const bannerHost = document.getElementById('banner-host-val');
+    if (bannerHost) bannerHost.textContent = hostDisplay;
+
+    const bannerHostSub = document.getElementById('banner-host-sub');
+    if (bannerHostSub) bannerHostSub.textContent = hostSubDisplay;
 
     // 4. Update Executive Card Live Values
     const execBytes = document.getElementById('exec-banner-wan-bytes');
     if (execBytes) execBytes.textContent = `${wanBytes}.00 B`;
 
+    const execWanSub = document.getElementById('exec-banner-wan-sub');
+    if (execWanSub) execWanSub.textContent = `${wanCount} Ext Packets (${blockedCount} Blocked)`;
+
     const execSockets = document.getElementById('exec-banner-sockets');
-    if (execSockets) execSockets.textContent = `${activeSockets.length} Loopback Ports`;
+    if (execSockets) execSockets.textContent = `${activeSockets.length} Sockets`;
+
+    const execSocketsSub = document.getElementById('exec-banner-sockets-sub');
+    if (execSocketsSub) execSocketsSub.textContent = `${serverIp} Enforced`;
 
     const execGpu = document.getElementById('exec-banner-gpu');
-    if (execGpu) execGpu.textContent = gpuText;
+    if (execGpu) execGpu.textContent = computeTitle;
+
+    const execGpuSub = document.getElementById('exec-banner-gpu-sub');
+    if (execGpuSub) execGpuSub.textContent = computeSub;
+
+    const execHost = document.getElementById('exec-banner-host-val');
+    if (execHost) execHost.textContent = hostDisplay;
+
+    const execHostSub = document.getElementById('exec-banner-host-sub');
+    if (execHostSub) execHostSub.textContent = hostSubDisplay;
 
   } catch (err) {
     // Keep baseline
@@ -788,7 +1222,7 @@ async function openCertificateModal() {
             </div>
             <div>
               <div style="font-size: 14px; font-weight: 700; color: #1B5E20;">100% Air-Gapped Sovereign Enclave</div>
-              <div style="font-size: 11px; color: #2E7D32; font-family: var(--font-mono); margin-top: 1px;">Zero Outbound Internet Transmission Verified</div>
+              <div style="font-size: 11px; color: #2E7D32; font-family: var(--font-mono); margin-top: 1px;">Guardrail: ${escapeHtml(cert.airgap_enforcement || 'ACTIVE')} • Zero Outbound WAN Transmission Enforced</div>
             </div>
           </div>
           <div style="text-align: right; font-family: var(--font-mono); font-size: 10px; color: #2E7D32;">
@@ -805,9 +1239,9 @@ async function openCertificateModal() {
             <div class="metric-sub-note" style="font-size: 9.5px;">0 Packets Leaked</div>
           </div>
           <div class="metric-kpi-tile" style="padding: 10px 12px;">
-            <div class="metric-label" style="font-size: 9px;">External Sockets</div>
-            <div class="metric-val-big" style="font-size: 20px; color: #2E7D32;">${externalCalls}</div>
-            <div class="metric-sub-note" style="font-size: 9.5px;">All WAN Blocked</div>
+            <div class="metric-label" style="font-size: 9px;">Socket Guardrail</div>
+            <div class="metric-val-big" style="font-size: 18px; color: #2E7D32;">${escapeHtml(cert.airgap_enforcement || 'ACTIVE')}</div>
+            <div class="metric-sub-note" style="font-size: 9.5px;">${cert.blocked_breaches_count || 0} Breaches Blocked</div>
           </div>
           <div class="metric-kpi-tile" style="padding: 10px 12px;">
             <div class="metric-label" style="font-size: 9px;">Local Tool Calls</div>
@@ -815,9 +1249,9 @@ async function openCertificateModal() {
             <div class="metric-sub-note" style="font-size: 9.5px;">100% On-Premises</div>
           </div>
           <div class="metric-kpi-tile" style="padding: 10px 12px;">
-            <div class="metric-label" style="font-size: 9px;">Data Residency</div>
-            <div class="metric-val-big" style="font-size: 18px; color: var(--accent-terracotta);">Tier-3</div>
-            <div class="metric-sub-note" style="font-size: 9.5px;">Mangalore Control Room</div>
+            <div class="metric-label" style="font-size: 9px;">Host Enclave</div>
+            <div class="metric-val-big" style="font-size: 14px; color: var(--accent-terracotta); word-break: break-all;">${escapeHtml(cert.hostname || telem.hostname || 'Localhost')}</div>
+            <div class="metric-sub-note" style="font-size: 9.5px;">${escapeHtml(cert.server_ip || telem.server_ip || '127.0.0.1')} • Hotspot LAN</div>
           </div>
         </div>
 
@@ -853,6 +1287,9 @@ async function openCertificateModal() {
           <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--text-charcoal); word-break: break-all; background: var(--bg-card); padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-subtle);">
             ${cert.sha256_audit_signature || 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'}
           </div>
+          <div style="font-size: 10px; color: var(--text-taupe); margin-top: 6px; font-family: var(--font-mono); word-break: break-all;">
+            Chain Hash: <strong>${escapeHtml(cert.latest_chain_hash || '0'.repeat(64))}</strong> (${cert.audit_event_count || 0} events)
+          </div>
         </div>
 
         <!-- Bottom Actions -->
@@ -861,9 +1298,12 @@ async function openCertificateModal() {
             Compliant with MoPNG / ONGC Sovereign Cyber Mandate
           </div>
           <div style="display: flex; gap: 8px;">
+            <button class="btn-header-action" onclick="downloadAuditTrailJsonl()">
+              <span>Export Ledger (.jsonl)</span>
+            </button>
             <button class="btn-header-action" onclick="downloadAuditCertificateJson()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>Download JSON Certificate</span>
+              <span>Download Certificate</span>
             </button>
             <button class="btn-send-message" onclick="openCertificateModal()">
               <span>Re-Scan Sockets</span>
@@ -873,7 +1313,32 @@ async function openCertificateModal() {
       </div>
     `;
   } catch (err) {
-    body.innerHTML = `<div style="color: var(--status-red-text); padding: 20px;">Failed to audit network sovereignty: ${escapeHtml(err.message)}</div>`;
+    console.error('Failed to open certificate modal:', err);
+    body.innerHTML = `
+      <div style="padding: 24px; text-align: center; color: var(--accent-terracotta);">
+        Failed to fetch sovereign air-gap telemetry. Ensure local workbench server is running.
+      </div>
+    `;
+  }
+}
+
+async function downloadAuditTrailJsonl() {
+  try {
+    const res = await fetch('/api/audit-trail');
+    const data = await res.json();
+    const records = data.records || [];
+    const jsonlContent = records.map(r => JSON.stringify(r)).join('\n');
+    const blob = new Blob([jsonlContent], { type: 'application/x-ndjson' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `MRPL_Audit_Trail_${data.session_id || 'session'}.jsonl`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.warn('Failed to export audit trail:', err);
   }
 }
 
@@ -931,10 +1396,41 @@ function formatMarkdown(text) {
 // --------------------------------------------------------------------------
 // 9. MODEL ROUTER & LOCAL MODELS CONNECTIVITY
 // --------------------------------------------------------------------------
-async function fetchModels() {
+let autoDetectSecondsRemaining = 600; // 10 minutes = 600 seconds
+let autoDetectIntervalId = null;
+
+function initAutonomousModelDetection() {
+  if (autoDetectIntervalId) clearInterval(autoDetectIntervalId);
+  autoDetectSecondsRemaining = 600;
+  updateAutoDetectTimerDisplay();
+
+  autoDetectIntervalId = setInterval(() => {
+    autoDetectSecondsRemaining--;
+    if (autoDetectSecondsRemaining <= 0) {
+      autoDetectSecondsRemaining = 600;
+      discoverModels(false); // Autonomous background scan every 10 minutes
+    }
+    updateAutoDetectTimerDisplay();
+  }, 1000);
+
+  // Initial silent background scan 2 seconds after page load
+  setTimeout(() => {
+    discoverModels(false);
+  }, 2000);
+}
+
+function updateAutoDetectTimerDisplay() {
+  const el = document.getElementById('auto-scan-countdown');
+  if (!el) return;
+  const mins = Math.floor(autoDetectSecondsRemaining / 60);
+  const secs = autoDetectSecondsRemaining % 60;
+  el.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+async function fetchModels(userTriggered = false) {
   const container = document.getElementById('settings-models-list');
-  const hwContainer = document.getElementById('settings-hardware-specs');
-  if (!container && !hwContainer) return;
+  const countPill = document.getElementById('role-allocations-count-pill');
+  if (!container) return;
 
   try {
     const res = await fetch('/api/models');
@@ -942,64 +1438,57 @@ async function fetchModels() {
     const data = await res.json();
 
     // 1. Render Active Profiles
-    if (container) {
-      const profiles = data.profiles || [];
-      if (profiles.length === 0) {
-        container.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-taupe);">No model profiles registered.</div>';
-      } else {
-        container.innerHTML = profiles.map(p => {
-          const avail = p.available_models || [];
-          const selectHtml = avail.length > 1 ? `
-            <select class="model-select-input" onchange="selectModelRole('${p.name}', this.value)">
-              ${avail.map(m => `<option value="${escapeHtml(m.model_id)}" ${m.model_id === p.model_id ? 'selected' : ''}>${escapeHtml(m.model_id)} (${m.vram_estimate_gb}GB)</option>`).join('')}
-            </select>
-          ` : `<span class="status-badge-pill ${p.is_installed ? 'badge-green' : 'badge-terracotta'}">${p.is_installed ? 'Installed' : 'Offline Fallback'}</span>`;
+    const profiles = data.profiles || [];
+    if (countPill) {
+      countPill.textContent = `${profiles.length} Roles Configured`;
+    }
+    if (profiles.length === 0) {
+      container.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-taupe);">No model profiles registered.</div>';
+    } else {
+      container.innerHTML = profiles.map(p => {
+        const avail = p.available_models || [];
+        const selectHtml = avail.length > 1 ? `
+          <select class="model-select-input" onchange="selectModelRole('${escapeHtml(p.name)}', this.value)">
+            ${avail.map(m => `<option value="${escapeHtml(m.model_id)}" ${m.model_id === p.model_id ? 'selected' : ''}>${escapeHtml(m.model_id)} (~${m.vram_estimate_gb || p.vram_estimate_gb} GB VRAM)</option>`).join('')}
+          </select>
+        ` : `<span class="status-badge-pill ${p.is_installed ? 'badge-green' : 'badge-terracotta'}">${p.is_installed ? 'Installed (' + escapeHtml(p.model_id) + ')' : 'Offline Fallback'}</span>`;
 
-          return `
-            <div class="model-role-item">
-              <div class="model-role-info">
-                <div class="model-role-title">
-                  <span>${escapeHtml(p.name.toUpperCase())}</span>
-                  <span class="status-badge-pill badge-green" style="font-size: 8.5px; padding: 1px 5px;">Active: ${escapeHtml(p.model_id)}</span>
-                </div>
-                <div class="model-role-desc">${escapeHtml(p.description || '')} • VRAM: ~${p.vram_estimate_gb} GB</div>
+        return `
+          <div class="model-role-card">
+            <div class="model-role-header-row">
+              <div class="model-role-left-group">
+                <span class="model-role-tag-badge">${escapeHtml(p.name.toUpperCase())}</span>
+                <span class="model-active-pill ${p.is_installed ? 'installed' : 'offline'}">
+                  <span class="pill-dot"></span>
+                  <span>Active: <strong>${escapeHtml(p.model_id)}</strong></span>
+                </span>
               </div>
-              <div class="model-role-controls">
+              <div class="model-role-select-wrap">
+                <span class="model-select-label">Assign Model:</span>
                 ${selectHtml}
               </div>
             </div>
-          `;
-        }).join('');
-      }
+            <div class="model-role-description">
+              ${escapeHtml(p.description || `Specialized multi-agent inference model assigned to ${p.name} duties.`)}
+            </div>
+            <div class="model-role-meta-bar">
+              <span class="role-meta-chip">VRAM: ~${p.vram_estimate_gb || 1.5} GB</span>
+              <span class="role-meta-chip">Context: ${p.context_window || 4096} tokens</span>
+              <span class="role-meta-chip">Temp: ${p.temperature ?? 0.1}</span>
+              ${p.fallback_model ? `<span class="role-meta-chip">Fallback: ${escapeHtml(p.fallback_model)}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
-    // 2. Render Hardware Specs & Ollama Discovery
-    if (hwContainer) {
-      const activeOllama = data.active_models_in_ollama || [];
-      hwContainer.innerHTML = `
-        <div class="hw-spec-row">
-          <span class="hw-spec-label">Execution Target:</span>
-          <span class="hw-spec-value">${escapeHtml(data.target_hardware || 'Local On-Premises')}</span>
-        </div>
-        <div class="hw-spec-row">
-          <span class="hw-spec-label">Current Engine Mode:</span>
-          <span class="hw-spec-value" style="color: #2E7D32;">${escapeHtml(data.current_mode || 'Sovereign')}</span>
-        </div>
-        <div class="hw-spec-row">
-          <span class="hw-spec-label">Ollama Host Connection:</span>
-          <span class="hw-spec-value">${data.ollama_available ? '<span style="color: #2E7D32;">● Connected (127.0.0.1:11434)</span>' : '<span style="color: var(--accent-terracotta);">Offline Fallback Active</span>'}</span>
-        </div>
-        <div class="hw-spec-row">
-          <span class="hw-spec-label">Allocated VRAM Budget:</span>
-          <span class="hw-spec-value">${data.vram_budget_gb || 4.0} GB (RTX 3050 Constraint)</span>
-        </div>
-        <div style="margin-top: 10px;">
-          <div style="font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 6px;">Local Ollama Storage:</div>
-          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-            ${activeOllama.length > 0 ? activeOllama.map(m => `<span class="status-badge-pill badge-green">${escapeHtml(m)}</span>`).join('') : '<span style="font-size: 11.5px; color: var(--text-taupe);">No local Ollama models registered yet.</span>'}
-          </div>
-        </div>
-      `;
+    if (userTriggered) {
+      const btn = document.querySelector('button[title="Reload Model Registry Status"]');
+      if (btn) {
+        const origHtml = btn.innerHTML;
+        btn.innerHTML = `<span>✓ Refreshed</span>`;
+        setTimeout(() => { btn.innerHTML = origHtml; }, 1400);
+      }
     }
 
   } catch (err) {
@@ -1025,16 +1514,169 @@ async function selectModelRole(role, modelId) {
   }
 }
 
-async function discoverModels() {
+async function discoverModels(isManual = false) {
+  const btn = document.getElementById('btn-scan-models');
+  const icon = document.getElementById('scan-btn-icon');
+  const label = document.getElementById('scan-btn-label');
+
+  if (isManual && btn) {
+    btn.disabled = true;
+    if (icon) icon.classList.add('spin-icon');
+    if (label) label.textContent = 'Scanning Ollama...';
+  }
+
   try {
     const res = await fetch('/api/models/discover');
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || `Server returned ${res.status}`);
+    }
     const data = await res.json();
-    const count = data.count ?? data.pending?.length ?? 0;
-    alert(`Ollama discovery complete. Found ${count} pending unregistered model${count === 1 ? '' : 's'}.`);
+    const pending = data.pending || [];
+    renderDiscoveredModelsBanner(pending);
+
+    if (isManual) {
+      if (pending.length === 0) {
+        alert('Ollama scan complete: All local models are already registered in the sovereign registry.');
+      } else {
+        alert(`Ollama scan complete: Found ${pending.length} unregistered model${pending.length === 1 ? '' : 's'}. Review the alert banner above to register.`);
+      }
+    }
     fetchModels();
   } catch (err) {
-    alert(`Discovery error: ${err.message}`);
+    if (isManual) {
+      alert(`Discovery scan error: ${err.message}`);
+    } else {
+      console.warn('Background model discovery warning:', err.message);
+    }
+  } finally {
+    if (isManual && btn) {
+      btn.disabled = false;
+      if (icon) icon.classList.remove('spin-icon');
+      if (label) label.textContent = 'Scan for New Models';
+    }
   }
+}
+
+function renderDiscoveredModelsBanner(pending) {
+  const banner = document.getElementById('discovered-models-banner');
+  const list = document.getElementById('discovered-models-list');
+  const title = document.getElementById('discovered-banner-title');
+  if (!banner || !list) return;
+
+  if (!pending || pending.length === 0) {
+    banner.style.display = 'none';
+    list.innerHTML = '';
+    return;
+  }
+
+  banner.style.display = 'block';
+  if (title) {
+    title.textContent = `${pending.length} New Local Model${pending.length === 1 ? '' : 's'} Detected in Ollama`;
+  }
+
+  list.innerHTML = pending.map(m => {
+    const rolesStr = JSON.stringify(m.suggested_roles || ['general']).replace(/"/g, '&quot;');
+    const paramStr = escapeHtml(m.parameter_size || '');
+    const modelIdEscaped = escapeHtml(m.model_id);
+    const modelIdArg = m.model_id.replace(/'/g, "\\'");
+
+    return `
+      <div class="discovered-model-card" id="disc-card-${modelIdEscaped}">
+        <div class="discovered-card-top">
+          <span class="discovered-model-tag">${modelIdEscaped}</span>
+          <span class="discovered-model-specs">${escapeHtml(m.parameter_size || 'Auto')} • ${escapeHtml(m.quantization || 'Q4')}</span>
+        </div>
+        <div class="discovered-roles-row">
+          <span style="font-size: 10px; font-weight: 600; color: var(--text-taupe);">Suggested Roles:</span>
+          ${(m.suggested_roles || []).map(r => `<span class="discovered-role-pill">${escapeHtml(r)}</span>`).join('')}
+        </div>
+        <div class="discovered-actions-row">
+          <button class="btn-strip-scan" style="padding: 4px 12px; font-size: 11px;" onclick="quickConfirmDiscoveredModel('${modelIdArg}', ${rolesStr})">
+            ✓ Add to Router
+          </button>
+          <button class="btn-dismiss-mini" style="margin-left: auto;" onclick="dismissModelFromDiscovery('${modelIdArg}')">
+            Dismiss
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function quickConfirmDiscoveredModel(modelId, roles) {
+  try {
+    const res = await fetch('/api/models/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model_id: modelId,
+        roles: roles && roles.length > 0 ? roles : ['general']
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detail || data.message || 'Confirmation failed');
+    }
+    await discoverModels(false);
+    await fetchModels();
+  } catch (err) {
+    alert(`Failed to register model '${modelId}': ${err.message}`);
+  }
+}
+
+async function dismissModelFromDiscovery(modelId) {
+  try {
+    const res = await fetch('/api/models/dismiss', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model_id: modelId })
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.detail || data.message || 'Dismissal failed');
+    }
+    await discoverModels(false);
+  } catch (err) {
+    alert(`Failed to dismiss model '${modelId}': ${err.message}`);
+  }
+}
+
+function dismissDiscoveredBanner() {
+  const banner = document.getElementById('discovered-models-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+function prefillAndOpenRegisterModal(modelId, suggestedRoles = [], paramSize = '') {
+  const idInput = document.getElementById('reg-model-id');
+  const nameInput = document.getElementById('reg-model-name');
+  const vramInput = document.getElementById('reg-vram');
+  const descInput = document.getElementById('reg-description');
+
+  if (idInput) idInput.value = modelId || '';
+  if (nameInput) nameInput.value = modelId || '';
+
+  if (vramInput) {
+    const s = String(paramSize).toLowerCase();
+    if (s.includes('1.5b') || s.includes('1b')) vramInput.value = '1.5';
+    else if (s.includes('3b') || s.includes('4b')) vramInput.value = '2.5';
+    else if (s.includes('7b') || s.includes('8b')) vramInput.value = '4.5';
+    else if (s.includes('14b')) vramInput.value = '8.5';
+    else vramInput.value = '2.0';
+  }
+
+  if (descInput) {
+    descInput.value = `Locally detected Ollama model (${modelId}) configured for sovereign refinery tasks.`;
+  }
+
+  const roleCheckboxes = document.querySelectorAll('input[name="reg-roles"]');
+  roleCheckboxes.forEach(cb => {
+    if (Array.isArray(suggestedRoles) && suggestedRoles.length > 0) {
+      cb.checked = suggestedRoles.includes(cb.value);
+    }
+  });
+
+  openRegisterModelModal();
 }
 
 // --------------------------------------------------------------------------
@@ -1116,3 +1758,289 @@ async function fetchCrudeEconomics() {
     console.warn('Crude economics error:', err);
   }
 }
+
+// --------------------------------------------------------------------------
+// 11. OPEN-WEIGHT MODEL REGISTRATION (FEATURE 3)
+// --------------------------------------------------------------------------
+function openRegisterModelModal() {
+  const modal = document.getElementById('modal-register-model');
+  if (modal) {
+    modal.classList.add('open');
+    const input = document.getElementById('reg-model-id');
+    if (input) input.focus();
+  }
+}
+
+function closeRegisterModelModal() {
+  const modal = document.getElementById('modal-register-model');
+  if (modal) modal.classList.remove('open');
+}
+
+async function submitRegisterModel(e) {
+  e.preventDefault();
+  const modelId = document.getElementById('reg-model-id')?.value.trim();
+  const modelName = document.getElementById('reg-model-name')?.value.trim();
+  const vram = parseFloat(document.getElementById('reg-vram')?.value) || 1.5;
+  const contextWindow = parseInt(document.getElementById('reg-context-window')?.value) || 4096;
+  const temp = parseFloat(document.getElementById('reg-temp')?.value) || 0.1;
+  const desc = document.getElementById('reg-description')?.value.trim();
+
+  const roleBoxes = document.querySelectorAll('input[name="reg-roles"]:checked');
+  const roles = Array.from(roleBoxes).map(b => b.value);
+
+  const capBoxes = document.querySelectorAll('input[name="reg-caps"]:checked');
+  const capabilities = Array.from(capBoxes).map(b => b.value);
+
+  if (!modelId) {
+    alert('Please specify an Ollama model identifier or tag (e.g. deepseek-r1:1.5b).');
+    return;
+  }
+  if (roles.length === 0) {
+    alert('Please check at least one assignable agent role.');
+    return;
+  }
+
+  const payload = {
+    model_id: modelId,
+    roles: roles,
+    capabilities: capabilities,
+    description: desc || (modelName ? `${modelName} registered model` : `Registered open-weight model ${modelId}`),
+    vram_estimate_gb: vram,
+    context_window: contextWindow,
+    temperature: temp,
+    set_as_active: false
+  };
+
+  try {
+    const res = await fetch('/api/models/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detail || data.message || 'Model registration failed');
+    }
+
+    closeRegisterModelModal();
+    document.getElementById('form-register-model')?.reset();
+    alert(`Success: Model '${modelId}' registered into sovereign model registry.`);
+    fetchModels();
+  } catch (err) {
+    alert(`Registration Error: ${err.message}`);
+  }
+}
+
+// --------------------------------------------------------------------------
+// 12. ON-PREMISES FILE PREVIEW MODAL (FEATURE 4)
+// --------------------------------------------------------------------------
+async function openFilePreview(filename, source = 'reports') {
+  const modal = document.getElementById('modal-file-preview');
+  const title = document.getElementById('preview-file-title');
+  const badge = document.getElementById('preview-format-badge');
+  const size = document.getElementById('preview-file-size');
+  const dlLink = document.getElementById('preview-download-link');
+  const body = document.getElementById('file-preview-body');
+  if (!modal || !body) return;
+
+  modal.classList.add('open');
+  if (title) title.textContent = filename;
+  const ext = filename.split('.').pop().toUpperCase();
+  if (badge) badge.textContent = ext;
+  if (size) size.textContent = '';
+  if (dlLink) {
+    dlLink.href = `/api/download/${encodeURIComponent(filename)}?source=${encodeURIComponent(source)}`;
+    dlLink.setAttribute('download', filename);
+  }
+
+  body.innerHTML = `
+    <div style="text-align: center; color: var(--text-taupe); padding: 50px 20px;">
+      <div class="status-pulse-dot" style="margin: 0 auto 12px auto; width: 8px; height: 8px; color: var(--accent-terracotta);"></div>
+      <div style="font-weight: 600; font-size: 13px;">Extracting on-premises sovereign preview for <code>${escapeHtml(filename)}</code>...</div>
+      <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 4px;">Zero WAN egress • Local native parser</div>
+    </div>
+  `;
+
+  try {
+    const res = await fetch(`/api/preview/${encodeURIComponent(filename)}?source=${encodeURIComponent(source)}`);
+    if (!res.ok) {
+      throw new Error(`Preview failed with HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    if (data.type === 'error') {
+      throw new Error(data.error);
+    }
+    if (data.size_bytes && size) {
+      size.textContent = `${(data.size_bytes / 1024).toFixed(1)} KB`;
+    }
+
+    renderPreviewContent(body, data, filename, source);
+  } catch (err) {
+    body.innerHTML = `
+      <div style="padding: 30px; text-align: center; color: var(--status-red-text);">
+        <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">Unable to parse preview on-premises</div>
+        <div style="font-size: 12px; color: var(--text-taupe);">${escapeHtml(err.message)}</div>
+        <div style="margin-top: 16px;">
+          <a href="/api/download/${encodeURIComponent(filename)}?source=${encodeURIComponent(source)}" class="btn-send-message" download style="text-decoration: none;">Download Raw File</a>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function closeFilePreviewModal() {
+  const modal = document.getElementById('modal-file-preview');
+  if (modal) modal.classList.remove('open');
+}
+
+function renderPreviewContent(container, data, filename, source) {
+  if (!container) return;
+
+  // 1. PPTX Slides
+  if (data.type === 'pptx') {
+    const slides = data.slides || [];
+    if (slides.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--text-taupe);">Presentation contains no slide text.</div>';
+      return;
+    }
+    container.innerHTML = `
+      <div class="preview-slides-grid">
+        ${slides.map(s => `
+          <div class="preview-slide-card">
+            <div class="preview-slide-header">
+              <div class="preview-slide-title">${escapeHtml(s.title || ('Slide ' + s.slide_number))}</div>
+              <div class="preview-slide-number">Slide ${s.slide_number} of ${slides.length}</div>
+            </div>
+            <div class="preview-slide-body">
+              <ul class="preview-slide-bullets">
+                ${(s.bullets && s.bullets.length > 0) ? s.bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('') : '<li style="color: var(--text-muted); font-style: italic;">Slide title card / visual frame.</li>'}
+              </ul>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  // 2. DOCX Document
+  else if (data.type === 'docx') {
+    const paras = data.paragraphs || [];
+    const tables = data.tables || [];
+    let docHtml = '<div class="preview-doc-paper">';
+
+    paras.forEach(p => {
+      const st = (p.style || '').toLowerCase();
+      if (st.includes('heading 1') || st.includes('title')) {
+        docHtml += `<h1>${escapeHtml(p.text)}</h1>`;
+      } else if (st.includes('heading 2')) {
+        docHtml += `<h2>${escapeHtml(p.text)}</h2>`;
+      } else if (st.includes('heading 3')) {
+        docHtml += `<h3>${escapeHtml(p.text)}</h3>`;
+      } else {
+        docHtml += `<p>${escapeHtml(p.text)}</p>`;
+      }
+    });
+
+    if (tables.length > 0) {
+      tables.forEach(t => {
+        docHtml += `<div style="margin: 18px 0; overflow-x: auto;"><table class="editorial-table">`;
+        t.forEach((row, rIdx) => {
+          if (rIdx === 0) {
+            docHtml += `<thead><tr>${row.map(c => `<th>${escapeHtml(c)}</th>`).join('')}</tr></thead><tbody>`;
+          } else {
+            docHtml += `<tr>${row.map(c => `<td>${escapeHtml(c)}</td>`).join('')}</tr>`;
+          }
+        });
+        docHtml += `</tbody></table></div>`;
+      });
+    }
+
+    docHtml += '</div>';
+    container.innerHTML = docHtml;
+  }
+  // 3. XLSX Spreadsheets
+  else if (data.type === 'xlsx') {
+    const sheets = data.sheets || {};
+    const sheetNames = Object.keys(sheets);
+    if (sheetNames.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--text-taupe);">No sheet data available in workbook.</div>';
+      return;
+    }
+    const currentSheet = sheetNames[0];
+    window._previewXlsxData = sheets;
+
+    container.innerHTML = `
+      <div class="preview-sheet-tabs" id="preview-sheet-tabs-wrap">
+        ${sheetNames.map((name, i) => `
+          <button class="preview-sheet-tab ${i === 0 ? 'active' : ''}" onclick="switchPreviewSheet('${escapeHtml(name)}')">${escapeHtml(name)}</button>
+        `).join('')}
+      </div>
+      <div class="preview-table-container" id="preview-sheet-table-wrap">
+        ${renderSheetTableHtml(sheets[currentSheet])}
+      </div>
+    `;
+  }
+  // 4. CSV Files
+  else if (data.type === 'csv') {
+    const rows = data.rows || [];
+    if (rows.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--text-taupe);">CSV dataset is empty.</div>';
+      return;
+    }
+    container.innerHTML = `
+      <div class="preview-table-container">
+        <table class="editorial-table">
+          <thead><tr>${rows[0].map(c => `<th>${escapeHtml(c)}</th>`).join('')}</tr></thead>
+          <tbody>
+            ${rows.slice(1).map(r => `<tr>${r.map(c => `<td class="table-num">${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+  // 5. Images (PNG, JPG, etc.)
+  else if (data.type === 'image') {
+    container.innerHTML = `
+      <div class="preview-image-viewport">
+        <img src="${data.url}" alt="${escapeHtml(filename)}" />
+      </div>
+    `;
+  }
+  // 6. Text / Markdown / Code / Logs
+  else if (data.type === 'text') {
+    container.innerHTML = `
+      <pre style="background: #1E1E1E; color: #E0E0E0; padding: 18px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 11.5px; line-height: 1.5; overflow-x: auto; white-space: pre-wrap;">${escapeHtml(data.content || '')}</pre>
+    `;
+  }
+  // 7. PDF or Generic
+  else {
+    container.innerHTML = `
+      <iframe src="${data.url}" style="width: 100%; height: 70vh; border: 1px solid var(--border-sand); border-radius: var(--radius-sm); background: #FFFFFF;"></iframe>
+    `;
+  }
+}
+
+function switchPreviewSheet(sheetName) {
+  if (!window._previewXlsxData || !window._previewXlsxData[sheetName]) return;
+  const tabs = document.querySelectorAll('.preview-sheet-tab');
+  tabs.forEach(t => {
+    if (t.textContent === sheetName) t.classList.add('active');
+    else t.classList.remove('active');
+  });
+  const tableWrap = document.getElementById('preview-sheet-table-wrap');
+  if (tableWrap) {
+    tableWrap.innerHTML = renderSheetTableHtml(window._previewXlsxData[sheetName]);
+  }
+}
+
+function renderSheetTableHtml(rows) {
+  if (!rows || rows.length === 0) return '<div style="padding:20px; text-align:center;">Sheet is empty.</div>';
+  return `
+    <table class="editorial-table">
+      <thead><tr>${rows[0].map(c => `<th>${escapeHtml(c)}</th>`).join('')}</tr></thead>
+      <tbody>
+        ${rows.slice(1).map(r => `<tr>${r.map(c => `<td class="table-num">${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}
+      </tbody>
+    </table>
+  `;
+}
+

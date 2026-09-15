@@ -305,12 +305,26 @@ class ModelRouter:
     ) -> tuple[bool, str]:
         """Registers a new model in the registry and optionally sets it active."""
         with self._file_lock:
-            if "models" not in self._registry_data:
-                self._registry_data["models"] = {}
+            # Normalize and alias roles for dynamic router mapping
+            normalized_roles = set()
+            role_aliases = {
+                "supervisor": {"supervisor", "general"},
+                "general": {"general", "supervisor"},
+                "analyst": {"reasoning", "analyst"},
+                "reasoning": {"reasoning", "analyst"},
+                "coder": {"code", "coder"},
+                "code": {"code", "coder"},
+                "vision": {"vision"},
+            }
+            for r in roles:
+                r_lower = r.lower().strip()
+                normalized_roles.update(role_aliases.get(r_lower, {r_lower}))
+
+            stored_roles = sorted(list(normalized_roles))
 
             self._registry_data["models"][model_id] = {
                 "capabilities": list(capabilities),
-                "roles": list(roles),
+                "roles": stored_roles,
                 "vram_estimate_gb": float(vram_estimate_gb),
                 "context_window": int(context_window),
                 "temperature": float(temperature),
@@ -320,7 +334,7 @@ class ModelRouter:
             if set_as_active_for_roles:
                 if "active_selection" not in self._registry_data:
                     self._registry_data["active_selection"] = {}
-                for r in roles:
+                for r in stored_roles:
                     self._registry_data["active_selection"][r] = model_id
 
             if not self._save_registry_unlocked():

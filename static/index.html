@@ -204,12 +204,12 @@
 
           <div class="airgap-data-node">
             <span class="node-label">PROCESS ISOLATION</span>
-            <span class="node-value" id="hdr-metric-sockets">127.0.0.1 Loopback (5 Sockets)</span>
+            <span class="node-value" id="hdr-metric-sockets">Active Ports...</span>
           </div>
 
           <div class="airgap-data-node">
             <span class="node-label">SOVEREIGN RESIDENCY</span>
-            <span class="node-value">MRPL Mangalore DC</span>
+            <span class="node-value" id="hdr-metric-host">Local Enclave</span>
           </div>
 
           <div class="airgap-data-node node-crypto">
@@ -295,29 +295,29 @@
 
             <div class="airgap-metric-tile">
               <div class="airgap-metric-tile-lbl">PROCESS ISOLATION</div>
-              <div class="airgap-metric-tile-val" id="banner-sockets-val">5 Active Sockets</div>
-              <div class="airgap-metric-tile-sub">127.0.0.1 Loopback</div>
+              <div class="airgap-metric-tile-val" id="banner-sockets-val">Active Ports...</div>
+              <div class="airgap-metric-tile-sub" id="banner-sockets-sub">Private Subnet / Loopback</div>
             </div>
 
             <div class="airgap-metric-tile">
-              <div class="airgap-metric-tile-lbl">COMPUTE / VRAM</div>
-              <div class="airgap-metric-tile-val" id="banner-gpu-val">RTX 3050 (4GB)</div>
-              <div class="airgap-metric-tile-sub">0% Cloud Offload</div>
+              <div class="airgap-metric-tile-lbl">COMPUTE / INFERENCE</div>
+              <div class="airgap-metric-tile-val" id="banner-gpu-val">Detecting Hardware...</div>
+              <div class="airgap-metric-tile-sub" id="banner-gpu-sub">Live Telemetry</div>
             </div>
 
             <div class="airgap-metric-tile">
               <div class="airgap-metric-tile-lbl">DATA RESIDENCY</div>
-              <div class="airgap-metric-tile-val">MRPL Mangalore</div>
-              <div class="airgap-metric-tile-sub">Tier-3 On-Premises</div>
+              <div class="airgap-metric-tile-val" id="banner-host-val">Local Enclave</div>
+              <div class="airgap-metric-tile-sub" id="banner-host-sub">Hotspot / On-Premises</div>
             </div>
 
             <div class="airgap-metric-tile">
               <div class="airgap-metric-tile-lbl">CRYPTOGRAPHIC AUDIT</div>
-              <div class="airgap-metric-tile-val val-green">
+              <div class="airgap-metric-tile-val val-green" id="banner-crypto-val">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 SHA-256 Valid
               </div>
-              <div class="airgap-metric-tile-sub">Tamper-Proof Ledger</div>
+              <div class="airgap-metric-tile-sub" id="banner-crypto-sub">Tamper-Proof Ledger</div>
             </div>
           </div>
         </div>
@@ -809,34 +809,34 @@
             <div class="airgap-metric-tile">
               <div class="airgap-metric-tile-lbl">WAN EGRESS</div>
               <div class="airgap-metric-tile-val val-green" id="exec-banner-wan-bytes">0.00 B</div>
-              <div class="airgap-metric-tile-sub">0 Ext Packets</div>
+              <div class="airgap-metric-tile-sub" id="exec-banner-wan-sub">0 Ext Packets</div>
             </div>
 
             <div class="airgap-metric-tile">
               <div class="airgap-metric-tile-lbl">HOST PORTS</div>
-              <div class="airgap-metric-tile-val" id="exec-banner-sockets">5 Loopback Ports</div>
-              <div class="airgap-metric-tile-sub">127.0.0.1 Enforced</div>
+              <div class="airgap-metric-tile-val" id="exec-banner-sockets">Active Ports...</div>
+              <div class="airgap-metric-tile-sub" id="exec-banner-sockets-sub">Private LAN / Loopback</div>
             </div>
 
             <div class="airgap-metric-tile">
               <div class="airgap-metric-tile-lbl">INFERENCE HARDWARE</div>
-              <div class="airgap-metric-tile-val" id="exec-banner-gpu">RTX 3050 (4GB)</div>
-              <div class="airgap-metric-tile-sub">Zero Cloud Offload</div>
+              <div class="airgap-metric-tile-val" id="exec-banner-gpu">Detecting Hardware...</div>
+              <div class="airgap-metric-tile-sub" id="exec-banner-gpu-sub">Live Telemetry</div>
             </div>
 
             <div class="airgap-metric-tile">
               <div class="airgap-metric-tile-lbl">DATA RESIDENCY</div>
-              <div class="airgap-metric-tile-val">Mangalore Refinery</div>
-              <div class="airgap-metric-tile-sub">Ministry Tier-3 DC</div>
+              <div class="airgap-metric-tile-val" id="exec-banner-host-val">Local Enclave</div>
+              <div class="airgap-metric-tile-sub" id="exec-banner-host-sub">Hotspot / On-Premises</div>
             </div>
 
             <div class="airgap-metric-tile">
               <div class="airgap-metric-tile-lbl">AUDIT INTEGRITY</div>
-              <div class="airgap-metric-tile-val val-green">
+              <div class="airgap-metric-tile-val val-green" id="exec-banner-crypto-val">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 SHA-256 Valid
               </div>
-              <div class="airgap-metric-tile-sub">Statutory Compliant</div>
+              <div class="airgap-metric-tile-sub" id="exec-banner-crypto-sub">Statutory Compliant</div>
             </div>
           </div>
         </div>
@@ -996,7 +996,10 @@
         <div class="editorial-card">
           <div class="card-header-bar">
             <div class="card-title-serif">Deliverables Repository</div>
-            <button class="btn-header-action" onclick="fetchDeliverables()">Refresh Repository</button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="text" class="model-form-input" style="padding: 4px 10px; font-size: 11px; width: 180px; height: 28px;" placeholder="Filter deliverables..." oninput="filterDeliverables(this.value)" id="deliverables-search-input" />
+              <button class="btn-header-action" onclick="fetchDeliverables()">Refresh Repository</button>
+            </div>
           </div>
           <div class="card-padded-body" style="padding: 0;">
             <div id="reports-table-body" class="editorial-table-wrap">
@@ -1049,6 +1052,61 @@
             </div>
           </div>
         </div>
+
+        <!-- Pipeline Hydraulics & PPAC Sensitivity Simulator -->
+        <div class="editorial-card" style="margin-top: 24px;">
+          <div class="card-header-bar">
+            <div>
+              <div class="card-title-serif">Pipeline Hydraulics & PPAC Capacity Sensitivity</div>
+              <div style="font-size: 11px; color: var(--text-taupe); margin-top: 2px;">On-premises Darcy-Weisbach friction modeling and throughput sensitivity simulator</div>
+            </div>
+            <span class="status-badge-pill badge-green">PHYSICAL MODEL</span>
+          </div>
+          <div class="card-padded-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 16px;">
+              <div>
+                <label style="display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 6px;">Pipeline Flow Rate (m³/h)</label>
+                <input type="number" id="sim-flow-rate" class="model-form-input" value="450" min="50" max="2000" step="25" />
+              </div>
+              <div>
+                <label style="display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 6px;">Transfer Line Length (m)</label>
+                <input type="number" id="sim-line-length" class="model-form-input" value="500" min="50" max="10000" step="50" />
+              </div>
+              <div>
+                <label style="display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 6px;">PPAC Throughput Delta (%)</label>
+                <input type="number" id="sim-throughput-delta" class="model-form-input" value="0" min="-50" max="50" step="1" />
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+              <button class="btn-send-message" onclick="runHydraulicSimulation()" id="btn-run-simulation">
+                <span>Compute Hydraulic Impact</span>
+              </button>
+            </div>
+            <!-- Output KPI Tiles -->
+            <div class="grid-4col" id="sim-results-grid" style="gap: 10px;">
+              <div class="metric-kpi-tile" style="padding: 10px 12px;">
+                <div class="metric-label" style="font-size: 9px;">Pressure Drop (ΔP)</div>
+                <div class="metric-val-big" id="sim-dp-val" style="font-size: 19px; color: var(--accent-terracotta);">0.378 bar</div>
+                <div class="metric-sub-note" style="font-size: 9.5px;">Swamee-Jain Friction</div>
+              </div>
+              <div class="metric-kpi-tile" style="padding: 10px 12px;">
+                <div class="metric-label" style="font-size: 9px;">Fluid Velocity</div>
+                <div class="metric-val-big" id="sim-vel-val" style="font-size: 19px; color: var(--text-charcoal);">1.71 m/s</div>
+                <div class="metric-sub-note" style="font-size: 9.5px;">12" Crude Transfer Header</div>
+              </div>
+              <div class="metric-kpi-tile" style="padding: 10px 12px;">
+                <div class="metric-label" style="font-size: 9px;">Reynolds Number</div>
+                <div class="metric-val-big" id="sim-re-val" style="font-size: 19px; color: var(--text-charcoal);">34,746</div>
+                <div class="metric-sub-note" style="font-size: 9.5px;">Turbulent Flow Regime</div>
+              </div>
+              <div class="metric-kpi-tile" style="padding: 10px 12px;">
+                <div class="metric-label" style="font-size: 9px;">Capacity Utilization</div>
+                <div class="metric-val-big" id="sim-util-val" style="font-size: 19px; color: #2E7D32;">111.8%</div>
+                <div class="metric-sub-note" id="sim-util-sub" style="font-size: 9.5px;">16.774 MMT Baseline</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ================================================================
@@ -1078,7 +1136,10 @@
         <div class="editorial-card">
           <div class="card-header-bar">
             <div class="card-title-serif">Ingested Engineering Library</div>
-            <button class="btn-header-action" onclick="fetchDocuments()">Refresh Library</button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="text" class="model-form-input" style="padding: 4px 10px; font-size: 11px; width: 180px; height: 28px;" placeholder="Filter documents..." oninput="filterDocuments(this.value)" id="docs-search-input" />
+              <button class="btn-header-action" onclick="fetchDocuments()">Refresh Library</button>
+            </div>
           </div>
           <div class="card-padded-body" style="padding: 0;">
             <div id="documents-list-wrap" class="editorial-table-wrap">
@@ -1091,6 +1152,9 @@
       <!-- ================================================================
            TAB: AIR-GAP & MODELS (SETTINGS)
            ================================================================ -->
+      <!-- ================================================================
+           TAB: AIR-GAP & MODELS (SETTINGS)
+           ================================================================ -->
       <section class="tab-section" id="tab-settings">
         <div class="hero-editorial-header">
           <div class="eyebrow-capsule">
@@ -1098,56 +1162,65 @@
             <span>Model Router & Sovereign Infrastructure</span>
           </div>
           <h1 class="hero-editorial-title">Local Models & Hardware Budget</h1>
-          <p class="hero-editorial-sub">Dynamic ModelRouter orchestration, local open-weight models, and real-time RTX 3050 VRAM telemetry.</p>
+          <p class="hero-editorial-sub">Dynamic ModelRouter orchestration, local open-weight models, and real-time on-device hardware telemetry.</p>
         </div>
 
-        <div class="grid-2col" style="margin-bottom: 24px;">
-          <!-- Active Role Allocations (Dynamic Model Selection) -->
+        <!-- Unified Model Router Control Strip & 10-Min Auto-Detection Bar -->
+        <div class="settings-control-strip">
+          <div class="auto-scan-status-wrap">
+            <div class="auto-scan-pulse-ring">
+              <span class="status-pulse-dot" style="color: #2E7D32;"></span>
+            </div>
+            <div class="auto-scan-text-col">
+              <div class="auto-scan-status-title">
+                <span>Autonomous Model Detection: </span>
+                <span class="badge-emerald-text">Active (Every 10 Mins)</span>
+              </div>
+              <div class="auto-scan-status-sub" id="auto-detect-timer-sub">
+                Auto-scanning 127.0.0.1:11434 • Next check in <span id="auto-scan-countdown" style="font-family: var(--font-mono); font-weight: 700; color: var(--text-charcoal);">10:00</span>
+              </div>
+            </div>
+          </div>
+          <div class="settings-strip-actions">
+            <button class="btn-strip-scan" id="btn-scan-models" onclick="discoverModels(true)" title="Manually scan local Ollama instance for newly downloaded models">
+              <svg id="scan-btn-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M21 21v-5h-5"/></svg>
+              <span id="scan-btn-label">Scan for New Models</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Discovered Unregistered Models Alert Banner (Dynamic) -->
+        <div id="discovered-models-banner" class="discovered-models-banner" style="display: none;">
+          <div class="discovered-banner-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="sparkle-gold-orb">⚡</span>
+              <div>
+                <div class="discovered-banner-title" id="discovered-banner-title">New Local Models Detected in Ollama</div>
+                <div class="discovered-banner-sub">Discovered open-weight model weights on 127.0.0.1:11434 not yet mapped into active agent roles.</div>
+              </div>
+            </div>
+            <button class="btn-dismiss-mini" onclick="dismissDiscoveredBanner()">Dismiss All</button>
+          </div>
+          <div id="discovered-models-list" class="discovered-models-cards-grid"></div>
+        </div>
+
+        <!-- Settings Cards Stack -->
+        <div class="settings-cards-stack">
+          <!-- Card 1: Active Role Allocations -->
           <div class="editorial-card">
             <div class="card-header-bar">
               <div>
-                <div class="card-title-serif">Active Role Allocations</div>
-                <div class="card-title-sub">Select local inference models per multi-agent role</div>
+                <div class="card-title-serif">Active Multi-Agent Role Allocations</div>
+                <div class="card-title-sub">Select local inference models dynamically per multi-agent pipeline role</div>
               </div>
-              <button class="btn-header-action" onclick="fetchModels()">Refresh Router</button>
+              <div class="role-allocations-count-pill" id="role-allocations-count-pill">
+                5 Roles Configured
+              </div>
             </div>
-            <div class="card-padded-body">
-              <div id="settings-models-list" style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="card-padded-body" style="padding: 18px 20px;">
+              <div id="settings-models-list" class="settings-models-cards-wrap">
                 <div style="padding: 16px; text-align: center; color: var(--text-taupe);">Querying local ModelRouter...</div>
               </div>
-            </div>
-          </div>
-
-          <!-- Sovereign Hardware & Compute Specifications -->
-          <div class="editorial-card">
-            <div class="card-header-bar">
-              <div>
-                <div class="card-title-serif">Compute Hardware & Local Engine</div>
-                <div class="card-title-sub">On-premises physical execution environment</div>
-              </div>
-              <button class="btn-header-action" onclick="discoverModels()">Scan Ollama</button>
-            </div>
-            <div class="card-padded-body">
-              <div id="settings-hardware-specs" style="display: flex; flex-direction: column; gap: 14px;">
-                <div style="padding: 16px; text-align: center; color: var(--text-taupe);">Detecting local hardware...</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Additional Air-Gap Certificate & Audit Card -->
-        <div class="editorial-card">
-          <div class="card-header-bar">
-            <div class="card-title-serif">Air-Gap Sovereignty Audit</div>
-            <button class="btn-header-action" onclick="openCertificateModal()">View Signed Cert</button>
-          </div>
-          <div class="card-padded-body">
-            <p style="font-size: 12.5px; color: var(--text-taupe); line-height: 1.5; margin-bottom: 14px;">
-              Network sockets and subprocess connections are continuously monitored by the <code>SovereignNetworkAuditor</code>. Zero outbound internet packets have occurred during this session.
-            </p>
-            <div style="background: var(--bg-sub); border: 1px solid var(--border-sand); border-radius: var(--radius-md); padding: 12px; font-family: var(--font-mono); font-size: 11px;">
-              <div>Session Sockets: <strong>127.0.0.1:8000 (FastAPI ASGI) & 127.0.0.1:11434 (Ollama Engine)</strong></div>
-              <div style="margin-top: 4px;">WAN Transmissions: <strong style="color: #2E7D32;">0 Bytes (100% Air-Gapped & Sealed)</strong></div>
             </div>
           </div>
         </div>
@@ -1212,6 +1285,7 @@
           <button class="copilot-suggestion-chip" onclick="sendSuggestedMessage('Compare Arabian Light vs Maya crude assay sulfur, TAN, and distillation yields', ['data/real_crude_oil_assays.csv'])">Crude Assays</button>
           <button class="copilot-suggestion-chip" onclick="sendSuggestedMessage('Process CDU Column-04 inspection report and evaluate API 510 deficit', ['data/real_cdu_ultrasonic_thickness_scan.pdf'])">API 510 NDT</button>
           <button class="copilot-suggestion-chip" onclick="sendSuggestedMessage('Which spare parts in inventory are below their reorder threshold?', ['data/refinery_equipment_spares_catalog.csv'])">OEM Spares</button>
+          <button class="copilot-suggestion-chip" onclick="sendSuggestedMessage('Generate Executive Briefing Presentation Deck for CDU Revamp (.pptx)', ['data/real_cdu_ultrasonic_thickness_scan.pdf'])">Executive Deck (.pptx)</button>
         </div>
       </div>
 
@@ -1266,6 +1340,94 @@
   </div>
 </div>
 
-<script src="/static/app.js?v=5"></script>
+<!-- Modal: Register Open-Weight Model -->
+<div class="modal-backdrop" id="modal-register-model" onclick="closeModalOnBackdrop(event, 'modal-register-model')">
+  <div class="modal-window" style="width: 580px;">
+    <div class="modal-header">
+      <div class="card-title-serif">Register Local Open-Weight Model</div>
+      <button class="copilot-icon-btn" onclick="closeRegisterModelModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <form id="form-register-model" onsubmit="submitRegisterModel(event)" style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 4px;">Ollama Model Identifier / Tag *</label>
+          <input type="text" id="reg-model-id" class="model-form-input" placeholder="e.g., deepseek-r1:1.5b, mistral:7b, qwen2.5:3b" required />
+        </div>
+        <div>
+          <label style="display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 4px;">Display Name</label>
+          <input type="text" id="reg-model-name" class="model-form-input" placeholder="e.g., DeepSeek R1 1.5B Distill" />
+        </div>
+        <div class="grid-2col" style="gap: 12px;">
+          <div>
+            <label style="display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 4px;">Estimated VRAM (GB)</label>
+            <input type="number" id="reg-vram" class="model-form-input" value="1.5" step="0.1" min="0.5" max="24.0" />
+          </div>
+          <div>
+            <label style="display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 4px;">Context Window (Tokens)</label>
+            <input type="number" id="reg-context-window" class="model-form-input" value="4096" step="512" min="1024" max="131072" />
+          </div>
+        </div>
+        <div>
+          <label style="display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 6px;">Assignable Agent Roles *</label>
+          <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+            <label class="model-checkbox-label"><input type="checkbox" name="reg-roles" value="supervisor"> <span>Supervisor</span></label>
+            <label class="model-checkbox-label"><input type="checkbox" name="reg-roles" value="analyst" checked> <span>Analyst</span></label>
+            <label class="model-checkbox-label"><input type="checkbox" name="reg-roles" value="coder" checked> <span>Coder</span></label>
+            <label class="model-checkbox-label"><input type="checkbox" name="reg-roles" value="vision"> <span>Vision</span></label>
+          </div>
+        </div>
+        <div>
+          <label style="display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 6px;">Capabilities</label>
+          <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+            <label class="model-checkbox-label"><input type="checkbox" name="reg-caps" value="reasoning" checked> <span>Reasoning</span></label>
+            <label class="model-checkbox-label"><input type="checkbox" name="reg-caps" value="sql_generation" checked> <span>SQL Generation</span></label>
+            <label class="model-checkbox-label"><input type="checkbox" name="reg-caps" value="vision_analysis"> <span>Vision / Multimodal</span></label>
+            <label class="model-checkbox-label"><input type="checkbox" name="reg-caps" value="low_latency"> <span>Low Latency</span></label>
+          </div>
+        </div>
+        <div>
+          <label style="display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 4px;">Recommended Temperature</label>
+          <input type="number" id="reg-temp" class="model-form-input" value="0.2" step="0.05" min="0.0" max="1.0" />
+        </div>
+        <div>
+          <label style="display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe); margin-bottom: 4px;">Description</label>
+          <textarea id="reg-description" class="model-form-input" rows="2" placeholder="e.g., Ultra-compact reasoning model for offline distillation and refinery telemetry calculation."></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px;">
+          <button type="button" class="btn-header-action" onclick="closeRegisterModelModal()">Cancel</button>
+          <button type="submit" class="btn-send-message"><span>Save to Registry</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: On-Premises File Preview -->
+<div class="modal-backdrop" id="modal-file-preview" onclick="closeModalOnBackdrop(event, 'modal-file-preview')">
+  <div class="modal-window modal-window-preview" style="width: 860px; max-width: 95vw; height: 86vh;">
+    <div class="modal-header">
+      <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+        <span class="preview-type-badge" id="preview-format-badge">PREVIEW</span>
+        <div class="card-title-serif" id="preview-file-title" style="font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">File Preview</div>
+        <span id="preview-file-size" style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);"></span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <a id="preview-download-link" href="#" class="btn-header-action" download style="text-decoration: none;">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Download</span>
+        </a>
+        <button class="copilot-icon-btn" onclick="closeFilePreviewModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+    </div>
+    <div class="modal-body" id="file-preview-body" style="padding: 20px; flex: 1; overflow-y: auto; background: var(--bg-canvas);">
+      <div style="text-align: center; color: var(--text-taupe); padding: 40px;">
+        <div class="status-pulse-dot" style="margin: 0 auto 10px auto; width: 8px; height: 8px; color: var(--accent-terracotta);"></div>
+        <div>Extracting on-premises preview...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js?v=6"></script>
 </body>
 </html>

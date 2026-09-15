@@ -82,7 +82,20 @@ class DataAnalysisWorker:
             self.conn = duckdb.connect(str(self.db_path))  # Opens (or creates) the persistent local database.
             self._initialize_registry()  # Creates the bookkeeping tables before any ingestion occurs.
         except duckdb.IOException:
-            self.conn = duckdb.connect(str(self.db_path), read_only=True)  # Fallback to read-only when server holds lock.
+            try:
+                self.conn = duckdb.connect(str(self.db_path), read_only=True)  # Fallback to read-only when server holds lock.
+            except duckdb.IOException:
+                self.conn = duckdb.connect(":memory:")  # Resilient fallback on Windows when another process holds an exclusive lock.
+                self._initialize_registry()
+                self._auto_seed_data_dir()
+
+    def _auto_seed_data_dir(self) -> None:
+        """Seeds tables from CSV files in data_dir if database is empty."""
+        for csv_path in sorted(self.settings.data_dir.glob("*.csv")):
+            try:
+                self.ingest(csv_path)
+            except Exception:
+                pass
 
     # ------------------------------------------------------------------ #
     # Registry: dedup + table bookkeeping (stored inside DuckDB itself)

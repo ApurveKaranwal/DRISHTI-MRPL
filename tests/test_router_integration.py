@@ -50,8 +50,8 @@ class TestModelRouterIntegration(unittest.TestCase):
         self.assertEqual(supervisor.active_model, "qwen2.5:7b")
 
         # Switch back
-        self.router.set_active_model("supervisor", "qwen3:8b")
-        self.assertEqual(supervisor.active_model, "qwen3:8b")
+        self.router.set_active_model("supervisor", "qwen3:8b-finetuned")
+        self.assertEqual(supervisor.active_model, "qwen3:8b-finetuned")
 
     def test_api_models_endpoint(self):
         """Test GET /api/models returns profiles with available models list."""

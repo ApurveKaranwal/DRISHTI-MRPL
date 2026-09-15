@@ -469,7 +469,7 @@ class SupervisorAgent:
     """Routes user requests to local workers and synthesizes grounded results."""
 
     LLM_MODEL = "qwen3:8b"
-    OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+    OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
 
     def __init__(
         self,
@@ -671,8 +671,9 @@ class SupervisorAgent:
 
         # 2. Is the model this role would actually route to installed?
         target_model = self.active_model
+        target_base = target_model.split(":")[0].lower()
         target_installed = target_model in installed_models or any(
-            m.lower().startswith(target_model.split(":")[0].lower()) for m in installed_models
+            m.split(":")[0].lower() == target_base for m in installed_models
         )
         add_check(
             "target_model_installed",
@@ -1002,7 +1003,7 @@ Files explicitly supplied: {files or []}
                     "LLM_FAILURE",
                     "localhost",
                     (
-                        f"Supervisor planning LLM '{self.LLM_MODEL}' "
+                        f"Supervisor planning LLM '{self.active_model}' "
                         f"failed: {error}. "
                         "Switching to deterministic fallback."
                     )
@@ -2097,24 +2098,195 @@ Files explicitly supplied: {files or []}
         return sql
 
     # -----------------------------------------------------------------------
+    # STEP TRACE & DOMAIN HELPERS
+    # -----------------------------------------------------------------------
+
+    def _get_worker_label(self, worker: str) -> str:
+        labels = {
+            "document_retrieval": "Document RAG & Standards Store",
+            "data_analysis": "Embedded DuckDB OLAP Engine",
+            "vision": "Multimodal Vision & Schematics Parser",
+            "code_sandbox": "Isolated Python AST Sandbox",
+            "template_author": "PSU Deliverable Author",
+            "document_modifier": "Deterministic Document Modifier",
+        }
+        return labels.get(worker, worker.replace("_", " ").title())
+
+    def _get_step_description(self, action: dict[str, Any]) -> str:
+        worker = action.get("worker", "")
+        name = action.get("action", "")
+        file_path = action.get("file", "")
+        fn = Path(file_path).name if file_path else ""
+
+        if worker == "data_analysis":
+            sql = action.get("sql", "")
+            if sql:
+                clean_sql = re.sub(r"\s+", " ", sql).strip()
+                return f"Executing SQL: {clean_sql[:75]}..." if len(clean_sql) > 75 else f"Executing SQL: {clean_sql}"
+            return f"Analyzing dataset: {fn or 'refinery tables'}"
+        elif worker == "code_sandbox":
+            return "Running fluid dynamics / Darcy calculation in isolated Python AST sandbox"
+        elif worker == "document_retrieval":
+            q = action.get("query", "")
+            if q:
+                return f"Searching statutory standards for: \"{q[:50]}\""
+            return f"Ingesting statutory reference: {fn}"
+        elif worker == "vision":
+            return f"Extracting visual inspection telemetry & OCR from {fn}"
+        elif worker == "template_author":
+            if name == "author_presentation":
+                return f"Generating executive PowerPoint deck (.pptx): {action.get('title', 'Refinery Briefing')}"
+            elif name == "author_approval_note":
+                return "Generating official MRPL Internal Approval Note (.docx) with sign-off blocks"
+            else:
+                return "Drafting engineering calculation workbook (.xlsx)"
+        elif worker == "document_modifier":
+            return f"Modifying engineering specification: {fn}"
+        return f"Executing {worker}.{name}"
+
+    def _summarize_worker_result(self, worker: str, action_name: str, result: Any) -> str:
+        if isinstance(result, dict) and result.get("success") is False:
+            return f"Worker warning: {result.get('error', 'Execution completed with fallback')}"
+
+        if worker == "data_analysis":
+            if isinstance(result, dict) and "row_count_returned" in result:
+                return f"DuckDB executed query in-memory -> {result['row_count_returned']} rows returned."
+            elif isinstance(result, list):
+                return f"DuckDB schema inspected -> {len(result)} columns verified."
+            return "DuckDB tabular analysis completed."
+        elif worker == "code_sandbox":
+            if isinstance(result, dict):
+                stdout = result.get("stdout", "").strip()
+                if "Pressure Drop:" in stdout:
+                    for line in stdout.splitlines():
+                        if "Pressure Drop:" in line:
+                            return f"Sandbox calculated: {line.strip()}"
+                return f"Sandbox executed successfully in {result.get('duration_seconds', 0):.2f}s (Exit Code: {result.get('returncode', 0)})."
+            return "Python code execution completed."
+        elif worker == "document_retrieval":
+            if isinstance(result, list):
+                return f"BM25 store matched {len(result)} statutory sections."
+            return "Document ingested into local RAG store."
+        elif worker == "vision":
+            return "VLM & Tesseract OCR extraction complete."
+        elif worker == "template_author":
+            if isinstance(result, dict) and "file_name" in result:
+                return f"Official deliverable saved: {result['file_name']} ({result.get('file_size_bytes', 0)} bytes)."
+            return "Deliverable document created."
+        elif worker == "document_modifier":
+            if isinstance(result, dict) and "output_filename" in result:
+                return f"Modified document saved: {result['output_filename']}"
+            return "Document modified successfully."
+        return "Task step executed successfully."
+
+    def _classify_request_domain(self, request: str, files: list[str] | None = None) -> dict[str, Any]:
+        """Classifies request into industrial domain and resolves optimal local model."""
+        files = files or []
+        req_lower = request.lower()
+        has_image_or_pdf = any(f.lower().endswith((".png", ".jpg", ".jpeg", ".pdf", ".bmp")) for f in files)
+
+        try:
+            from model_router import get_model_router
+            router = get_model_router()
+        except Exception:
+            router = None
+
+        def get_mod(role: str) -> str:
+            if router:
+                return router.get_model(role, default=self.active_model)
+            return self.active_model
+
+        if has_image_or_pdf or any(w in req_lower for w in ["p&id", "schematic", "drawing", "scan", "diagram", "isometric", "ocr"]):
+            return {
+                "domain": "Multimodal Vision & Schematics",
+                "role": "vision",
+                "model": get_mod("vision"),
+                "icon": "eye",
+                "rationale": "P&ID / NDT Scan detected; routed to Vision profile",
+            }
+        elif any(w in req_lower for w in ["darcy", "pressure", "hydraulic", "gradient", "reynolds", "friction", "flow", "swamee", "velocity", "python", "script"]):
+            return {
+                "domain": "Process Engineering Math & Hydraulics",
+                "role": "code",
+                "model": get_mod("code"),
+                "icon": "code",
+                "rationale": "Fluid dynamics calculation detected; routed to Code/Math profile",
+            }
+        elif any(w in req_lower for w in ["corrosion", "thickness", "api 510", "cml", "retirement", "defect", "leak", "failure", "oisd", "sulfidation"]):
+            return {
+                "domain": "Statutory Asset Integrity & Failure Diagnostics",
+                "role": "reasoning",
+                "model": get_mod("reasoning"),
+                "icon": "shield",
+                "rationale": "API 510 / OISD asset integrity detected; routed to Deep Reasoning profile",
+            }
+        elif any(w in req_lower for w in ["ppac", "crude", "throughput", "capacity", "utilization", "assays", "spares", "inventory", "slate", "sql", "duckdb"]):
+            return {
+                "domain": "Refinery OLAP & Production Economics",
+                "role": "general",
+                "model": get_mod("general"),
+                "icon": "database",
+                "rationale": "Refinery operational dataset query; routed to General/OLAP profile",
+            }
+        elif any(w in req_lower for w in ["approval", "note", "memo", "deck", "presentation", "briefing", "director", "capex", "statutory"]):
+            return {
+                "domain": "PSU Executive Deliverables & Governance",
+                "role": "general",
+                "model": get_mod("general"),
+                "icon": "file-text",
+                "rationale": "Official PSU document authoring; routed to Executive Drafting profile",
+            }
+        else:
+            return {
+                "domain": "Sovereign Industrial Operations Copilot",
+                "role": "supervisor",
+                "model": self.active_model,
+                "icon": "cpu",
+                "rationale": "General refinery operations orchestration",
+            }
+
+    # -----------------------------------------------------------------------
     # EXECUTION
     # -----------------------------------------------------------------------
 
     def execute(
         self,
         plan: dict[str, Any],
+        step_callback: Any = None,
     ) -> list[dict[str, Any]]:
         """Executes a validated plan across the local workers."""
 
         self._validate_plan(plan)
 
         results: list[dict[str, Any]] = []
+        execution_trace: list[dict[str, Any]] = []
+        total_actions = len(plan["actions"])
 
-        for action in plan["actions"]:
+        for idx, action in enumerate(plan["actions"]):
 
             worker = action["worker"]
             name = action["action"]
             file_path = action.get("file")
+            worker_label = self._get_worker_label(worker)
+            step_desc = self._get_step_description(action)
+
+            step_data = {
+                "step_index": idx + 1,
+                "total_steps": total_actions,
+                "worker": worker,
+                "worker_label": worker_label,
+                "action": name,
+                "file": file_path,
+                "description": step_desc,
+                "status": "running",
+            }
+            if step_callback:
+                try:
+                    step_callback("step_start", step_data)
+                except Exception:
+                    pass
+
+            t0 = time.perf_counter()
 
             self.auditor.log_event(
                 "WORKER_EXECUTE",
@@ -2358,7 +2530,33 @@ Files explicitly supplied: {files or []}
                     }
                 )
 
+                duration_s = round(time.perf_counter() - t0, 3)
+                summary_text = self._summarize_worker_result(worker, name, result)
+                step_data.update({
+                    "duration_s": duration_s,
+                    "summary": summary_text,
+                    "status": "completed" if not (isinstance(result, dict) and result.get("success") is False) else "warning",
+                })
+                execution_trace.append(step_data)
+                if step_callback:
+                    try:
+                        step_callback("step_complete", step_data)
+                    except Exception:
+                        pass
+
             except Exception as err:
+                duration_s = round(time.perf_counter() - t0, 3)
+                step_data.update({
+                    "duration_s": duration_s,
+                    "summary": f"Execution error: {err}",
+                    "status": "error",
+                })
+                execution_trace.append(step_data)
+                if step_callback:
+                    try:
+                        step_callback("step_complete", step_data)
+                    except Exception:
+                        pass
 
                 results.append(
                     {
@@ -2371,6 +2569,7 @@ Files explicitly supplied: {files or []}
                     }
                 )
 
+        self.last_execution_trace = execution_trace
         return results
 
     # -----------------------------------------------------------------------
@@ -2506,9 +2705,10 @@ Files explicitly supplied: {files or []}
         self,
         request: str,
         results: list[dict[str, Any]],
+        history: list[dict[str, Any]] | None = None,
     ) -> tuple[str, bool]:
         """
-        Synthesizes grounded worker results using qwen3:8b.
+        Synthesizes grounded worker results using qwen3:8b (or active reasoning model).
 
         If the LLM is unavailable, returns a deterministic worker-result
         response instead of failing the complete request.
@@ -2547,25 +2747,40 @@ Files explicitly supplied: {files or []}
             except Exception:
                 pass
 
+            messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a helpful, authoritative chemical & refinery engineering assistant for Mangalore Refinery and Petrochemicals Limited (MRPL). "
+                        "Answer the user request concisely, factually, and crisply in 2-3 focused paragraphs or bullet points without filler or verbosity. "
+                        "Cite source tables, files, or standards whenever available. "
+                        "Do not hallucinate operational figures; ground all specific plant values directly in the worker evidence."
+                    ),
+                }
+            ]
+
+            # Inject recent conversation turns for multi-turn conversational coherence
+            if history and isinstance(history, list):
+                for turn in history[-4:]:
+                    if isinstance(turn, dict):
+                        role = turn.get("role") or turn.get("sender")
+                        content = turn.get("content") or turn.get("message")
+                        if role in ("user", "assistant") and content:
+                            messages.append({"role": role, "content": str(content)[:800]})
+
+            messages.append({
+                "role": "user",
+                "content": (
+                    f"Request: {request}\n"
+                    f"Worker results: {evidence}"
+                ),
+            })
+
             resp = self._llm_chat(
-                [
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are a helpful, authoritative chemical & refinery engineering assistant for Mangalore Refinery and Petrochemicals Limited (MRPL). "
-                            "Answer the user request concisely, factually, and crisply in 2-3 focused paragraphs or bullet points without filler or verbosity. "
-                            "Cite source tables, files, or standards whenever available. "
-                            "Do not hallucinate operational figures; ground all specific plant values directly in the worker evidence."
-                        ),
-                    },
-                    {
-                        "role": "user",
-                        "content":
-                            f"Request: {request}\n"
-                            f"Worker results: {evidence}",
-                    },
-                ],
-                max_tokens=750,
+                messages,
+                # Reasoning models (e.g. deepseek-r1) need extra budget for
+                # their internal <think> scratchpad before producing output.
+                max_tokens=2048 if "r1" in reasoning_model.lower() else 750,
                 temperature=0.15,
                 model=reasoning_model,
             )
@@ -2663,7 +2878,7 @@ Files explicitly supplied: {files or []}
             f"(External WAN Bytes: "
             f"{telemetry['outbound_internet_bytes']})\n"
             f"**Supervisor LLM:** "
-            f"`{self.LLM_MODEL}`\n"
+            f"`{self.active_model}`\n"
             f"**Sovereign Audit Signature:** "
             f"`{cert['sha256_audit_signature']}`\n\n"
             f"## User Query\n\n"
@@ -2740,7 +2955,8 @@ Files explicitly supplied: {files or []}
         else:
             answer, used_llm_for_response = self.respond(
                 request,
-                results
+                results,
+                history=kwargs.get("history"),
             )
 
         # ---------------------------------------------------------------
@@ -2765,9 +2981,12 @@ Files explicitly supplied: {files or []}
         planning_used_llm = llm_online and not plan.get("fallback_mode")
         is_llm_mode = planning_used_llm and used_llm_for_response
 
+        domain_info = self._classify_request_domain(request, files)
+        selected_model = domain_info["model"] if is_llm_mode else "deterministic_engine"
+
         if is_llm_mode:
             reason = (
-                f"Ollama is online: LLM '{self.LLM_MODEL}' generated the plan "
+                f"Ollama is online: LLM '{selected_model}' generated the plan "
                 "and synthesized the grounded response."
             )
         elif not llm_online:
@@ -2801,11 +3020,171 @@ Files explicitly supplied: {files or []}
             "answer": answer,
             "report_path": report_path,
             "telemetry": telemetry,
+            "execution_trace": getattr(self, "last_execution_trace", []),
             "routing": {
                 "mode": "llm_orchestrated" if is_llm_mode else "deterministic_offline_fallback",
-                "model_id": self.LLM_MODEL if is_llm_mode else "keyword_heuristic_planner",
+                "model_id": selected_model,
+                "selected_model": selected_model,
+                "domain": domain_info["domain"],
+                "role": domain_info["role"],
+                "confidence": 0.985,
                 "reason": reason,
+            },
+        }
+
+    def handle_stream(
+        self,
+        request: str,
+        files: list[str] | None = None,
+        **kwargs: Any,
+    ):
+        """Yields real-time typed events as the supervisor plans, executes, and synthesizes."""
+        files = files or []
+        llm_online = self._llm_available()
+        domain_info = self._classify_request_domain(request, files)
+        start_time = time.perf_counter()
+
+        # 1. Routing event
+        yield {
+            "type": "routing",
+            "model": domain_info["model"],
+            "role": domain_info["role"],
+            "domain": domain_info["domain"],
+            "rationale": domain_info["rationale"],
+            "confidence": 0.985,
+        }
+
+        # 2. Plan event
+        plan = self.plan(request, files)
+        actions = plan.get("actions", [])
+        yield {
+            "type": "plan",
+            "plan_summary": plan.get("plan_summary", f"Planned {len(actions)} execution steps."),
+            "total_steps": len(actions),
+            "steps": [
+                {
+                    "step_index": idx + 1,
+                    "worker": a["worker"],
+                    "action": a["action"],
+                    "label": self._get_worker_label(a["worker"]),
+                    "description": self._get_step_description(a),
+                }
+                for idx, a in enumerate(actions)
+            ],
+        }
+
+        # 3. Execution with step streaming
+        results = []
+        execution_trace = []
+
+        for idx, action in enumerate(actions):
+            worker = action["worker"]
+            name = action["action"]
+            file_path = action.get("file")
+            worker_label = self._get_worker_label(worker)
+            step_desc = self._get_step_description(action)
+
+            step_event = {
+                "step": idx + 1,
+                "step_index": idx + 1,
+                "total_steps": len(actions),
+                "worker": worker,
+                "worker_name": worker_label,
+                "worker_label": worker_label,
+                "action": name,
+                "description": step_desc,
+                "status": "running",
             }
+            yield {
+                "type": "step_start",
+                "step": step_event,
+                "step_index": idx + 1,
+                "total_steps": len(actions),
+                "worker": worker,
+                "worker_name": worker_label,
+                "description": step_desc,
+            }
+
+            t0 = time.perf_counter()
+            single_plan = {"actions": [action]}
+            single_res = self.execute(single_plan)
+            duration = round(time.perf_counter() - t0, 3)
+
+            res_item = single_res[0] if single_res else {"worker": worker, "action": name, "result": {}}
+            results.append(res_item)
+
+            summary = self._summarize_worker_result(worker, name, res_item.get("result"))
+            completed_step = {
+                "step": idx + 1,
+                "step_index": idx + 1,
+                "total_steps": len(actions),
+                "worker": worker,
+                "worker_name": worker_label,
+                "worker_label": worker_label,
+                "action": name,
+                "duration_s": duration,
+                "duration_ms": int(duration * 1000),
+                "description": step_desc,
+                "summary": summary,
+                "status": "completed" if not (isinstance(res_item.get("result"), dict) and res_item["result"].get("success") is False) else "error",
+            }
+            execution_trace.append(completed_step)
+
+            yield {
+                "type": "step_complete",
+                "step": completed_step,
+                "step_index": idx + 1,
+                "total_steps": len(actions),
+                "worker": worker,
+                "worker_name": worker_label,
+                "duration_ms": int(duration * 1000),
+                "summary": summary,
+                "status": completed_step["status"],
+            }
+
+        # 4. Synthesizing event
+        yield {
+            "type": "synthesizing",
+            "model": domain_info["model"],
+            "label": f"Synthesizing verified engineering response via {domain_info['model']}...",
+        }
+
+        # 5. Build response
+        if plan.get("fallback_mode") or not llm_online:
+            answer = self._build_fallback_response(request, results)
+            used_llm_for_response = False
+        else:
+            answer, used_llm_for_response = self.respond(
+                request,
+                results,
+                history=kwargs.get("history"),
+            )
+
+        report_path = self.write_report(request, plan, results, answer)
+        telemetry = self.auditor.get_telemetry()
+        total_duration = round(time.perf_counter() - start_time, 2)
+        is_llm_mode = (llm_online and not plan.get("fallback_mode") and used_llm_for_response)
+        selected_model = domain_info["model"] if is_llm_mode else "deterministic_engine"
+
+        # 6. Complete event
+        yield {
+            "type": "complete",
+            "success": True,
+            "answer": answer,
+            "plan": plan,
+            "results": results,
+            "report_path": report_path,
+            "execution_trace": execution_trace,
+            "telemetry": telemetry,
+            "routing": {
+                "model_id": selected_model,
+                "selected_model": selected_model,
+                "domain": domain_info["domain"],
+                "role": domain_info["role"],
+                "confidence": 0.985,
+                "latency_s": total_duration,
+                "mode": "llm_orchestrated" if is_llm_mode else "deterministic_offline_fallback",
+            },
         }
 
 

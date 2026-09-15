@@ -22,7 +22,7 @@ import pandas as pd
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict
 
@@ -72,7 +72,7 @@ app = FastAPI(
     default_response_class=SafeJSONResponse,
 )
 
-# Enable CORS for local origins only (air-gapped deployment)
+# Enable CORS for local origins and air-gapped private LAN/hotspot subnets (RFC-1918)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -81,6 +81,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ],
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -100,6 +101,7 @@ for directory in [UPLOADS_DIR, REPORTS_DIR, SANDBOX_DIR, STATIC_DIR]:
 
 # Shared Supervisor and Auditor instances
 auditor = SovereignNetworkAuditor(REPORTS_DIR)
+auditor.enable_airgap_enforcement()
 supervisor = SupervisorAgent(auditor=auditor)
 
 # Pre-seed authentic engineering datasets into analytical workers
@@ -121,6 +123,7 @@ class ChatRequest(BaseModel):
     message: str
     files: Optional[List[str]] = []
     profile: Optional[str] = None
+    history: Optional[List[Dict[str, Any]]] = []
 
 
 class DuckDBQueryRequest(BaseModel):
@@ -152,6 +155,58 @@ async def health_check():
     )
 
 
+def _scan_deliverables(results: list[dict[str, Any]], report_path: str | None = None) -> list[dict[str, Any]]:
+    deliverables = []
+    for r in results or []:
+        worker = r.get("worker")
+        res_data = r.get("result", {})
+        if worker == "template_author":
+            if "file_path" in res_data:
+                p = Path(res_data["file_path"])
+                deliverables.append({
+                    "name": p.name,
+                    "type": res_data.get("deliverable_type", "document"),
+                    "path": str(p),
+                    "source": "reports",
+                    "size_bytes": p.stat().st_size if p.is_file() else 0,
+                })
+        elif worker == "code_sandbox":
+            gen_list = res_data.get("generated_files", [])
+            if not gen_list:
+                gen_list = [str(f) for f in SANDBOX_DIR.glob("*.png")]
+            for gen_f in gen_list:
+                p = Path(gen_f)
+                deliverables.append({
+                    "name": p.name,
+                    "type": "plot" if p.suffix.lower() in [".png", ".jpg", ".svg"] else "file",
+                    "path": str(p),
+                    "source": "sandbox",
+                    "size_bytes": p.stat().st_size if p.is_file() else 0,
+                })
+        elif worker == "document_modifier":
+            if "output_path" in res_data:
+                p = Path(res_data["output_path"])
+                deliverables.append({
+                    "name": p.name,
+                    "type": "modified_doc",
+                    "path": str(p),
+                    "source": "sandbox",
+                    "size_bytes": p.stat().st_size if p.is_file() else 0,
+                })
+
+    if report_path:
+        rp = Path(report_path)
+        if rp.is_file():
+            deliverables.append({
+                "name": rp.name,
+                "type": "audit_report",
+                "path": str(rp),
+                "source": "reports",
+                "size_bytes": rp.stat().st_size,
+            })
+    return deliverables
+
+
 @app.post("/api/chat")
 async def handle_chat(payload: ChatRequest):
     """Executes an end-to-end agentic workflow across the local workers."""
@@ -164,54 +219,10 @@ async def handle_chat(payload: ChatRequest):
             supervisor.handle,
             payload.message,
             payload.files or [],
+            history=payload.history or [],
         )
-        
-        # Scan for newly generated deliverables
-        deliverables = []
-        for r in result.get("results", []):
-            worker = r.get("worker")
-            res_data = r.get("result", {})
-            if worker == "template_author":
-                if "file_path" in res_data:
-                    p = Path(res_data["file_path"])
-                    deliverables.append({
-                        "name": p.name,
-                        "type": res_data.get("deliverable_type", "document"),
-                        "path": str(p),
-                        "size_bytes": p.stat().st_size if p.is_file() else 0,
-                    })
-            elif worker == "code_sandbox":
-                gen_list = res_data.get("generated_files", [])
-                if not gen_list:
-                    gen_list = [str(f) for f in SANDBOX_DIR.glob("*.png")]
-                for gen_f in gen_list:
-                    p = Path(gen_f)
-                    deliverables.append({
-                        "name": p.name,
-                        "type": "plot" if p.suffix.lower() in [".png", ".jpg", ".svg"] else "file",
-                        "path": str(p),
-                        "size_bytes": p.stat().st_size if p.is_file() else 0,
-                    })
-            elif worker == "document_modifier":
-                if "output_path" in res_data:
-                    p = Path(res_data["output_path"])
-                    deliverables.append({
-                        "name": p.name,
-                        "type": "modified_doc",
-                        "path": str(p),
-                        "size_bytes": p.stat().st_size if p.is_file() else 0,
-                    })
 
-        # Include audit report as deliverable
-        if result.get("report_path"):
-            rp = Path(result["report_path"])
-            if rp.is_file():
-                deliverables.append({
-                    "name": rp.name,
-                    "type": "audit_report",
-                    "path": str(rp),
-                    "size_bytes": rp.stat().st_size,
-                })
+        deliverables = _scan_deliverables(result.get("results", []), result.get("report_path"))
 
         return clean_for_json({
             "success": True,
@@ -221,6 +232,7 @@ async def handle_chat(payload: ChatRequest):
             "answer": result.get("answer"),
             "report_path": result.get("report_path"),
             "deliverables": deliverables,
+            "execution_trace": result.get("execution_trace", []),
             "telemetry": result.get("telemetry"),
         })
     except Exception as exc:
@@ -232,6 +244,50 @@ async def handle_chat(payload: ChatRequest):
                 "error": str(exc),
             },
         )
+
+
+@app.post("/api/chat/stream")
+async def handle_chat_stream(payload: ChatRequest):
+    """Streams real-time step execution progress events and final answer via NDJSON."""
+    if not payload.message.strip():
+        raise HTTPException(status_code=400, detail="Message cannot be empty.")
+
+    async def event_generator():
+        import queue
+        q = queue.Queue()
+
+        def runner():
+            try:
+                for event in supervisor.handle_stream(
+                    payload.message,
+                    payload.files or [],
+                    history=payload.history or [],
+                ):
+                    q.put(event)
+                q.put(None)
+            except Exception as e:
+                q.put({"type": "error", "error": str(e)})
+                q.put(None)
+
+        thread = threading.Thread(target=runner, daemon=True)
+        thread.start()
+
+        while True:
+            try:
+                item = q.get_nowait()
+            except queue.Empty:
+                await asyncio.sleep(0.04)
+                continue
+
+            if item is None:
+                break
+
+            if item.get("type") == "complete":
+                item["deliverables"] = _scan_deliverables(item.get("results", []), item.get("report_path"))
+
+            yield (json.dumps(clean_for_json(item)) + "\n").encode("utf-8")
+
+    return StreamingResponse(event_generator(), media_type="application/x-ndjson")
 
 
 ALLOWED_UPLOAD_EXTENSIONS = {
@@ -576,6 +632,20 @@ async def get_certificate():
     return auditor.generate_audit_certificate()
 
 
+@app.get("/api/audit-trail")
+async def get_audit_trail():
+    """Returns the persistent, hash-chained session audit trail ledger."""
+    trail = auditor.get_audit_trail()
+    return {
+        "session_id": auditor.session_id,
+        "enforcement_active": getattr(auditor, "_enforcement_active", False),
+        "total_records": len(trail),
+        "latest_chain_hash": getattr(auditor, "_last_event_hash", "0" * 64),
+        "audit_file": str(getattr(auditor, "audit_log_file", "")),
+        "records": trail,
+    }
+
+
 @app.get("/api/deliverables")
 async def list_deliverables():
     """Lists all generated reports, spreadsheets, presentations, and sandbox plots."""
@@ -631,6 +701,161 @@ async def download_file(filename: str, source: str = "reports"):
         filename=filename,
         media_type=media_type or "application/octet-stream"
     )
+
+
+@app.get("/api/preview/{filename}")
+async def preview_file(filename: str, source: str = "reports"):
+    """Securely inspects and returns on-premises structured preview of generated reports, plots, datasets."""
+    source_map = {
+        "reports": REPORTS_DIR,
+        "sandbox": SANDBOX_DIR,
+        "data": DATA_DIR,
+        "uploads": UPLOADS_DIR,
+    }
+    base = source_map.get(source, REPORTS_DIR)
+    target = (base / filename).resolve()
+
+    if not str(target).startswith(str(base.resolve())):
+        raise HTTPException(status_code=403, detail="Unauthorized directory traversal.")
+    if not target.is_file():
+        raise HTTPException(status_code=404, detail="File not found.")
+
+    ext = target.suffix.lower()
+
+    # 1. Images
+    if ext in (".png", ".jpg", ".jpeg", ".webp", ".svg", ".bmp"):
+        return {
+            "type": "image",
+            "filename": filename,
+            "url": f"/api/download/{filename}?source={source}",
+            "size_bytes": target.stat().st_size,
+        }
+
+    # 2. DOCX (Word Document)
+    elif ext == ".docx":
+        try:
+            import docx
+            doc = docx.Document(str(target))
+            paragraphs = []
+            for p in doc.paragraphs:
+                text = p.text.strip()
+                if text:
+                    paragraphs.append({
+                        "style": p.style.name if p.style else "Normal",
+                        "text": text,
+                    })
+            tables_data = []
+            for table in doc.tables:
+                t_rows = []
+                for row in table.rows:
+                    t_rows.append([cell.text.strip() for cell in row.cells])
+                if t_rows:
+                    tables_data.append(t_rows)
+            return {
+                "type": "docx",
+                "filename": filename,
+                "paragraphs": paragraphs,
+                "tables": tables_data,
+                "size_bytes": target.stat().st_size,
+            }
+        except Exception as e:
+            return {"type": "error", "error": f"Failed to parse DOCX: {e}"}
+
+    # 3. PPTX (PowerPoint Presentation)
+    elif ext == ".pptx":
+        try:
+            import pptx
+            prs = pptx.Presentation(str(target))
+            slides_data = []
+            for idx, slide in enumerate(prs.slides, 1):
+                slide_title = ""
+                bullets = []
+                for shape in slide.shapes:
+                    if shape.has_text_frame:
+                        for p in shape.text_frame.paragraphs:
+                            t = p.text.strip()
+                            if not t:
+                                continue
+                            if not slide_title and shape == slide.shapes[0]:
+                                slide_title = t
+                            else:
+                                bullets.append(t)
+                slides_data.append({
+                    "slide_number": idx,
+                    "title": slide_title or f"Slide {idx}",
+                    "bullets": bullets,
+                })
+            return {
+                "type": "pptx",
+                "filename": filename,
+                "slides": slides_data,
+                "size_bytes": target.stat().st_size,
+            }
+        except Exception as e:
+            return {"type": "error", "error": f"Failed to parse PPTX: {e}"}
+
+    # 4. XLSX (Excel Spreadsheet)
+    elif ext in (".xlsx", ".xls"):
+        try:
+            import openpyxl
+            wb = openpyxl.load_workbook(str(target), read_only=True, data_only=True)
+            sheets_data = {}
+            for sname in wb.sheetnames[:5]:
+                ws = wb[sname]
+                rows = []
+                for r in ws.iter_rows(max_row=50, values_only=True):
+                    rows.append([str(c) if c is not None else "" for c in r])
+                sheets_data[sname] = rows
+            return {
+                "type": "xlsx",
+                "filename": filename,
+                "sheets": sheets_data,
+                "size_bytes": target.stat().st_size,
+            }
+        except Exception as e:
+            return {"type": "error", "error": f"Failed to parse XLSX: {e}"}
+
+    # 5. CSV
+    elif ext == ".csv":
+        try:
+            import csv
+            with open(target, "r", encoding="utf-8", errors="replace") as f:
+                reader = csv.reader(f)
+                rows = [row for row in list(reader)[:50]]
+            return {
+                "type": "csv",
+                "filename": filename,
+                "rows": rows,
+                "size_bytes": target.stat().st_size,
+            }
+        except Exception as e:
+            return {"type": "error", "error": f"Failed to parse CSV: {e}"}
+
+    # 6. Markdown / Text / Code / Log
+    elif ext in (".md", ".txt", ".py", ".json", ".log"):
+        content = target.read_text(encoding="utf-8", errors="replace")[:10000]
+        return {
+            "type": "text",
+            "filename": filename,
+            "content": content,
+            "size_bytes": target.stat().st_size,
+        }
+
+    # 7. PDF
+    elif ext == ".pdf":
+        return {
+            "type": "pdf",
+            "filename": filename,
+            "url": f"/api/download/{filename}?source={source}",
+            "size_bytes": target.stat().st_size,
+        }
+
+    return {
+        "type": "generic",
+        "filename": filename,
+        "url": f"/api/download/{filename}?source={source}",
+        "size_bytes": target.stat().st_size,
+    }
 
 
 @app.get("/api/documents")
@@ -1055,9 +1280,17 @@ async def serve_index():
 
 if __name__ == "__main__":
     import uvicorn
+    from Sovereign_monitor import SovereignNetworkAuditor
+
+    host_info = SovereignNetworkAuditor.get_host_info()
+    local_ip = host_info["local_ip"]
+    bind_host = os.environ.get("HOST", "0.0.0.0")
+    bind_port = int(os.environ.get("PORT", 8000))
+
     print("\n" + "=" * 80)
     print(" [DRISHTI-MRPL] Starting Sovereign Industrial AI Operations Server...")
-    print(" Local URL: http://localhost:8000")
+    print(" Localhost Access:  http://127.0.0.1:8000")
+    print(f" Hotspot / LAN IP:  http://{local_ip}:{bind_port}  <-- Connect remote laptop here")
     print(" Mode: 100% Air-Gapped / Zero External Cloud Connectivity")
     print("=" * 80 + "\n")
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host=bind_host, port=bind_port)
