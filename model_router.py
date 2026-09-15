@@ -87,20 +87,28 @@ class ModelRouter:
     def _create_default_registry(self) -> dict[str, Any]:
         return {
             "active_selection": {
-                "supervisor": "qwen3:8b",
-                "general": "qwen3:8b",
+                "supervisor": "qwen3:8b-finetuned",
+                "general": "qwen3:8b-finetuned",
                 "reasoning": "deepseek-r1:1.5b",
                 "vision": "qwen3-vl:8b",
-                "code": "qwen2.5-coder:7b",
+                "code": "qwen2.5:7b",
             },
             "models": {
                 "qwen3:8b": {
-                    "capabilities": ["text", "reasoning"],
-                    "roles": ["supervisor", "general", "reasoning"],
+                    "capabilities": ["text", "reasoning", "code"],
+                    "roles": ["supervisor", "general", "reasoning", "code"],
                     "vram_estimate_gb": 4.8,
                     "context_window": 8192,
                     "temperature": 0.1,
-                    "description": "Primary PSU supervisor for planning, memorandum drafting, and grounded synthesis.",
+                    "description": "Primary PSU supervisor for planning, memorandum drafting, process coding, and grounded synthesis.",
+                },
+                "qwen3:8b-finetuned": {
+                    "capabilities": ["text", "reasoning", "code"],
+                    "roles": ["supervisor", "general", "reasoning", "code"],
+                    "vram_estimate_gb": 4.8,
+                    "context_window": 40960,
+                    "temperature": 0.1,
+                    "description": "Locally fine-tuned PSU sovereign model for MRPL operations, planning, memorandum synthesis, and engineering code.",
                 },
                 "qwen3-vl:8b": {
                     "capabilities": ["text", "vision"],
@@ -110,21 +118,21 @@ class ModelRouter:
                     "temperature": 0.0,
                     "description": "Multimodal visual inspection model for P&IDs and ultrasonic scans.",
                 },
-                "qwen2.5vl:3b": {
-                    "capabilities": ["text", "vision"],
+                "qwen2.5vl:7b": {
+                    "capabilities": ["vision", "text"],
                     "roles": ["vision"],
-                    "vram_estimate_gb": 3.2,
-                    "context_window": 2048,
-                    "temperature": 0.0,
-                    "description": "Ultra-lightweight multimodal vision model for edge deployment.",
-                },
-                "qwen2.5-coder:7b": {
-                    "capabilities": ["text", "code"],
-                    "roles": ["code"],
-                    "vram_estimate_gb": 4.2,
+                    "vram_estimate_gb": 4.0,
                     "context_window": 4096,
                     "temperature": 0.0,
-                    "description": "Specialized code generation engine for process calculations and scripts.",
+                    "description": "High-efficiency multimodal vision model for P&IDs and equipment inspection.",
+                },
+                "qwen2.5:7b": {
+                    "capabilities": ["text", "reasoning", "code"],
+                    "roles": ["supervisor", "general", "code"],
+                    "vram_estimate_gb": 4.5,
+                    "context_window": 4096,
+                    "temperature": 0.1,
+                    "description": "Structured prose generator and Python code engine for PSU memorandum drafting and technical calculations.",
                 },
                 "deepseek-r1:1.5b": {
                     "capabilities": ["text", "reasoning"],
@@ -134,13 +142,21 @@ class ModelRouter:
                     "temperature": 0.2,
                     "description": "Chain-of-thought model for root-cause analysis.",
                 },
+                "deepseek-r1:7b": {
+                    "capabilities": ["text", "reasoning"],
+                    "roles": ["general", "reasoning", "supervisor"],
+                    "vram_estimate_gb": 4.0,
+                    "context_window": 4096,
+                    "temperature": 0.1,
+                    "description": "7B parameter deep reasoning engine for complex troubleshooting and failure mode analyses.",
+                },
             },
             "fallbacks": {
                 "supervisor": "qwen3:8b",
                 "general": "qwen3:8b",
-                "reasoning": "qwen3:8b",
-                "vision": "qwen2.5vl:3b",
-                "code": "qwen2.5-coder:7b",
+                "reasoning": "deepseek-r1:1.5b",
+                "vision": "qwen2.5vl:7b",
+                "code": "qwen2.5:7b",
             },
         }
 

@@ -32,9 +32,9 @@ class TestModelRouterIntegration(unittest.TestCase):
         # Verify router returns qwen3-vl:8b
         self.assertEqual(self.router.get_model("vision"), "qwen3-vl:8b")
 
-        # Now dynamically switch to qwen2.5vl:3b
-        self.router.set_active_model("vision", "qwen2.5vl:3b")
-        self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:3b")
+        # Now dynamically switch to qwen2.5vl:7b
+        self.router.set_active_model("vision", "qwen2.5vl:7b")
+        self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:7b")
 
         # Switch back to default
         self.router.set_active_model("vision", "qwen3-vl:8b")
@@ -65,16 +65,16 @@ class TestModelRouterIntegration(unittest.TestCase):
         self.assertIn("available_models", vision_prof)
         v_ids = [m["model_id"] for m in vision_prof["available_models"]]
         self.assertIn("qwen3-vl:8b", v_ids)
-        self.assertIn("qwen2.5vl:3b", v_ids)
+        self.assertIn("qwen2.5vl:7b", v_ids)
 
     def test_api_model_select_endpoint(self):
         """Test POST /api/models/select endpoint updates active selection."""
         # Switch vision model
-        payload = ModelSelectPayload(role="vision", model_id="qwen2.5vl:3b")
+        payload = ModelSelectPayload(role="vision", model_id="qwen2.5vl:7b")
         data = asyncio.run(select_model(payload))
         self.assertEqual(data["status"], "success")
-        self.assertEqual(data["active_model"], "qwen2.5vl:3b")
-        self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:3b")
+        self.assertEqual(data["active_model"], "qwen2.5vl:7b")
+        self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:7b")
 
         # Switch back
         payload = ModelSelectPayload(role="vision", model_id="qwen3-vl:8b")
@@ -85,7 +85,7 @@ class TestModelRouterIntegration(unittest.TestCase):
     def test_api_model_select_invalid_role(self):
         """Test POST /api/models/select rejects incompatible model assignment."""
         from fastapi import HTTPException
-        payload = ModelSelectPayload(role="vision", model_id="qwen2.5-coder:7b")
+        payload = ModelSelectPayload(role="vision", model_id="deepseek-r1:1.5b")
         with self.assertRaises(HTTPException):
             asyncio.run(select_model(payload))
 

@@ -18,8 +18,8 @@ class TestModelRouter(unittest.TestCase):
         self.router.load_registry()
 
     def test_default_role_resolution(self):
-        self.assertEqual(self.router.get_model("supervisor"), "qwen3:8b")
-        self.assertEqual(self.router.get_model("code"), "qwen2.5-coder:7b")
+        self.assertEqual(self.router.get_model("supervisor"), "qwen3:8b-finetuned")
+        self.assertEqual(self.router.get_model("code"), "qwen2.5:7b")
         self.assertEqual(self.router.get_model("vision"), "qwen3-vl:8b")
         self.assertEqual(self.router.get_model("reasoning"), "deepseek-r1:1.5b")
 
@@ -27,14 +27,14 @@ class TestModelRouter(unittest.TestCase):
         vision_models = self.router.get_available_models_for_role("vision")
         model_ids = [m["model_id"] for m in vision_models]
         self.assertIn("qwen3-vl:8b", model_ids)
-        self.assertIn("qwen2.5vl:3b", model_ids)
-        self.assertNotIn("qwen2.5-coder:7b", model_ids)
+        self.assertIn("qwen2.5vl:7b", model_ids)
+        self.assertNotIn("deepseek-r1:1.5b", model_ids)
 
     def test_switch_active_model_valid(self):
-        # Switch vision model to qwen2.5vl:3b
-        ok, msg = self.router.set_active_model("vision", "qwen2.5vl:3b")
+        # Switch vision model to qwen2.5vl:7b
+        ok, msg = self.router.set_active_model("vision", "qwen2.5vl:7b")
         self.assertTrue(ok, msg)
-        self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:3b")
+        self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:7b")
 
         # Switch back to qwen3-vl:8b
         ok, msg = self.router.set_active_model("vision", "qwen3-vl:8b")
@@ -42,8 +42,8 @@ class TestModelRouter(unittest.TestCase):
         self.assertEqual(self.router.get_model("vision"), "qwen3-vl:8b")
 
     def test_switch_active_model_invalid_role(self):
-        # qwen2.5-coder:7b does not have vision role
-        ok, msg = self.router.set_active_model("vision", "qwen2.5-coder:7b")
+        # deepseek-r1:1.5b does not have vision role
+        ok, msg = self.router.set_active_model("vision", "deepseek-r1:1.5b")
         self.assertFalse(ok)
         self.assertIn("only supports roles", msg)
 
@@ -54,7 +54,7 @@ class TestModelRouter(unittest.TestCase):
 
     def test_model_config(self):
         cfg = self.router.get_model_config("code")
-        self.assertEqual(cfg["model_id"], "qwen2.5-coder:7b")
+        self.assertEqual(cfg["model_id"], "qwen2.5:7b")
         self.assertIn("temperature", cfg)
         self.assertIn("context_window", cfg)
 

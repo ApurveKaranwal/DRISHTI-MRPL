@@ -24,11 +24,19 @@ from pathlib import Path
 from typing import Any
 
 
+def _detect_python_executable() -> str:
+    """Detects virtual environment python executable or falls back to sys.executable."""
+    venv_py = Path(__file__).parent.absolute() / "venv" / "bin" / "python"
+    if venv_py.is_file():
+        return str(venv_py)
+    return sys.executable
+
+
 @dataclass(frozen=True)
 class SandboxSettings:
     sandbox_dir: Path = Path(os.getenv("SANDBOX_DIR", "./outputs/sandbox"))
     timeout_seconds: float = float(os.getenv("SANDBOX_TIMEOUT", "30.0"))
-    python_executable: str = sys.executable
+    python_executable: str = _detect_python_executable()
 
 
 class SecurityViolationError(RuntimeError):
@@ -230,7 +238,7 @@ class CodeSandboxWorker:
         timed_out = False
         try:
             process = subprocess.run(
-                [self.settings.python_executable, str(script_file)],
+                [self.settings.python_executable, str(resolved_script)],
                 capture_output=True,
                 text=True,
                 timeout=self.settings.timeout_seconds,

@@ -78,8 +78,11 @@ class DataAnalysisWorker:
         self.settings = settings or AnalysisSettings()  # Uses supplied settings or safe environment defaults.
         self.settings.data_dir.mkdir(parents=True, exist_ok=True)  # Creates local state directory if needed.
         self.db_path = self.settings.data_dir / self.settings.db_filename  # Chooses the DuckDB file location.
-        self.conn = duckdb.connect(str(self.db_path))  # Opens (or creates) the persistent local database.
-        self._initialize_registry()  # Creates the bookkeeping tables before any ingestion occurs.
+        try:
+            self.conn = duckdb.connect(str(self.db_path))  # Opens (or creates) the persistent local database.
+            self._initialize_registry()  # Creates the bookkeeping tables before any ingestion occurs.
+        except duckdb.IOException:
+            self.conn = duckdb.connect(str(self.db_path), read_only=True)  # Fallback to read-only when server holds lock.
 
     # ------------------------------------------------------------------ #
     # Registry: dedup + table bookkeeping (stored inside DuckDB itself)

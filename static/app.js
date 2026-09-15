@@ -1029,7 +1029,8 @@ async function discoverModels() {
   try {
     const res = await fetch('/api/models/discover');
     const data = await res.json();
-    alert(`Ollama discovery complete. Found ${data.length || 0} pending unregistered models.`);
+    const count = data.count ?? data.pending?.length ?? 0;
+    alert(`Ollama discovery complete. Found ${count} pending unregistered model${count === 1 ? '' : 's'}.`);
     fetchModels();
   } catch (err) {
     alert(`Discovery error: ${err.message}`);
