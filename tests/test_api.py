@@ -153,7 +153,13 @@ def test_telemetry_endpoint():
     assert status == 200, f"Expected 200, got {status}"
     tel = json.loads(body.decode())
     assert "active_sockets" in tel
-    print(f"PASS: /api/telemetry actively tracking {len(tel['active_sockets'])} local sockets")
+    assert "client_ip" in tel, "Missing client_ip in telemetry"
+    assert "is_client_node" in tel, "Missing is_client_node in telemetry"
+    assert "connection_type" in tel, "Missing connection_type in telemetry"
+    assert "network_throughput" in tel, "Missing network_throughput in telemetry"
+    assert "cluster_inferences" in tel, "Missing cluster_inferences in telemetry"
+    assert "connected_clients" in tel, "Missing connected_clients in telemetry"
+    print(f"PASS: /api/telemetry actively tracking {len(tel['active_sockets'])} local sockets, node role: {tel.get('node_role')}")
 
 
 if __name__ == "__main__":

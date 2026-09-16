@@ -31,15 +31,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Periodic telemetry polling (3s)
   setInterval(fetchSystemTelemetry, 3000);
+
+  // Sync initial copilot panel state
+  const copilotPanel = document.getElementById('copilot-panel');
+  if (copilotPanel && !copilotPanel.classList.contains('collapsed')) {
+    document.body.classList.add('copilot-expanded');
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) appContainer.classList.add('copilot-expanded');
+  }
 });
+
+function toggleSidebar(forceState) {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (!sidebar) return;
+  const shouldOpen = typeof forceState === 'boolean' ? forceState : !sidebar.classList.contains('open');
+  sidebar.classList.toggle('open', shouldOpen);
+  if (backdrop) backdrop.classList.toggle('open', shouldOpen);
+}
 
 function setupNavigation() {
   const navItems = document.querySelectorAll('.nav-item');
   navItems.forEach(item => {
     item.addEventListener('click', () => {
       const tab = item.getAttribute('data-tab');
-      if (tab) switchTab(tab);
+      if (tab) {
+        switchTab(tab);
+        if (window.innerWidth <= 900) {
+          toggleSidebar(false);
+        }
+      }
     });
+  });
+
+  // Global mobile keyboard shortcut for closing drawers
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      toggleSidebar(false);
+      if (window.innerWidth <= 600) {
+        const copilot = document.getElementById('copilot-panel');
+        if (copilot && !copilot.classList.contains('collapsed')) {
+          toggleCopilot();
+        }
+      }
+    }
   });
 }
 
@@ -110,12 +145,22 @@ function switchTab(tabId) {
   if (tabId === 'alerts') fetchSparesAlerts();
   if (tabId === 'crude-economics') fetchCrudeEconomics();
   if (tabId === 'overview') fetchRefineryOverview();
+
+  // DRISHTI LIVE PLANT - HOOK
+  if (tabId === 'live-plant') {
+    if (window.activateLivePlant) window.activateLivePlant();
+  } else {
+    if (window.deactivateLivePlant) window.deactivateLivePlant();
+  }
 }
 
 function triggerSimulationPrompt() {
   const panel = document.getElementById('copilot-panel');
   if (panel && panel.classList.contains('collapsed')) {
     panel.classList.remove('collapsed');
+    document.body.classList.add('copilot-expanded');
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) appContainer.classList.add('copilot-expanded');
   }
   switchCopilotTab('chat');
   
@@ -139,6 +184,10 @@ function toggleCopilot() {
   const panel = document.getElementById('copilot-panel');
   if (panel) {
     panel.classList.toggle('collapsed');
+    const isExpanded = !panel.classList.contains('collapsed');
+    document.body.classList.toggle('copilot-expanded', isExpanded);
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) appContainer.classList.toggle('copilot-expanded', isExpanded);
   }
 }
 
@@ -982,7 +1031,9 @@ async function runSqlQuery() {
 // --------------------------------------------------------------------------
 async function fetchSystemTelemetry() {
   try {
+    const t0 = performance.now();
     const res = await fetch('/api/telemetry');
+    const pingMs = Math.max(1, Math.round(performance.now() - t0));
     if (!res.ok) return;
     const data = await res.json();
 
@@ -995,7 +1046,7 @@ async function fetchSystemTelemetry() {
     const hostname = data.hostname || 'Localhost';
     const serverIp = data.server_ip || window.location.hostname || '127.0.0.1';
 
-    // 100% Real Hardware Telemetry (No fake 3050 fallback)
+    // 100% Real Hardware Telemetry
     const hw = data.hardware || {};
     const gpuInfo = hw.gpu;
     const cpuInfo = hw.cpu;
@@ -1018,14 +1069,46 @@ async function fetchSystemTelemetry() {
       computeSub = 'Local Hardware Enclave';
     }
 
-    const hostDisplay = `${hostname}`;
-    const hostSubDisplay = `${serverIp} • Hotspot/LAN`;
+    // Host vs Client Network Node Topology
+    const isClientNode = Boolean(data.is_client_node);
+    const clientIp = data.client_ip || '127.0.0.1';
+    const clientDevice = data.client_device || 'Node';
+    const connectedClients = data.connected_clients || [];
+    const connectedCount = data.connected_clients_count || 0;
+    const netThroughput = data.network_throughput || { tx_rate_kbps: 0.0, rx_rate_kbps: 0.0 };
+    const clusterInferences = data.cluster_inferences || { total: 0, host: 0, client: 0 };
+
+    let hostDisplay = '';
+    let hostSubDisplay = '';
+    let roleBadgeText = '';
+    let roleBadgeClass = '';
+    let nodeIpDisplay = '';
+
+    if (isClientNode) {
+      // Remote device connected via Hotspot/LAN
+      hostDisplay = `CLIENT: ${clientIp}`;
+      hostSubDisplay = `Host: ${serverIp} • ${pingMs}ms Hotspot Ping`;
+      roleBadgeText = `CLIENT NODE (${clientDevice})`;
+      roleBadgeClass = 'interlink-role-badge role-client';
+      nodeIpDisplay = `${clientIp} → ${serverIp}`;
+    } else {
+      // Host machine (local enclave server)
+      hostDisplay = `${hostname}`;
+      hostSubDisplay = `${serverIp} • ${connectedCount} Client Node(s)`;
+      roleBadgeText = 'HOST ENCLAVE CORE';
+      roleBadgeClass = 'interlink-role-badge';
+      nodeIpDisplay = `${serverIp} (${hostname})`;
+    }
 
     // 1. Update Header Subtitle
     const badgeSub = document.getElementById('header-airgap-sub');
     if (badgeSub) {
       if (isAirGapped) {
-        badgeSub.textContent = `0 WAN • ${wanBytes} B LEAKAGE • GUARDRAIL: ${guardrailState} (${serverIp})`;
+        if (isClientNode) {
+          badgeSub.textContent = `0 WAN • 0 B LEAKAGE • CLIENT (${clientIp}) → HOST (${serverIp}) • ${pingMs}ms PING`;
+        } else {
+          badgeSub.textContent = `0 WAN • 0 B LEAKAGE • HOST CORE (${serverIp}) • ${connectedCount} CLIENT(S) CONNECTED`;
+        }
         badgeSub.style.color = '#2E7D32';
       } else {
         badgeSub.textContent = `ALERT: ${wanCount} EXTERNAL WAN DETECTED`;
@@ -1043,12 +1126,17 @@ async function fetchSystemTelemetry() {
 
     const hdrSockets = document.getElementById('hdr-metric-sockets');
     if (hdrSockets) {
-      hdrSockets.textContent = `${activeSockets.length} Active Ports (${serverIp})`;
+      const txKbps = netThroughput.tx_rate_kbps || 0;
+      hdrSockets.textContent = `${activeSockets.length} Ports • ${txKbps.toFixed(1)} KB/s TX`;
     }
 
     const hdrHost = document.getElementById('hdr-metric-host');
     if (hdrHost) {
-      hdrHost.textContent = `${hostname} (${serverIp})`;
+      if (isClientNode) {
+        hdrHost.textContent = `Client: ${clientIp} (${pingMs}ms)`;
+      } else {
+        hdrHost.textContent = `${hostname} (${serverIp})`;
+      }
     }
 
     // 3. Update Operations Card Live Values
@@ -1100,6 +1188,53 @@ async function fetchSystemTelemetry() {
 
     const execHostSub = document.getElementById('exec-banner-host-sub');
     if (execHostSub) execHostSub.textContent = hostSubDisplay;
+
+    // 5. Update Hotspot Interlink Telemetry Bars (Overview & Executive)
+    const txRate = netThroughput.tx_rate_kbps || 0;
+    const rxRate = netThroughput.rx_rate_kbps || 0;
+    const throughputStr = `▲ ${txRate.toFixed(1)} KB/s TX • ▼ ${rxRate.toFixed(1)} KB/s RX`;
+    const inferencesStr = `${clusterInferences.total || 0} Total (${clusterInferences.client || 0} Client / ${clusterInferences.host || 0} Host)`;
+
+    // Render roster HTML
+    let rosterHtml = '';
+    if (connectedClients.length === 0) {
+      rosterHtml = `<span class="interlink-roster-tag">${isClientNode ? 'Linked via Hotspot' : '0 Hotspot Clients Linked'}</span>`;
+    } else {
+      rosterHtml = connectedClients.map(c => `
+        <span class="interlink-client-pill ${c.status === 'ACTIVE' ? 'active' : ''}" title="${escapeHtml(c.device)} • Action: ${escapeHtml(c.last_action)} (${c.last_seen_seconds_ago}s ago) • Inferences: ${c.total_inferences}">
+          <span class="pill-dot"></span>
+          <span>${escapeHtml(c.device.split(' ')[0])}: ${escapeHtml(c.ip)}</span>
+          ${c.total_inferences > 0 ? `<span style="font-weight:700; color: #1B5E20;">(${c.total_inferences} inf)</span>` : ''}
+        </span>
+      `).join('');
+    }
+
+    const pairs = [
+      { badgeId: 'interlink-role-badge', ipId: 'interlink-node-ip', pingId: 'interlink-ping-val', thId: 'interlink-throughput-val', infId: 'interlink-inferences-val', rosterId: 'interlink-client-roster' },
+      { badgeId: 'exec-interlink-role-badge', ipId: 'exec-interlink-node-ip', pingId: 'exec-interlink-ping-val', thId: 'exec-interlink-throughput-val', infId: 'exec-interlink-inferences-val', rosterId: 'exec-interlink-client-roster' }
+    ];
+
+    pairs.forEach(p => {
+      const bEl = document.getElementById(p.badgeId);
+      if (bEl) {
+        bEl.textContent = roleBadgeText;
+        bEl.className = roleBadgeClass;
+      }
+      const ipEl = document.getElementById(p.ipId);
+      if (ipEl) ipEl.textContent = nodeIpDisplay;
+
+      const pingEl = document.getElementById(p.pingId);
+      if (pingEl) pingEl.textContent = `${pingMs}ms`;
+
+      const thEl = document.getElementById(p.thId);
+      if (thEl) thEl.textContent = throughputStr;
+
+      const infEl = document.getElementById(p.infId);
+      if (infEl) infEl.textContent = inferencesStr;
+
+      const rEl = document.getElementById(p.rosterId);
+      if (rEl) rEl.innerHTML = rosterHtml;
+    });
 
   } catch (err) {
     // Keep baseline
@@ -1168,7 +1303,7 @@ async function openCertificateModal() {
   try {
     const [certRes, telemRes] = await Promise.all([
       fetch('/api/certificate'),
-      fetch('/api/system-telemetry')
+      fetch('/api/telemetry')
     ]);
     const cert = await certRes.json();
     const telem = await telemRes.json();
@@ -1178,6 +1313,69 @@ async function openCertificateModal() {
     const internalCalls = cert.total_internal_tool_calls || cert.total_internal_calls || 0;
     const externalCalls = telem.external_wan_calls || 0;
     const outboundBytes = cert.external_wan_bytes_transferred || telem.outbound_internet_bytes || 0;
+
+    const connectedClients = telem.connected_clients || [];
+    const isClientNode = Boolean(telem.is_client_node);
+    const clientIp = telem.client_ip || '127.0.0.1';
+    const serverIp = cert.server_ip || telem.server_ip || '127.0.0.1';
+    const hostname = cert.hostname || telem.hostname || 'Localhost';
+    const clusterInferences = telem.cluster_inferences || { total: 0, host: 0, client: 0 };
+    const netThroughput = telem.network_throughput || { tx_rate_kbps: 0, rx_rate_kbps: 0 };
+
+    // Build Cluster Node Rows
+    let nodeRows = `
+      <tr>
+        <td>
+          <span style="font-weight:700; color: #1B5E20;">HOST SERVER</span>
+          ${!isClientNode ? '<span class="status-badge-pill badge-green" style="font-size:8.5px; margin-left:4px;">THIS DEVICE</span>' : ''}
+        </td>
+        <td><strong>${escapeHtml(serverIp)}</strong> (${escapeHtml(hostname)})</td>
+        <td>Host Hardware Enclave</td>
+        <td><span class="status-badge-pill badge-green">CORE ACTIVE</span></td>
+        <td><strong>${clusterInferences.host || 0}</strong> dispatches</td>
+      </tr>
+    `;
+
+    if (connectedClients.length === 0) {
+      if (isClientNode) {
+        nodeRows += `
+          <tr>
+            <td>
+              <span style="font-weight:700; color: #0D47A1;">CLIENT NODE</span>
+              <span class="status-badge-pill badge-blue" style="font-size:8.5px; margin-left:4px;">THIS DEVICE</span>
+            </td>
+            <td><strong>${escapeHtml(clientIp)}</strong></td>
+            <td>${escapeHtml(telem.client_device || 'Remote Device')}</td>
+            <td><span class="status-badge-pill badge-green">HOTSPOT LINKED</span></td>
+            <td><strong>${clusterInferences.client || 0}</strong> dispatches</td>
+          </tr>
+        `;
+      } else {
+        nodeRows += `
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-taupe); font-style: italic; padding: 10px;">
+              No remote hotspot clients currently connected. Connect a phone, tablet, or laptop via Wi-Fi hotspot to link nodes.
+            </td>
+          </tr>
+        `;
+      }
+    } else {
+      connectedClients.forEach(c => {
+        const isCurrentClient = isClientNode && c.ip === clientIp;
+        nodeRows += `
+          <tr>
+            <td>
+              <span style="font-weight:700; color: #0D47A1;">CLIENT NODE</span>
+              ${isCurrentClient ? '<span class="status-badge-pill badge-blue" style="font-size:8.5px; margin-left:4px;">THIS DEVICE</span>' : ''}
+            </td>
+            <td><strong>${escapeHtml(c.ip)}</strong></td>
+            <td>${escapeHtml(c.device)}</td>
+            <td><span class="status-badge-pill ${c.status === 'ACTIVE' ? 'badge-green' : 'badge-terracotta'}">${escapeHtml(c.status)} (${c.last_seen_seconds_ago}s ago)</span></td>
+            <td><strong>${c.total_inferences || 0}</strong> (${escapeHtml(c.last_action)})</td>
+          </tr>
+        `;
+      });
+    }
 
     let socketRows = '';
     if (sockets.length === 0) {
@@ -1202,14 +1400,19 @@ async function openCertificateModal() {
         </tr>
       `;
     } else {
-      socketRows = sockets.map(s => `
-        <tr>
-          <td><strong>${escapeHtml(s.local_address)}</strong></td>
-          <td>${escapeHtml(s.remote_address || 'LISTEN')}</td>
-          <td>${escapeHtml(s.status || 'ESTABLISHED')}</td>
-          <td><span class="status-badge-pill ${s.classification === 'LOCAL_LOOPBACK' ? 'badge-green' : 'badge-terracotta'}">${escapeHtml(s.classification)}</span></td>
-        </tr>
-      `).join('');
+      socketRows = sockets.map(s => {
+        let badgeClass = 'badge-terracotta';
+        if (s.classification === 'LOCAL_LOOPBACK') badgeClass = 'badge-green';
+        else if (s.classification === 'HOTSPOT_CLIENT_LINK') badgeClass = 'badge-blue';
+        return `
+          <tr>
+            <td><strong>${escapeHtml(s.local_address)}</strong></td>
+            <td>${escapeHtml(s.remote_address || 'LISTEN')}</td>
+            <td>${escapeHtml(s.status || 'ESTABLISHED')}</td>
+            <td><span class="status-badge-pill ${badgeClass}">${escapeHtml(s.classification)}</span></td>
+          </tr>
+        `;
+      }).join('');
     }
 
     body.innerHTML = `
@@ -1221,8 +1424,12 @@ async function openCertificateModal() {
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
             </div>
             <div>
-              <div style="font-size: 14px; font-weight: 700; color: #1B5E20;">100% Air-Gapped Sovereign Enclave</div>
-              <div style="font-size: 11px; color: #2E7D32; font-family: var(--font-mono); margin-top: 1px;">Guardrail: ${escapeHtml(cert.airgap_enforcement || 'ACTIVE')} • Zero Outbound WAN Transmission Enforced</div>
+              <div style="font-size: 14px; font-weight: 700; color: #1B5E20;">
+                ${isClientNode ? `Client Node (${escapeHtml(clientIp)}) Linked to Sovereign Enclave` : '100% Air-Gapped Sovereign Enclave Core'}
+              </div>
+              <div style="font-size: 11px; color: #2E7D32; font-family: var(--font-mono); margin-top: 1px;">
+                Guardrail: ${escapeHtml(cert.airgap_enforcement || 'ACTIVE')} • Throughput: ▲ ${netThroughput.tx_rate_kbps || 0} KB/s • ▼ ${netThroughput.rx_rate_kbps || 0} KB/s
+              </div>
             </div>
           </div>
           <div style="text-align: right; font-family: var(--font-mono); font-size: 10px; color: #2E7D32;">
@@ -1244,14 +1451,42 @@ async function openCertificateModal() {
             <div class="metric-sub-note" style="font-size: 9.5px;">${cert.blocked_breaches_count || 0} Breaches Blocked</div>
           </div>
           <div class="metric-kpi-tile" style="padding: 10px 12px;">
-            <div class="metric-label" style="font-size: 9px;">Local Tool Calls</div>
-            <div class="metric-val-big" style="font-size: 20px; color: var(--text-charcoal);">${internalCalls}</div>
-            <div class="metric-sub-note" style="font-size: 9.5px;">100% On-Premises</div>
+            <div class="metric-label" style="font-size: 9px;">Cluster Inferences</div>
+            <div class="metric-val-big" style="font-size: 20px; color: var(--text-charcoal);">${clusterInferences.total || 0}</div>
+            <div class="metric-sub-note" style="font-size: 9.5px;">${clusterInferences.client || 0} Remote / ${clusterInferences.host || 0} Host</div>
           </div>
           <div class="metric-kpi-tile" style="padding: 10px 12px;">
-            <div class="metric-label" style="font-size: 9px;">Host Enclave</div>
-            <div class="metric-val-big" style="font-size: 14px; color: var(--accent-terracotta); word-break: break-all;">${escapeHtml(cert.hostname || telem.hostname || 'Localhost')}</div>
-            <div class="metric-sub-note" style="font-size: 9.5px;">${escapeHtml(cert.server_ip || telem.server_ip || '127.0.0.1')} • Hotspot LAN</div>
+            <div class="metric-label" style="font-size: 9px;">Node Topology</div>
+            <div class="metric-val-big" style="font-size: 14px; color: var(--accent-terracotta); word-break: break-all;">
+              ${isClientNode ? `Client: ${escapeHtml(clientIp)}` : `Host: ${escapeHtml(hostname)}`}
+            </div>
+            <div class="metric-sub-note" style="font-size: 9.5px;">
+              ${escapeHtml(serverIp)} • ${connectedClients.length} Hotspot Client(s)
+            </div>
+          </div>
+        </div>
+
+        <!-- Hotspot & Client Machine Cluster Topology -->
+        <div style="border: 1px solid var(--border-sand); border-radius: var(--radius-md); overflow: hidden;">
+          <div style="padding: 8px 14px; background: var(--bg-sub); border-bottom: 1px solid var(--border-sand); display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-family: var(--font-mono); font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--text-charcoal);">Hotspot & Client Machine Cluster Topology</span>
+            <span class="status-badge-pill badge-green" style="font-size: 9px; padding: 2px 6px;">${connectedClients.length + 1} ACTIVE NODE(S)</span>
+          </div>
+          <div class="editorial-table-wrap" style="max-height: 160px; overflow-y: auto;">
+            <table class="editorial-table" style="font-size: 11px;">
+              <thead>
+                <tr>
+                  <th>Node Role</th>
+                  <th>IP / Hostname</th>
+                  <th>Device Profile</th>
+                  <th>Connection Status</th>
+                  <th>Model Dispatches</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${nodeRows}
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -1259,7 +1494,7 @@ async function openCertificateModal() {
         <div style="border: 1px solid var(--border-sand); border-radius: var(--radius-md); overflow: hidden;">
           <div style="padding: 8px 14px; background: var(--bg-sub); border-bottom: 1px solid var(--border-sand); display: flex; justify-content: space-between; align-items: center;">
             <span style="font-family: var(--font-mono); font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--text-charcoal);">Active Process Network Sockets</span>
-            <span class="status-badge-pill badge-green" style="font-size: 9px; padding: 2px 6px;">LOOPBACK ONLY</span>
+            <span class="status-badge-pill badge-green" style="font-size: 9px; padding: 2px 6px;">AIR-GAP ISOLATED</span>
           </div>
           <div class="editorial-table-wrap" style="max-height: 180px; overflow-y: auto;">
             <table class="editorial-table" style="font-size: 11px;">
@@ -2044,3 +2279,408 @@ function renderSheetTableHtml(rows) {
   `;
 }
 
+
+// DRISHTI LIVE PLANT - START
+const livePlantState = {
+  active: false,
+  intervalId: null,
+  assets: [],
+  snapshot: null,
+  historyData: [],
+  chartMetric: 'risk.score',
+  focusMode: 'AUTO',
+  selectedAsset: null
+};
+
+function lpEl(id) {
+  return document.getElementById(id);
+}
+
+function lpStatusMeta(status, score) {
+  const s = String(status || 'NORMAL').toUpperCase();
+  const n = Number(score || 0);
+  if (s === 'CRITICAL' || n >= 80) return { text: 'CRITICAL', color: 'var(--status-red-text)', badge: 'badge-red', card: 'critical' };
+  if (s === 'WARNING' || n >= 60) return { text: 'WARNING', color: 'var(--status-amber-text)', badge: 'badge-terracotta', card: 'high-risk' };
+  if (s === 'WATCH' || n >= 30) return { text: 'WATCH', color: 'var(--status-amber-text)', badge: 'badge-terracotta', card: 'high-risk' };
+  return { text: 'NORMAL', color: 'var(--status-green-text)', badge: 'badge-green', card: '' };
+}
+
+function lpFormatValue(value, decimals = 2) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n.toFixed(decimals) : '--';
+}
+
+function lpFormatTime(timestamp) {
+  if (!timestamp) return '--';
+  const d = new Date(timestamp);
+  return Number.isNaN(d.getTime()) ? '--' : d.toLocaleTimeString();
+}
+
+function lpFormatAge(timestamp) {
+  if (!timestamp) return '--';
+  const t = new Date(timestamp).getTime();
+  if (!Number.isFinite(t)) return '--';
+  const age = Math.max(0, (Date.now() - t) / 1000);
+  return `${age < 10 ? age.toFixed(1) : Math.round(age)}s ago`;
+}
+
+function lpAssetDomKey(assetId) {
+  return String(assetId || '').toLowerCase().replace(/-/g, '');
+}
+
+function lpUpdateConnection(connected, timestamp) {
+  const badge = lpEl('lp-status-badge');
+  const last = lpEl('lp-last-updated');
+  if (!badge || !last) return;
+  const pill = badge.parentElement;
+  if (connected) {
+    badge.textContent = 'SCADA ONLINE';
+    last.textContent = `${lpFormatTime(timestamp)} (${lpFormatAge(timestamp)})`;
+    if (pill) {
+      pill.style.background = 'var(--status-green-bg)';
+      pill.style.borderColor = 'var(--status-green-border)';
+      pill.style.color = 'var(--status-green-text)';
+    }
+  } else {
+    badge.textContent = 'SCADA OFFLINE';
+    last.textContent = 'Disconnected';
+    if (pill) {
+      pill.style.background = 'var(--status-red-bg)';
+      pill.style.borderColor = 'var(--status-red-border)';
+      pill.style.color = 'var(--status-red-text)';
+    }
+  }
+}
+
+window.activateLivePlant = function() {
+  if (livePlantState.active) return;
+  livePlantState.active = true;
+  fetchLivePlantScenarios();
+  fetchLivePlantState();
+  livePlantState.intervalId = setInterval(fetchLivePlantState, 2000);
+};
+
+window.deactivateLivePlant = function() {
+  livePlantState.active = false;
+  if (livePlantState.intervalId) {
+    clearInterval(livePlantState.intervalId);
+    livePlantState.intervalId = null;
+  }
+};
+
+async function fetchLivePlantState() {
+  try {
+    const params = new URLSearchParams();
+    if (livePlantState.focusMode === 'MANUAL' && livePlantState.selectedAsset) {
+      params.set('asset_id', livePlantState.selectedAsset);
+    }
+
+    const query = params.toString();
+    const res = await fetch(`/api/runtime/live-state${query ? `?${query}` : ''}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.detail || 'Runtime state unavailable');
+
+    livePlantState.snapshot = data;
+    livePlantState.assets = data.assets || [];
+    livePlantState.historyData = data.history || [];
+
+    if (livePlantState.focusMode === 'AUTO') {
+      livePlantState.selectedAsset = data.focus_asset_id || data.plant_risk?.asset_id || livePlantState.assets[0]?.asset_id || null;
+    }
+
+    lpUpdateConnection(true, data.timestamp || data.simulator?.latest_timestamp);
+    renderLivePlantState(data);
+  } catch (error) {
+    console.warn('Live plant state fetch error:', error);
+    lpUpdateConnection(false, null);
+  }
+}
+
+async function fetchLivePlantScenarios() {
+  try {
+    const res = await fetch('/api/runtime/scenarios', { cache: 'no-store' });
+    if (!res.ok) return;
+    const json = await res.json();
+    const select = lpEl('lp-scenario-select');
+    const list = json.scenarios || [];
+    if (!select || !list.length) return;
+
+    const current = select.value;
+    select.innerHTML = list.map(sc => `<option value="${escapeHtml(sc.name)}">${escapeHtml(sc.name.replaceAll('_', ' '))}</option>`).join('');
+    if (list.some(sc => sc.name === current)) select.value = current;
+  } catch (error) {
+    console.warn('Scenario fetch error:', error);
+  }
+}
+
+async function applyLivePlantScenario() {
+  const select = lpEl('lp-scenario-select');
+  if (!select) return;
+  const button = document.querySelector('[onclick="applyLivePlantScenario()"]');
+  if (button) button.disabled = true;
+
+  try {
+    const res = await fetch('/api/runtime/scenario', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenario: select.value })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    await fetchLivePlantState();
+  } catch (error) {
+    console.warn('Scenario apply error:', error);
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+async function startLivePlantSimulator() {
+  try {
+    const res = await fetch('/api/runtime/start', { method: 'POST' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    await fetchLivePlantState();
+  } catch (error) {
+    console.warn('Runtime start error:', error);
+  }
+}
+
+async function stopLivePlantSimulator() {
+  try {
+    const res = await fetch('/api/runtime/stop', { method: 'POST' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    await fetchLivePlantState();
+  } catch (error) {
+    console.warn('Runtime stop error:', error);
+  }
+}
+
+function renderLivePlantState(data) {
+  const simulator = data.simulator || {};
+  const site = data.site || {};
+  const scenario = data.scenario || {};
+  const plantRisk = data.plant_risk || { score: 0, status: 'NORMAL' };
+
+  if (lpEl('lp-source-label')) lpEl('lp-source-label').textContent = data.source?.label || 'MRPL OPC-SCADA';
+
+  const simBadge = lpEl('lp-sim-status');
+  if (simBadge) {
+    simBadge.textContent = simulator.running ? 'SCADA ONLINE' : 'SCADA PAUSED';
+    simBadge.className = simulator.running ? 'status-badge-pill badge-blue' : 'status-badge-pill badge-terracotta';
+  }
+
+  const scenarioSelect = lpEl('lp-scenario-select');
+  if (scenarioSelect && scenario.name) scenarioSelect.value = scenario.name;
+
+  renderPlantRisk(plantRisk);
+  renderAssetCards(data.assets || []);
+  renderAlerts(data.alerts || []);
+  renderFocusAsset(data.focus_asset || null);
+  updateLivePlantChart(data.history || []);
+}
+
+function renderPlantRisk(risk) {
+  const score = Number(risk.score || 0);
+  const meta = lpStatusMeta(risk.status, score);
+
+  const statusEl = lpEl('lp-plant-status-text');
+  if (statusEl) {
+    statusEl.textContent = meta.text;
+    statusEl.className = `status-badge-pill ${meta.badge}`;
+  }
+  if (lpEl('lp-plant-risk-score')) lpEl('lp-plant-risk-score').textContent = `${Math.round(score)} / 100`;
+  if (lpEl('lp-emergency-banner')) lpEl('lp-emergency-banner').style.display = risk.emergency ? 'block' : 'none';
+
+  if (lpEl('lp-highrisk-asset')) lpEl('lp-highrisk-asset').textContent = risk.asset_id ? `Active Focus: ${risk.asset_id}` : 'Refinery Units Overall';
+  const badge = lpEl('lp-highrisk-status');
+  if (badge) {
+    badge.textContent = meta.text;
+    badge.className = `status-badge-pill ${meta.badge}`;
+  }
+  if (lpEl('lp-highrisk-score-text')) lpEl('lp-highrisk-score-text').textContent = `${Math.round(score)} / 100`;
+  const bar = lpEl('lp-risk-bar');
+  if (bar) {
+    bar.style.width = `${Math.min(100, Math.max(0, score))}%`;
+    bar.className = `tolerance-fill ${score >= 80 ? 'fill-red' : score >= 60 ? 'fill-amber' : score >= 30 ? 'fill-cyan' : 'fill-green'}`;
+  }
+
+  const primaryText = risk.primary_risk || 'Nominal Steady-State';
+  if (lpEl('lp-primary-risk')) lpEl('lp-primary-risk').textContent = primaryText;
+  if (lpEl('lp-primary-risk-text')) lpEl('lp-primary-risk-text').textContent = primaryText;
+  if (lpEl('lp-recommendation')) lpEl('lp-recommendation').textContent = risk.recommendation || 'All measured operational parameters remain within API Standard 610 and OISD design limits.';
+
+  const trend = risk.trend_direction || 'STABLE';
+  const trendLabel = trend === 'RISING' ? 'Increasing' : trend === 'FALLING' ? 'Decreasing' : 'Stable';
+  if (lpEl('lp-risk-trend')) lpEl('lp-risk-trend').textContent = `${trendLabel} Trend`;
+  if (lpEl('lp-risk-trend-text')) lpEl('lp-risk-trend-text').textContent = trendLabel;
+}
+
+function renderAssetCards(assets) {
+  assets.forEach(asset => updateLivePlantAssetUI(asset.asset_id, { reading: asset.reading, risk: asset.risk }));
+}
+
+function updateLivePlantAssetUI(assetId, data) {
+  if (!data?.reading) return;
+  const reading = data.reading;
+  const risk = data.risk || { score: 0, status: 'NORMAL' };
+  const safe = lpAssetDomKey(assetId);
+  const prefix = `lp-${safe}-`;
+  const meta = lpStatusMeta(risk.status, risk.score);
+
+  const status = lpEl(`${prefix}status`);
+  if (status) {
+    status.textContent = meta.text;
+    status.className = `status-badge-pill ${meta.badge}`;
+  }
+  const riskEl = lpEl(`${prefix}risk`);
+  if (riskEl) riskEl.textContent = `${Math.round(Number(risk.score || 0))} / 100`;
+  const card = lpEl(`lp-asset-${safe}`);
+  if (card) card.className = `metric-kpi-tile lp-asset-card ${meta.card}`;
+
+  if (assetId === 'CDU-01') {
+    if (lpEl('lp-cdu01-temp')) lpEl('lp-cdu01-temp').textContent = lpFormatValue(reading.reactor_temperature_c, 1);
+    if (lpEl('lp-cdu01-press')) lpEl('lp-cdu01-press').textContent = `${lpFormatValue(reading.reactor_pressure_bar, 2)} bar`;
+    if (lpEl('lp-cdu01-flow')) lpEl('lp-cdu01-flow').textContent = `${lpFormatValue(reading.flow_rate_m3_h, 1)} m³/h`;
+    if (lpEl('lp-cdu01-nrg')) lpEl('lp-cdu01-nrg').textContent = `${lpFormatValue(reading.energy_consumption_mw, 2)} MW`;
+  } else if (assetId === 'HE-201') {
+    if (lpEl('lp-he201-temph')) lpEl('lp-he201-temph').textContent = lpFormatValue(reading.reactor_temperature_c, 1);
+    if (lpEl('lp-he201-tempc')) lpEl('lp-he201-tempc').textContent = `${lpFormatValue(reading.bearing_temperature_c, 1)} °C`;
+    if (lpEl('lp-he201-flow')) lpEl('lp-he201-flow').textContent = `${lpFormatValue(reading.flow_rate_m3_h, 1)} m³/h`;
+    if (lpEl('lp-he201-foul')) lpEl('lp-he201-foul').textContent = `${lpFormatValue(reading.level_pct, 1)} %`;
+  } else if (assetId === 'P-101' || assetId === 'P-102') {
+    if (lpEl(`${prefix}vib`)) lpEl(`${prefix}vib`).textContent = lpFormatValue(reading.pump_vibration_mm_s, 2);
+    if (lpEl(`${prefix}brgt`)) lpEl(`${prefix}brgt`).textContent = `${lpFormatValue(reading.bearing_temperature_c, 1)} °C`;
+    if (lpEl(`${prefix}rpm`)) lpEl(`${prefix}rpm`).textContent = `${Math.round(Number(reading.pump_rpm || 0))} RPM`;
+    if (lpEl(`${prefix}nrg`)) lpEl(`${prefix}nrg`).textContent = `${lpFormatValue(reading.energy_consumption_mw, 2)} MW`;
+  }
+}
+
+function renderFocusAsset(asset) {
+  if (!asset?.reading) return;
+  const reading = asset.reading;
+  const risk = asset.risk || {};
+  const assetId = asset.asset_id;
+  if (lpEl('lp-focus-asset')) lpEl('lp-focus-asset').textContent = assetId;
+
+  const rows = [
+    ['CDU Flash Zone Temp', reading.reactor_temperature_c, '°C', 'API 510 / Max 385°C'],
+    ['Column Overhead Pressure', reading.reactor_pressure_bar, 'bar', 'PSV Setpoint 2.40 bar'],
+    ['Crude Feed Flow Rate', reading.flow_rate_m3_h, 'm³/h', 'Nominal 450.0 m³/h'],
+    ['Processing Throughput', reading.feed_rate_t_h, 't/h', 'PPAC 380.0 t/h'],
+    ['Pump Vibration (Unfiltered)', reading.pump_vibration_mm_s, 'mm/s', 'API 610 < 2.80 mm/s'],
+    ['Bearing Metal Temperature', reading.bearing_temperature_c, '°C', 'API 610 < 72.0°C'],
+    ['Motor Rotational Speed', reading.pump_rpm, 'RPM', '2950 RPM Synchronous'],
+    ['Motor Power Consumption', reading.energy_consumption_mw, 'MW', '3.85 MW Nominal'],
+    ['Feed Valve Opening', reading.valve_position_pct, '%', 'FV-CDU-104 Control'],
+    ['Column Bottoms Sump Level', reading.level_pct, '%', 'Target 60 - 70%'],
+    ['Atmospheric H₂S Exposure', reading.h2s_ppm, 'ppm', 'OISD PEL < 10.0 ppm'],
+    ['Flue Gas SO₂ Concentration', reading.so2_ppm, 'ppm', 'NAAQS < 2.0 ppm'],
+    ['Furnace NOx Emission', reading.nox_ppm, 'ppm', 'Limit 50.0 ppm']
+  ];
+
+  const body = lpEl('lp-sensor-focus-table');
+  if (body) {
+    body.innerHTML = rows.map(([label, value, unit, spec]) => `
+      <tr>
+        <td style="padding:7px 12px;font-size:12px;color:var(--text-charcoal);font-weight:550;">${escapeHtml(label)}</td>
+        <td style="padding:7px 12px;font-size:11px;color:var(--text-taupe);font-family:var(--font-mono);">${escapeHtml(spec)}</td>
+        <td class="table-num" style="text-align:right;padding:7px 12px;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text-charcoal);">${lpFormatValue(value, 2)} ${unit}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+function renderAlerts(alerts) {
+  const body = lpEl('lp-alerts-table');
+  const count = lpEl('lp-alert-count');
+  const tileVal = lpEl('lp-active-alerts-tile-val');
+  if (!body) return;
+
+  const numAlerts = alerts ? alerts.length : 0;
+  if (count) count.textContent = String(numAlerts);
+  if (tileVal) {
+    tileVal.textContent = numAlerts === 0 ? '0 Active' : `${numAlerts} Active`;
+    tileVal.className = numAlerts === 0 ? 'airgap-metric-tile-val val-green' : 'airgap-metric-tile-val val-red';
+  }
+
+  if (!alerts || !alerts.length) {
+    body.innerHTML = '<tr><td style="color:var(--status-green-text);padding:24px 18px;font-size:12.5px;font-family:var(--font-sans);">All plant equipment operating within API 610 and OISD-STD-129 statutory envelopes.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = alerts.slice(0, 10).map(alert => {
+    const meta = lpStatusMeta(alert.severity, alert.severity === 'CRITICAL' ? 80 : alert.severity === 'WARNING' ? 60 : 30);
+    return `<tr class="lp-alert-row"><td style="padding:10px 14px;border-bottom:1px solid var(--border-subtle);"><div class="lp-alert-top"><span class="status-badge-pill ${meta.badge}">${escapeHtml(alert.severity || 'WATCH')}</span><strong style="font-family:var(--font-mono);font-size:11px;margin-left:6px;">${escapeHtml(alert.asset_id || 'UNKNOWN')}</strong><span class="lp-alert-time">${escapeHtml(lpFormatTime(alert.timestamp))}</span></div><div class="lp-alert-message" style="margin-top:4px;font-size:11.5px;color:var(--text-charcoal);">${escapeHtml(alert.message || '')}</div></td></tr>`;
+  }).join('');
+}
+
+function focusLivePlantAsset(assetId) {
+  livePlantState.focusMode = 'MANUAL';
+  livePlantState.selectedAsset = assetId;
+  const labelEl = lpEl('lp-chart-asset-label');
+  if (labelEl) labelEl.textContent = assetId;
+  fetchLivePlantState();
+}
+
+window.focusLivePlantAsset = focusLivePlantAsset;
+window.applyLivePlantScenario = applyLivePlantScenario;
+window.startLivePlantSimulator = startLivePlantSimulator;
+window.stopLivePlantSimulator = stopLivePlantSimulator;
+
+function updateLivePlantChart(historyData) {
+  const canvas = lpEl('lp-risk-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const chronological = [...historyData]
+    .filter(frame => frame?.reading?.timestamp)
+    .sort((a, b) => new Date(a.reading.timestamp) - new Date(b.reading.timestamp));
+
+  const values = chronological.map(frame => Number(frame.risk?.score || 0)).filter(Number.isFinite);
+  if (values.length < 2) {
+    ctx.fillStyle = '#8a817c';
+    ctx.font = '11.5px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('Accumulating real-time telemetry points...', W / 2, H / 2);
+    return;
+  }
+
+  const min = 0;
+  const max = 100;
+
+  const left = 14;
+  const right = W - 14;
+  const top = 14;
+  const bottom = H - 18;
+  const stepX = (right - left) / Math.max(1, values.length - 1);
+  const y = value => bottom - ((value - min) / (max - min)) * (bottom - top);
+
+  // Background subtle grid lines
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.06)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const gy = top + ((bottom - top) * i / 4);
+    ctx.beginPath(); ctx.moveTo(left, gy); ctx.lineTo(right, gy); ctx.stroke();
+  }
+
+  // Risk line
+  ctx.beginPath();
+  values.forEach((value, i) => {
+    const x = left + i * stepX;
+    const yy = y(value);
+    if (i === 0) ctx.moveTo(x, yy); else ctx.lineTo(x, yy);
+  });
+  const latestScore = values[values.length - 1];
+  ctx.strokeStyle = latestScore >= 80 ? '#C83232' : latestScore >= 60 ? '#D49B45' : '#2D8A4E';
+  ctx.lineWidth = 2.2;
+  ctx.stroke();
+
+  if (lpEl('lp-chart-current')) {
+    lpEl('lp-chart-current').textContent = `Current: ${Math.round(latestScore)} / 100`;
+  }
+}
+// DRISHTI LIVE PLANT - END

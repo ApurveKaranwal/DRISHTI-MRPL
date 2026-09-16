@@ -90,7 +90,7 @@ class ModelRouter:
                 "supervisor": "qwen3:8b-finetuned",
                 "general": "qwen3:8b-finetuned",
                 "reasoning": "deepseek-r1:1.5b",
-                "vision": "qwen3-vl:8b",
+                "vision": "qwen2.5vl:7b",
                 "code": "qwen2.5:7b",
             },
             "models": {

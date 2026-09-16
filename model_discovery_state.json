@@ -1,5 +1,6 @@
 {
   "dismissed": [
-    "llama3.1:8b"
+    "llama3.1:8b",
+    "nonexistent-test-model:1b"
   ]
 }

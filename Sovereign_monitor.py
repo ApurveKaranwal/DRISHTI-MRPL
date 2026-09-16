@@ -17,6 +17,7 @@ import platform
 import shutil
 import socket
 import subprocess
+import threading
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -110,6 +111,20 @@ class SovereignNetworkAuditor:
         self._nic_baselines: dict[str, int] = {}
         self._is_loopback_nic: dict[str, bool] = {}
         self._init_nic_baselines()
+
+        # Real-time network throughput and client tracking
+        self._last_net_io = None
+        self._last_net_io_time: float = 0.0
+        self._client_registry: dict[str, dict[str, Any]] = {}
+        self._client_lock = threading.RLock()
+        self._cluster_inferences: dict[str, Any] = {
+            "total": 0,
+            "host": 0,
+            "client": 0,
+            "last_inference_time": None,
+            "last_inference_source": None,
+            "last_inference_action": None,
+        }
 
         # Log session initialization
         self.log_event("SESSION_INIT", "localhost", "MRPL Sovereign Air-Gap Auditor active.")
@@ -302,7 +317,10 @@ class SovereignNetworkAuditor:
                 if self._is_strict_loopback(remote_ip):
                     classification = "LOCAL_LOOPBACK"
                 elif self._is_private_lan(remote_ip):
-                    classification = "INTERNAL_LOOPBACK_OR_LAN"
+                    if c.status == "ESTABLISHED" and (":8000" in laddr or getattr(getattr(c, "laddr", None), "port", None) == 8000):
+                        classification = "HOTSPOT_CLIENT_LINK"
+                    else:
+                        classification = "INTERNAL_LOOPBACK_OR_LAN"
                 else:
                     classification = "EXTERNAL_WAN_ALERT"
                     if not hasattr(self, "_violating_endpoints"):
@@ -501,8 +519,150 @@ class SovereignNetworkAuditor:
                 local_ip = "127.0.0.1"
         return {"hostname": hostname, "local_ip": local_ip}
 
-    def get_telemetry(self) -> dict[str, Any]:
-        """Returns current air-gap, sovereignty, and real-time hardware metrics."""
+    def record_request(self, client_ip: str, user_agent: str = "", path: str = "") -> None:
+        """Records client activity, classifies devices, and tracks model inferences in real time."""
+        if not client_ip:
+            client_ip = "127.0.0.1"
+
+        host_info = self.get_host_info()
+        is_host = client_ip in ("127.0.0.1", "::1", "localhost", host_info["local_ip"])
+        node_type = "HOST_LOCAL" if is_host else "HOTSPOT_CLIENT"
+
+        ua_lower = (user_agent or "").lower()
+        if "ipad" in ua_lower or "tablet" in ua_lower:
+            device = "Tablet (iPad/Android)"
+        elif "mobile" in ua_lower or "iphone" in ua_lower or "android" in ua_lower:
+            device = "Mobile Phone"
+        elif "windows" in ua_lower:
+            device = "Windows Device"
+        elif "macintosh" in ua_lower or "mac os" in ua_lower:
+            device = "macOS Device"
+        elif "linux" in ua_lower:
+            device = "Linux Machine"
+        else:
+            device = "Host Browser" if is_host else "Remote Client Node"
+
+        # Determine action classification
+        is_inference = False
+        action_name = "Navigation / Assets"
+        path_lower = (path or "").lower()
+        if any(p in path_lower for p in ("/api/models/predict", "/predict")):
+            action_name = "CDU Yield Prediction"
+            is_inference = True
+        elif any(p in path_lower for p in ("/api/models/optimize", "/optimize")):
+            action_name = "Crude Blend Optimization"
+            is_inference = True
+        elif any(p in path_lower for p in ("/api/chat", "/chat")):
+            action_name = "Copilot Intelligence Query"
+            is_inference = True
+        elif any(p in path_lower for p in ("/api/scenarios/run", "/scenarios")):
+            action_name = "Failure Scenario Simulation"
+            is_inference = True
+        elif any(p in path_lower for p in ("/api/plant", "telemetry/stream")):
+            action_name = "Live Plant Sensor Stream"
+            is_inference = True
+        elif "/api/telemetry" in path_lower or "/api/system-telemetry" in path_lower:
+            action_name = "Telemetry Heartbeat"
+        elif "/api/" in path_lower:
+            action_name = "Workbench API Call"
+
+        now = time.time()
+        with self._client_lock:
+            client_entry = self._client_registry.setdefault(client_ip, {
+                "ip": client_ip,
+                "device": device,
+                "node_type": node_type,
+                "first_seen": datetime.now(timezone.utc).isoformat(),
+                "total_requests": 0,
+                "total_inferences": 0,
+                "last_action": action_name,
+                "last_seen_epoch": now,
+            })
+            client_entry["device"] = device
+            client_entry["total_requests"] += 1
+            client_entry["last_action"] = action_name
+            client_entry["last_seen_epoch"] = now
+
+            if is_inference:
+                client_entry["total_inferences"] += 1
+                self._cluster_inferences["total"] += 1
+                if is_host:
+                    self._cluster_inferences["host"] += 1
+                else:
+                    self._cluster_inferences["client"] += 1
+                self._cluster_inferences["last_inference_time"] = datetime.now(timezone.utc).strftime("%H:%M:%S")
+                self._cluster_inferences["last_inference_source"] = f"{device} ({client_ip})"
+                self._cluster_inferences["last_inference_action"] = action_name
+
+    def get_network_throughput(self) -> dict[str, Any]:
+        """Calculates real-time transmission rates in KB/s from kernel network counters."""
+        if not _PSUTIL_AVAILABLE:
+            return {
+                "tx_rate_kbps": 0.0,
+                "rx_rate_kbps": 0.0,
+                "total_sent_mb": 0.0,
+                "total_recv_mb": 0.0,
+            }
+        try:
+            now = time.time()
+            current = psutil.net_io_counters()
+            tx_rate = 0.0
+            rx_rate = 0.0
+            if self._last_net_io and self._last_net_io_time > 0:
+                dt = max(0.2, now - self._last_net_io_time)
+                tx_bytes = max(0, current.bytes_sent - self._last_net_io.bytes_sent)
+                rx_bytes = max(0, current.bytes_recv - self._last_net_io.bytes_recv)
+                tx_rate = round((tx_bytes / 1024) / dt, 1)
+                rx_rate = round((rx_bytes / 1024) / dt, 1)
+
+            self._last_net_io = current
+            self._last_net_io_time = now
+
+            return {
+                "tx_rate_kbps": tx_rate,
+                "rx_rate_kbps": rx_rate,
+                "total_sent_mb": round(current.bytes_sent / (1024 * 1024), 2),
+                "total_recv_mb": round(current.bytes_recv / (1024 * 1024), 2),
+            }
+        except Exception:
+            return {
+                "tx_rate_kbps": 0.0,
+                "rx_rate_kbps": 0.0,
+                "total_sent_mb": 0.0,
+                "total_recv_mb": 0.0,
+            }
+
+    def get_active_clients(self) -> list[dict[str, Any]]:
+        """Returns active clients seen within the last 180 seconds."""
+        now = time.time()
+        clients = []
+        host_info = self.get_host_info()
+        host_ip = host_info["local_ip"]
+
+        with self._client_lock:
+            for ip, data in self._client_registry.items():
+                if ip in ("127.0.0.1", "::1", "localhost", host_ip):
+                    continue
+                seconds_ago = round(now - data.get("last_seen_epoch", now), 1)
+                if seconds_ago <= 180.0:
+                    status = "ACTIVE" if seconds_ago < 35.0 else "IDLE"
+                    clients.append({
+                        "ip": ip,
+                        "device": data.get("device", "Remote Device"),
+                        "status": status,
+                        "last_seen_seconds_ago": seconds_ago,
+                        "total_requests": data.get("total_requests", 0),
+                        "total_inferences": data.get("total_inferences", 0),
+                        "last_action": data.get("last_action", "Connected"),
+                    })
+        clients.sort(key=lambda c: c["last_seen_seconds_ago"])
+        return clients
+
+    def get_telemetry(self, client_ip: str | None = None, user_agent: str | None = None) -> dict[str, Any]:
+        """Returns current air-gap, sovereignty, real-time hardware, and Host-Client cluster telemetry."""
+        if not client_ip:
+            client_ip = "127.0.0.1"
+
         active_sockets = self.scan_active_sockets()
         external_count = sum(1 for s in active_sockets if s.get("classification") == "EXTERNAL_WAN_ALERT")
         if hasattr(self, "_violating_endpoints"):
@@ -519,11 +679,54 @@ class SovereignNetworkAuditor:
             outbound_bytes = getattr(self, "_external_bytes_total", 0)
 
         host_info = self.get_host_info()
+        server_ip = host_info["local_ip"]
+        hostname = host_info["hostname"]
+
+        # Determine node role for caller
+        is_client = client_ip not in ("127.0.0.1", "::1", "localhost", server_ip)
+
+        ua_lower = (user_agent or "").lower()
+        if "ipad" in ua_lower or "tablet" in ua_lower:
+            client_device = "Tablet (iPad/Android)"
+        elif "mobile" in ua_lower or "iphone" in ua_lower or "android" in ua_lower:
+            client_device = "Mobile Phone"
+        elif "windows" in ua_lower:
+            client_device = "Windows Device"
+        elif "macintosh" in ua_lower or "mac os" in ua_lower:
+            client_device = "macOS Device"
+        elif "linux" in ua_lower:
+            client_device = "Linux Machine"
+        else:
+            client_device = "Host Machine" if not is_client else "Remote Client Node"
+
+        if (not user_agent or client_device == "Remote Client Node") and client_ip in self._client_registry:
+            client_device = self._client_registry[client_ip].get("device", client_device)
+
+        active_clients = self.get_active_clients()
+        net_throughput = self.get_network_throughput()
+
+        with self._client_lock:
+            cluster_inferences = copy.deepcopy(self._cluster_inferences)
 
         return {
             "session_id": self.session_id,
-            "hostname": host_info["hostname"],
-            "server_ip": host_info["local_ip"],
+            "hostname": hostname,
+            "server_ip": server_ip,
+            "host_os": f"{platform.system()} {platform.release()} ({platform.machine()})",
+            # Caller Node Context
+            "client_ip": client_ip,
+            "is_client_node": is_client,
+            "client_device": client_device,
+            "connection_type": "HOTSPOT / LAN REMOTE NODE" if is_client else "HOST ENCLAVE CORE (SERVER)",
+            "node_role": "CLIENT" if is_client else "HOST",
+            # Connected Clients Cluster
+            "connected_clients_count": len(active_clients),
+            "connected_clients": active_clients,
+            # Network I/O Throughput
+            "network_throughput": net_throughput,
+            # Cluster Inferences
+            "cluster_inferences": cluster_inferences,
+            # Airgap & Hardware telemetry
             "is_air_gapped": external_count == 0,
             "external_wan_calls": external_count,
             "outbound_internet_bytes": outbound_bytes,

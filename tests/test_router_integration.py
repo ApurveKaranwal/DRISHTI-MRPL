@@ -37,7 +37,7 @@ class TestModelRouterIntegration(unittest.TestCase):
         self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:7b")
 
         # Switch back to default
-        self.router.set_active_model("vision", "qwen3-vl:8b")
+        self.router.set_active_model("vision", "qwen2.5vl:7b")
 
     def test_supervisor_agent_dynamic_resolution(self):
         """Verify SupervisorAgent dynamically resolves planning and reasoning models."""
@@ -76,11 +76,17 @@ class TestModelRouterIntegration(unittest.TestCase):
         self.assertEqual(data["active_model"], "qwen2.5vl:7b")
         self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:7b")
 
-        # Switch back
+        # Switch to qwen3-vl:8b
         payload = ModelSelectPayload(role="vision", model_id="qwen3-vl:8b")
         data = asyncio.run(select_model(payload))
         self.assertEqual(data["status"], "success")
         self.assertEqual(self.router.get_model("vision"), "qwen3-vl:8b")
+
+        # Switch back to default
+        payload = ModelSelectPayload(role="vision", model_id="qwen2.5vl:7b")
+        data = asyncio.run(select_model(payload))
+        self.assertEqual(data["status"], "success")
+        self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:7b")
 
     def test_api_model_select_invalid_role(self):
         """Test POST /api/models/select rejects incompatible model assignment."""

@@ -54,3 +54,10 @@ outputs/*
 !outputs/.gitkeep
 !outputs/reports/
 !outputs/sandbox/
+
+# Runtime telemetry storage
+data/runtime/*
+!data/runtime/.gitkeep
+
+# Temporary generation scratch
+scratch/

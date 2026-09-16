@@ -83,6 +83,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             <span>Dashboard</span>
           </li>
+          <li class="nav-item" data-tab="live-plant">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M5 19l3-2M19 19l-3-2"/></svg>
+            <span>Live Plant Monitoring</span>
+          </li>
           <li class="nav-item" data-tab="main-refinery">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 22V7l4-4h4l4 4v15"/><path d="M2 22h20"/><path d="M7 11h10"/></svg>
             <span>Main Refinery</span>
@@ -166,12 +170,20 @@
     </div>
   </aside>
 
+  <!-- Mobile Sidebar Backdrop Overlay -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+
   <!-- ====================================================================
        2. CENTER WORKSPACE
        ==================================================================== -->
   <main class="workspace">
     <!-- Top Header Bar -->
     <header class="workspace-header">
+      <!-- Mobile Sidebar Toggle Button -->
+      <button class="btn-header-action btn-menu-toggle" id="btn-sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle Navigation Menu" title="Toggle Navigation Menu">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+
       <!-- Expanded Sovereign Air-Gap Telemetry Command Console -->
       <div class="airgap-command-console" onclick="openCertificateModal()" role="button" tabindex="0" title="100% Cryptographically Verified Air-Gap. Click to inspect live process sockets & cryptographic SHA-256 audit certificate.">
         
@@ -318,6 +330,36 @@
                 SHA-256 Valid
               </div>
               <div class="airgap-metric-tile-sub" id="banner-crypto-sub">Tamper-Proof Ledger</div>
+            </div>
+          </div>
+
+          <!-- Real-Time Hotspot & Client Machine Interlink Telemetry Bar -->
+          <div class="airgap-interlink-strip">
+            <div class="interlink-node-status">
+              <span class="interlink-pulse-dot" id="interlink-status-dot"></span>
+              <span class="interlink-role-badge" id="interlink-role-badge">HOST ENCLAVE CORE</span>
+              <span class="interlink-node-ip" id="interlink-node-ip">127.0.0.1</span>
+            </div>
+            
+            <div class="interlink-cluster-metrics">
+              <div class="interlink-metric-item" title="Live Round-Trip Latency (Ping) to Workbench Host">
+                <span class="interlink-metric-label">HOTSPOT PING</span>
+                <span class="interlink-metric-val val-ping" id="interlink-ping-val">1ms</span>
+              </div>
+              
+              <div class="interlink-metric-item" title="Kernel Network Transfer Rate">
+                <span class="interlink-metric-label">NETWORK I/O</span>
+                <span class="interlink-metric-val" id="interlink-throughput-val">0.0 KB/s TX • 0.0 KB/s RX</span>
+              </div>
+
+              <div class="interlink-metric-item" title="Real-Time Model Inferences Executed by Cluster">
+                <span class="interlink-metric-label">INFERENCES</span>
+                <span class="interlink-metric-val" id="interlink-inferences-val">0 Total</span>
+              </div>
+            </div>
+
+            <div class="interlink-client-roster" id="interlink-client-roster">
+              <span class="interlink-roster-tag">Awaiting Hotspot Client Links...</span>
             </div>
           </div>
         </div>
@@ -509,6 +551,304 @@
           </div>
         </div>
       </section>
+
+            <!-- DRISHTI LIVE PLANT - START -->
+      <!-- ================================================================
+           TAB: LIVE PLANT (REAL-TIME SCADA MONITORING)
+           ================================================================ -->
+      <section class="tab-section" id="tab-live-plant">
+        <div class="hero-editorial-header">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+            <div class="eyebrow-capsule">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+              <span>Real-Time SCADA Telemetry Ingestion</span>
+            </div>
+            <span class="status-badge-pill badge-green" id="lp-status-badge">SCADA ONLINE</span>
+            <div style="font-size: 11px; color: var(--text-taupe); font-family: var(--font-mono);">
+              LAST TELEMETRY FRAME: <span id="lp-last-updated" style="color: var(--text-charcoal); font-weight: 600;">Synchronizing...</span>
+            </div>
+          </div>
+          <h1 class="hero-editorial-title">Live Plant Monitoring & Telemetry</h1>
+          <p class="hero-editorial-sub">High-frequency industrial sensor telemetry, multi-factor mechanical risk modeling, and automated statutory limit surveillance calibrated to the MRPL Mangalore Refinery Complex.</p>
+        </div>
+
+        <!-- Plant Status & Scenario Injection Strip -->
+        <div class="airgap-perimeter-card" style="margin-bottom: 22px;">
+          <div class="airgap-perimeter-header-row">
+            <div class="airgap-perimeter-left-title">
+              <div class="airgap-shield-orb">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div class="airgap-perimeter-headings">
+                <div class="airgap-perimeter-title">
+                  <span>MRPL CDU-I Operational Telemetry Stream</span>
+                  <span class="status-badge-pill badge-green" id="lp-plant-status-text">NORMAL</span>
+                </div>
+                <div class="airgap-perimeter-subline">
+                  OPC SCADA Gateway • API Standard 610 (12th Ed) • OISD-STD-129 Statutory Limits
+                </div>
+              </div>
+            </div>
+            <div class="airgap-perimeter-actions">
+              <label style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Fault Injector:</label>
+              <select id="lp-scenario-select" class="header-search-input" style="height: 32px; font-size: 11.5px; min-width: 170px; max-width: 250px; flex: 1 1 auto; padding: 0 8px;">
+                <option value="NORMAL">Steady-State Baseline (Normal)</option>
+                <option value="PUMP_DEGRADATION">P-101A Bearing Wear (API 610 Trip)</option>
+                <option value="HIGH_TEMPERATURE">CDU Thermal Runaway (Flash Zone)</option>
+                <option value="PRESSURE_SURGE">Column Overpressure (Overhead)</option>
+                <option value="GAS_LEAK">OISD H2S Toxic Release Breach</option>
+                <option value="COOLING_FAILURE">HE-201 Exchanger Tube Fouling</option>
+                <option value="LOAD_INCREASE">PPAC 115% Production Stress</option>
+              </select>
+              <button class="btn-send-message" onclick="applyLivePlantScenario()" style="height: 32px; font-size: 11px; padding: 0 12px;">Apply</button>
+              <button class="btn-header-action" onclick="document.getElementById('lp-scenario-select').value='NORMAL'; applyLivePlantScenario();" style="height: 32px; font-size: 11px; border-color: var(--status-green-border); color: var(--status-green-text);">Reset</button>
+            </div>
+          </div>
+
+          <div class="airgap-perimeter-card-divider"></div>
+
+          <div class="airgap-live-metrics-grid">
+            <div class="airgap-metric-tile">
+              <div class="airgap-metric-tile-lbl">COMPOSITE RISK INDEX</div>
+              <div class="airgap-metric-tile-val val-green" id="lp-plant-risk-score">0 / 100</div>
+              <div class="airgap-metric-tile-sub" id="lp-risk-trend">Stable Trend</div>
+            </div>
+
+            <div class="airgap-metric-tile">
+              <div class="airgap-metric-tile-lbl">PRIMARY RISK DRIVER</div>
+              <div class="airgap-metric-tile-val" id="lp-primary-risk" style="font-size: 12.5px; font-weight: 600;">Nominal Operating Bounds</div>
+              <div class="airgap-metric-tile-sub">API Standard 610 / 510</div>
+            </div>
+
+            <div class="airgap-metric-tile">
+              <div class="airgap-metric-tile-lbl">ACTIVE ALERTS</div>
+              <div class="airgap-metric-tile-val val-green" id="lp-active-alerts-tile-val">0 Active</div>
+              <div class="airgap-metric-tile-sub">Statutory & Mechanical</div>
+            </div>
+
+            <div class="airgap-metric-tile">
+              <div class="airgap-metric-tile-lbl">SAMPLING FREQUENCY</div>
+              <div class="airgap-metric-tile-val">0.50 Hz</div>
+              <div class="airgap-metric-tile-sub">2.00s Clock Interval</div>
+            </div>
+
+            <div class="airgap-metric-tile">
+              <div class="airgap-metric-tile-lbl">TELEMETRY GATEWAY</div>
+              <div class="airgap-metric-tile-val" style="font-size: 12px;" id="lp-source-label">MRPL OPC-SCADA</div>
+              <div class="airgap-metric-tile-sub">On-Premises Enclave</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="lp-emergency-banner" style="display: none; margin-bottom: 20px; background: var(--status-red-bg); color: var(--status-red-text); padding: 10px 16px; border-radius: var(--radius-sm); font-weight: 700; font-size: 12px; border: 1px solid var(--status-red-border); font-family: var(--font-mono); letter-spacing: 0.04em;">
+          STATUTORY INTERLOCK ALERT: OPERATIONAL PARAMETERS EXCEED STATUTORY OISD-STD-129 LIMITS
+        </div>
+
+        <!-- Active Plant Equipment (4 Assets Grid) -->
+        <div class="card-header-bar" style="margin-bottom: 10px; padding: 0 4px;">
+          <div>
+            <div class="card-title-serif" style="font-size: 16px;">Active Refinery Equipment (MRPL Mangalore)</div>
+            <div class="card-title-sub">Real-time mechanical, hydraulic, and thermodynamic indicators. Select any asset card to focus telemetry.</div>
+          </div>
+        </div>
+
+        <div class="grid-4col" style="margin-bottom: 22px;">
+          <!-- CDU-01 -->
+          <div class="metric-kpi-tile lp-asset-card" id="lp-asset-cdu01" onclick="focusLivePlantAsset('CDU-01')" style="cursor: pointer;">
+            <div class="metric-label-row">
+              <span class="metric-label">CDU-01</span>
+              <span class="status-badge-pill badge-green" id="lp-cdu01-status">NORMAL</span>
+            </div>
+            <div class="metric-sub-note" style="margin-bottom: 8px;">Atmospheric Column C-101</div>
+            <div class="metric-value-row" style="margin-bottom: 8px;">
+              <span class="metric-val-big" id="lp-cdu01-temp" style="font-size: 21px;">--</span>
+              <span class="metric-val-unit">°C</span>
+            </div>
+            <div class="lp-asset-values">
+              <div><span>Overhead Press</span><strong id="lp-cdu01-press">--</strong></div>
+              <div><span>Feed Flow</span><strong id="lp-cdu01-flow">--</strong></div>
+              <div><span>Power Draw</span><strong id="lp-cdu01-nrg">--</strong></div>
+              <div class="lp-risk-row"><span>Risk Index</span><strong id="lp-cdu01-risk">0 / 100</strong></div>
+            </div>
+          </div>
+
+          <!-- P-101 -->
+          <div class="metric-kpi-tile lp-asset-card" id="lp-asset-p101" onclick="focusLivePlantAsset('P-101')" style="cursor: pointer;">
+            <div class="metric-label-row">
+              <span class="metric-label">P-101</span>
+              <span class="status-badge-pill badge-green" id="lp-p101-status">NORMAL</span>
+            </div>
+            <div class="metric-sub-note" style="margin-bottom: 8px;">Crude Charge Pump (API 610)</div>
+            <div class="metric-value-row" style="margin-bottom: 8px;">
+              <span class="metric-val-big" id="lp-p101-vib" style="font-size: 21px;">--</span>
+              <span class="metric-val-unit">mm/s</span>
+            </div>
+            <div class="lp-asset-values">
+              <div><span>Bearing Temp</span><strong id="lp-p101-brgt">--</strong></div>
+              <div><span>Motor Speed</span><strong id="lp-p101-rpm">--</strong></div>
+              <div><span>Power Draw</span><strong id="lp-p101-nrg">--</strong></div>
+              <div class="lp-risk-row"><span>Risk Index</span><strong id="lp-p101-risk">0 / 100</strong></div>
+            </div>
+          </div>
+
+          <!-- P-102 -->
+          <div class="metric-kpi-tile lp-asset-card" id="lp-asset-p102" onclick="focusLivePlantAsset('P-102')" style="cursor: pointer;">
+            <div class="metric-label-row">
+              <span class="metric-label">P-102</span>
+              <span class="status-badge-pill badge-green" id="lp-p102-status">NORMAL</span>
+            </div>
+            <div class="metric-sub-note" style="margin-bottom: 8px;">Residue Booster (API 610)</div>
+            <div class="metric-value-row" style="margin-bottom: 8px;">
+              <span class="metric-val-big" id="lp-p102-vib" style="font-size: 21px;">--</span>
+              <span class="metric-val-unit">mm/s</span>
+            </div>
+            <div class="lp-asset-values">
+              <div><span>Bearing Temp</span><strong id="lp-p102-brgt">--</strong></div>
+              <div><span>Motor Speed</span><strong id="lp-p102-rpm">--</strong></div>
+              <div><span>Power Draw</span><strong id="lp-p102-nrg">--</strong></div>
+              <div class="lp-risk-row"><span>Risk Index</span><strong id="lp-p102-risk">0 / 100</strong></div>
+            </div>
+          </div>
+
+          <!-- HE-201 -->
+          <div class="metric-kpi-tile lp-asset-card" id="lp-asset-he201" onclick="focusLivePlantAsset('HE-201')" style="cursor: pointer;">
+            <div class="metric-label-row">
+              <span class="metric-label">HE-201</span>
+              <span class="status-badge-pill badge-green" id="lp-he201-status">NORMAL</span>
+            </div>
+            <div class="metric-sub-note" style="margin-bottom: 8px;">Preheat Train (TEMA R)</div>
+            <div class="metric-value-row" style="margin-bottom: 8px;">
+              <span class="metric-val-big" id="lp-he201-temph" style="font-size: 21px;">--</span>
+              <span class="metric-val-unit">°C</span>
+            </div>
+            <div class="lp-asset-values">
+              <div><span>Tube Outlet</span><strong id="lp-he201-tempc">--</strong></div>
+              <div><span>Crude Flow</span><strong id="lp-he201-flow">--</strong></div>
+              <div><span>Fouling Factor</span><strong id="lp-he201-foul">--</strong></div>
+              <div class="lp-risk-row"><span>Risk Index</span><strong id="lp-he201-risk">0 / 100</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-Column Row 1: Operational Risk Assessment & Active Alerts -->
+        <div class="grid-2col" style="margin-bottom: 22px;">
+          <!-- Card 1: Operational Risk Assessment -->
+          <div class="editorial-card" style="margin-bottom: 0;">
+            <div class="card-header-bar">
+              <div>
+                <div class="card-title-serif">Operational Risk Assessment</div>
+                <div class="card-title-sub">Multi-factor degradation index and engineering safety advisory</div>
+              </div>
+              <span class="status-badge-pill badge-green" id="lp-highrisk-status">NORMAL</span>
+            </div>
+            <div class="card-padded-body">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--text-charcoal);" id="lp-highrisk-asset">Refinery Units Overall</span>
+                <span style="font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--text-charcoal);" id="lp-highrisk-score-text">0 / 100</span>
+              </div>
+              <div class="tolerance-track" style="height: 8px; margin-bottom: 16px; border-radius: 999px;">
+                <div class="tolerance-fill fill-green" id="lp-risk-bar" style="width: 0%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+              </div>
+
+              <div style="background: var(--bg-sub); border: 1px solid var(--border-sand); padding: 12px 14px; border-radius: var(--radius-sm);">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Governing Mechanism</span>
+                  <span id="lp-primary-risk-text" style="font-size: 11.5px; font-weight: 600; color: var(--text-charcoal);">Nominal Steady-State</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                  <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Trend Trajectory</span>
+                  <span id="lp-risk-trend-text" style="font-size: 11.5px; font-weight: 600; color: var(--text-charcoal);">Stable</span>
+                </div>
+                <div style="font-family: var(--font-serif); font-size: 13.5px; color: var(--status-amber-text); border-top: 1px solid var(--border-subtle); padding-top: 8px; line-height: 1.45;" id="lp-recommendation">
+                  All measured operational parameters remain within API Standard 610 and OISD design limits.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Active Condition & Statutory Alerts -->
+          <div class="editorial-card" style="margin-bottom: 0;">
+            <div class="card-header-bar">
+              <div>
+                <div class="card-title-serif">Active Condition & Statutory Alerts</div>
+                <div class="card-title-sub">Automated compliance logging under API 610, API 510, and OISD-STD-129</div>
+              </div>
+              <span class="lp-count-badge" id="lp-alert-count">0</span>
+            </div>
+            <div class="card-padded-body" style="padding: 0;">
+              <div class="editorial-table-wrap" style="height: 100%; min-height: 200px; max-height: 235px; overflow-y: auto;">
+                <table class="editorial-table">
+                  <tbody id="lp-alerts-table">
+                    <tr>
+                      <td style="color: var(--status-green-text); padding: 24px 18px; font-size: 12.5px; font-family: var(--font-sans);">
+                        All plant equipment operating within API 610 and OISD-STD-129 statutory envelopes.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-Column Row 2: Dynamic Trend & Detailed Sensor Matrix -->
+        <div class="grid-2col" style="margin-bottom: 22px;">
+          <!-- Card 3: Dynamic Trend -->
+          <div class="editorial-card" style="margin-bottom: 0;">
+            <div class="card-header-bar">
+              <div>
+                <div class="card-title-serif">Dynamic Telemetry Trend: <span id="lp-chart-asset-label" style="color: var(--accent-terracotta);">P-101A</span></div>
+                <div class="card-title-sub">60-second high-resolution mechanical risk & vibration history</div>
+              </div>
+              <div class="lp-chart-controls">
+                <select id="lp-chart-metric" class="header-search-input" onchange="updateLivePlantChart(livePlantState.historyData)" style="height: 28px; font-size: 11px; padding: 0 6px;">
+                  <option value="risk.score">Equipment Risk Index</option>
+                  <option value="pump_vibration_mm_s">Pump Vibration (mm/s)</option>
+                  <option value="bearing_temperature_c">Bearing Temperature (°C)</option>
+                  <option value="reactor_temperature_c">Flash Zone Temp (°C)</option>
+                  <option value="reactor_pressure_bar">Overhead Pressure (bar)</option>
+                  <option value="h2s_ppm">Atmospheric H2S (ppm)</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-padded-body" style="padding: 14px 18px;">
+              <div class="lp-chart-summary">
+                <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Time-Series Window: 60 Samples</span>
+                <span style="font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--text-charcoal);" id="lp-chart-current">Current: 0 / 100</span>
+              </div>
+              <canvas id="lp-risk-chart" width="400" height="150" style="width: 100%; max-width: 100%; height: 150px;"></canvas>
+            </div>
+          </div>
+
+          <!-- Card 4: Detailed Sensor Matrix -->
+          <div class="editorial-card" style="margin-bottom: 0;">
+            <div class="card-header-bar">
+              <div>
+                <div class="card-title-serif">Detailed Sensor Matrix: <span id="lp-focus-asset" style="color: var(--accent-terracotta); font-family: var(--font-mono); font-size: 13.5px;">CDU-01</span></div>
+                <div class="card-title-sub">Process parameters, rotating mechanical, and emission telemetry</div>
+              </div>
+              <button class="btn-header-action" onclick="fetchLivePlantState()">Poll Frame</button>
+            </div>
+            <div class="card-padded-body" style="padding: 0;">
+              <div class="editorial-table-wrap" style="max-height: 215px; overflow-y: auto;">
+                <table class="editorial-table">
+                  <thead>
+                    <tr>
+                      <th>Sensor Parameter</th>
+                      <th>Standard / Limit</th>
+                      <th style="text-align: right;">Measured Value</th>
+                    </tr>
+                  </thead>
+                  <tbody id="lp-sensor-focus-table">
+                    <tr><td colspan="3" style="padding: 20px; text-align: center; color: var(--text-taupe);">Synchronizing sensor matrix...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- DRISHTI LIVE PLANT - END -->
 
       <!-- ================================================================
            TAB: MAIN REFINERY
@@ -839,6 +1179,36 @@
               <div class="airgap-metric-tile-sub" id="exec-banner-crypto-sub">Statutory Compliant</div>
             </div>
           </div>
+
+          <!-- Real-Time Hotspot & Client Machine Interlink Telemetry Bar (Executive View) -->
+          <div class="airgap-interlink-strip">
+            <div class="interlink-node-status">
+              <span class="interlink-pulse-dot" id="exec-interlink-status-dot"></span>
+              <span class="interlink-role-badge" id="exec-interlink-role-badge">HOST ENCLAVE CORE</span>
+              <span class="interlink-node-ip" id="exec-interlink-node-ip">127.0.0.1</span>
+            </div>
+            
+            <div class="interlink-cluster-metrics">
+              <div class="interlink-metric-item" title="Live Round-Trip Latency (Ping) to Workbench Host">
+                <span class="interlink-metric-label">HOTSPOT PING</span>
+                <span class="interlink-metric-val val-ping" id="exec-interlink-ping-val">1ms</span>
+              </div>
+              
+              <div class="interlink-metric-item" title="Kernel Network Transfer Rate">
+                <span class="interlink-metric-label">NETWORK I/O</span>
+                <span class="interlink-metric-val" id="exec-interlink-throughput-val">0.0 KB/s TX • 0.0 KB/s RX</span>
+              </div>
+
+              <div class="interlink-metric-item" title="Real-Time Model Inferences Executed by Cluster">
+                <span class="interlink-metric-label">INFERENCES</span>
+                <span class="interlink-metric-val" id="exec-interlink-inferences-val">0 Total</span>
+              </div>
+            </div>
+
+            <div class="interlink-client-roster" id="exec-interlink-client-roster">
+              <span class="interlink-roster-tag">Awaiting Hotspot Client Links...</span>
+            </div>
+          </div>
         </div>
 
         <div class="grid-4col" style="margin-bottom: 22px;">
@@ -996,8 +1366,8 @@
         <div class="editorial-card">
           <div class="card-header-bar">
             <div class="card-title-serif">Deliverables Repository</div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <input type="text" class="model-form-input" style="padding: 4px 10px; font-size: 11px; width: 180px; height: 28px;" placeholder="Filter deliverables..." oninput="filterDeliverables(this.value)" id="deliverables-search-input" />
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <input type="text" class="model-form-input" style="padding: 4px 10px; font-size: 11px; min-width: 140px; flex: 1; height: 28px;" placeholder="Filter deliverables..." oninput="filterDeliverables(this.value)" id="deliverables-search-input" />
               <button class="btn-header-action" onclick="fetchDeliverables()">Refresh Repository</button>
             </div>
           </div>
@@ -1024,9 +1394,9 @@
 
         <div class="editorial-card">
           <div class="card-padded-body">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
               <span style="font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-taupe);">SQL Query Editor</span>
-              <div style="display: flex; gap: 8px;">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button class="btn-header-action" onclick="loadSampleSql('ppac')">PPAC Throughput</button>
                 <button class="btn-header-action" onclick="loadSampleSql('assays')">Crude Assays</button>
                 <button class="btn-header-action" onclick="loadSampleSql('spares')">OEM Spares</button>
@@ -1136,8 +1506,8 @@
         <div class="editorial-card">
           <div class="card-header-bar">
             <div class="card-title-serif">Ingested Engineering Library</div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <input type="text" class="model-form-input" style="padding: 4px 10px; font-size: 11px; width: 180px; height: 28px;" placeholder="Filter documents..." oninput="filterDocuments(this.value)" id="docs-search-input" />
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <input type="text" class="model-form-input" style="padding: 4px 10px; font-size: 11px; min-width: 140px; flex: 1; height: 28px;" placeholder="Filter documents..." oninput="filterDocuments(this.value)" id="docs-search-input" />
               <button class="btn-header-action" onclick="fetchDocuments()">Refresh Library</button>
             </div>
           </div>

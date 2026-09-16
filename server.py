@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 import pandas as pd
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -30,6 +30,7 @@ import requests
 
 from Supervisor_agent import SupervisorAgent
 from Sovereign_monitor import SovereignNetworkAuditor
+from runtime_data.runtime_api import router as runtime_router, start_runtime_simulator, stop_runtime_simulator
 
 
 def clean_for_json(val: Any) -> Any:
@@ -71,6 +72,15 @@ app = FastAPI(
     version="2.0.0",
     default_response_class=SafeJSONResponse,
 )
+app.include_router(runtime_router)
+
+@app.on_event("startup")
+async def start_runtime():
+    start_runtime_simulator()
+
+@app.on_event("shutdown")
+async def stop_runtime():
+    stop_runtime_simulator()
 
 # Enable CORS for local origins and air-gapped private LAN/hotspot subnets (RFC-1918)
 app.add_middleware(
@@ -103,6 +113,16 @@ for directory in [UPLOADS_DIR, REPORTS_DIR, SANDBOX_DIR, STATIC_DIR]:
 auditor = SovereignNetworkAuditor(REPORTS_DIR)
 auditor.enable_airgap_enforcement()
 supervisor = SupervisorAgent(auditor=auditor)
+
+@app.middleware("http")
+async def track_client_telemetry_middleware(request: Request, call_next):
+    """Automatically logs caller IP, device user-agent, and model inferences for cluster telemetry."""
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    user_agent = request.headers.get("user-agent", "")
+    path = request.url.path
+    auditor.record_request(client_ip=client_ip, user_agent=user_agent, path=path)
+    response = await call_next(request)
+    return response
 
 # Pre-seed authentic engineering datasets into analytical workers
 for csv_file in DATA_DIR.glob("*.csv"):
@@ -350,9 +370,11 @@ async def handle_upload(file: UploadFile = File(...)):
 
 
 @app.get("/api/telemetry")
-async def get_telemetry():
-    """Returns real-time air-gap sovereignty metrics."""
-    return auditor.get_telemetry()
+async def get_telemetry(request: Request = None):
+    """Returns real-time air-gap sovereignty, cluster node, and network telemetry."""
+    client_ip = request.client.host if (request and request.client) else "127.0.0.1"
+    user_agent = request.headers.get("user-agent", "") if request else ""
+    return auditor.get_telemetry(client_ip=client_ip, user_agent=user_agent)
 
 
 @app.get("/api/system-telemetry")

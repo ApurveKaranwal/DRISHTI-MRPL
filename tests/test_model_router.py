@@ -20,7 +20,7 @@ class TestModelRouter(unittest.TestCase):
     def test_default_role_resolution(self):
         self.assertEqual(self.router.get_model("supervisor"), "qwen3:8b-finetuned")
         self.assertEqual(self.router.get_model("code"), "qwen2.5:7b")
-        self.assertEqual(self.router.get_model("vision"), "qwen3-vl:8b")
+        self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:7b")
         self.assertEqual(self.router.get_model("reasoning"), "deepseek-r1:1.5b")
 
     def test_get_available_models_for_role(self):
@@ -31,15 +31,15 @@ class TestModelRouter(unittest.TestCase):
         self.assertNotIn("deepseek-r1:1.5b", model_ids)
 
     def test_switch_active_model_valid(self):
-        # Switch vision model to qwen2.5vl:7b
-        ok, msg = self.router.set_active_model("vision", "qwen2.5vl:7b")
-        self.assertTrue(ok, msg)
-        self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:7b")
-
-        # Switch back to qwen3-vl:8b
+        # Switch vision model to qwen3-vl:8b
         ok, msg = self.router.set_active_model("vision", "qwen3-vl:8b")
         self.assertTrue(ok, msg)
         self.assertEqual(self.router.get_model("vision"), "qwen3-vl:8b")
+
+        # Switch back to qwen2.5vl:7b
+        ok, msg = self.router.set_active_model("vision", "qwen2.5vl:7b")
+        self.assertTrue(ok, msg)
+        self.assertEqual(self.router.get_model("vision"), "qwen2.5vl:7b")
 
     def test_switch_active_model_invalid_role(self):
         # deepseek-r1:1.5b does not have vision role
