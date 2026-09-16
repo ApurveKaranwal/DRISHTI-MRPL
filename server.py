@@ -668,6 +668,24 @@ async def get_audit_trail():
     }
 
 
+@app.post("/api/airgap/test-probe")
+async def test_airgap_probe():
+    """Simulates an outbound WAN socket connection to verify that the Sovereign Air-Gap
+    guardrail intercepts and blocks unauthorized egress at the socket layer.
+    """
+    result = auditor.simulate_external_egress_test(target_host="api.openai.com", target_port=443)
+    return {
+        "success": True,
+        **result
+    }
+
+
+@app.post("/api/airgap/reset-probe")
+async def reset_airgap_probe():
+    """Resets the blocked breach test counter for testing and demonstration."""
+    return auditor.reset_breach_counters()
+
+
 @app.get("/api/deliverables")
 async def list_deliverables():
     """Lists all generated reports, spreadsheets, presentations, and sandbox plots."""
