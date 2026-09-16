@@ -2403,19 +2403,20 @@ function lpAssetDomKey(assetId) {
 function lpUpdateConnection(connected, timestamp) {
   const badge = lpEl('lp-status-badge');
   const last = lpEl('lp-last-updated');
-  if (!badge || !last) return;
+  if (last) {
+    last.textContent = connected ? `${lpFormatTime(timestamp)} (${lpFormatAge(timestamp)})` : 'Disconnected';
+  }
+  if (!badge) return;
   const pill = badge.parentElement;
   if (connected) {
-    badge.textContent = 'SCADA ONLINE';
-    last.textContent = `${lpFormatTime(timestamp)} (${lpFormatAge(timestamp)})`;
+    badge.textContent = 'ONLINE';
     if (pill) {
       pill.style.background = 'var(--status-green-bg)';
       pill.style.borderColor = 'var(--status-green-border)';
       pill.style.color = 'var(--status-green-text)';
     }
   } else {
-    badge.textContent = 'SCADA OFFLINE';
-    last.textContent = 'Disconnected';
+    badge.textContent = 'OFFLINE';
     if (pill) {
       pill.style.background = 'var(--status-red-bg)';
       pill.style.borderColor = 'var(--status-red-border)';
@@ -2538,7 +2539,7 @@ function renderLivePlantState(data) {
 
   const simBadge = lpEl('lp-sim-status');
   if (simBadge) {
-    simBadge.textContent = simulator.running ? 'SCADA ONLINE' : 'SCADA PAUSED';
+    simBadge.textContent = simulator.running ? 'ONLINE' : 'PAUSED';
     simBadge.className = simulator.running ? 'status-badge-pill badge-blue' : 'status-badge-pill badge-terracotta';
   }
 
