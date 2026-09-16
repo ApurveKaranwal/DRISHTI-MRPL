@@ -2636,51 +2636,184 @@ function updateLivePlantChart(historyData) {
   const H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  const chronological = [...historyData]
+  const metricSelect = lpEl('lp-chart-metric');
+  const metricKey = metricSelect ? metricSelect.value : 'risk.score';
+
+  const rawHistory = (historyData && historyData.length) ? historyData : (typeof livePlantState !== 'undefined' ? livePlantState.historyData : []);
+  const chronological = [...(rawHistory || [])]
     .filter(frame => frame?.reading?.timestamp)
     .sort((a, b) => new Date(a.reading.timestamp) - new Date(b.reading.timestamp));
 
-  const values = chronological.map(frame => Number(frame.risk?.score || 0)).filter(Number.isFinite);
+  // Extract metric values
+  const values = chronological.map(frame => {
+    if (metricKey === 'risk.score') {
+      return Number(frame.risk?.score ?? 0);
+    }
+    return Number(frame.reading?.[metricKey] ?? 0);
+  }).filter(Number.isFinite);
+
   if (values.length < 2) {
     ctx.fillStyle = '#8a817c';
-    ctx.font = '11.5px "JetBrains Mono", monospace';
+    ctx.font = '11px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('Accumulating real-time telemetry points...', W / 2, H / 2);
     return;
   }
 
-  const min = 0;
-  const max = 100;
+  // Determine scale, units, thresholds based on metric
+  let min = 0;
+  let max = 100;
+  let unit = '';
+  let threshold = null;
+  let thresholdLabel = '';
+  let decimals = 1;
 
-  const left = 14;
-  const right = W - 14;
-  const top = 14;
-  const bottom = H - 18;
-  const stepX = (right - left) / Math.max(1, values.length - 1);
-  const y = value => bottom - ((value - min) / (max - min)) * (bottom - top);
-
-  // Background subtle grid lines
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.06)';
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= 4; i++) {
-    const gy = top + ((bottom - top) * i / 4);
-    ctx.beginPath(); ctx.moveTo(left, gy); ctx.lineTo(right, gy); ctx.stroke();
+  if (metricKey === 'risk.score') {
+    min = 0;
+    max = 100;
+    unit = ' / 100';
+    threshold = 60;
+    thresholdLabel = 'Warning: 60';
+    decimals = 0;
+  } else if (metricKey === 'pump_vibration_mm_s') {
+    const rawMin = Math.min(...values);
+    const rawMax = Math.max(...values);
+    min = Math.max(0, Math.floor((rawMin - 0.5) * 10) / 10);
+    max = Math.max(3.5, Math.ceil((rawMax + 0.5) * 10) / 10);
+    unit = ' mm/s';
+    threshold = 2.80;
+    thresholdLabel = 'API 610 Limit: 2.80 mm/s';
+    decimals = 2;
+  } else if (metricKey === 'bearing_temperature_c') {
+    const rawMin = Math.min(...values);
+    const rawMax = Math.max(...values);
+    min = Math.floor(Math.min(50, rawMin - 5));
+    max = Math.ceil(Math.max(85, rawMax + 5));
+    unit = ' °C';
+    threshold = 72.0;
+    thresholdLabel = 'API 610 Max: 72.0°C';
+    decimals = 1;
+  } else if (metricKey === 'reactor_temperature_c') {
+    const rawMin = Math.min(...values);
+    const rawMax = Math.max(...values);
+    min = Math.floor(rawMin - 5);
+    max = Math.ceil(rawMax + 5);
+    unit = ' °C';
+    threshold = 368.0;
+    thresholdLabel = 'Watch: 368°C';
+    decimals = 1;
+  } else if (metricKey === 'reactor_pressure_bar') {
+    const rawMin = Math.min(...values);
+    const rawMax = Math.max(...values);
+    min = Math.max(0, Math.floor((rawMin - 0.2) * 10) / 10);
+    max = Math.ceil((rawMax + 0.2) * 10) / 10;
+    unit = ' bar';
+    threshold = 2.25;
+    thresholdLabel = 'Watch: 2.25 bar';
+    decimals = 2;
+  } else if (metricKey === 'h2s_ppm') {
+    min = 0;
+    max = Math.max(5, Math.ceil(Math.max(...values) + 1));
+    unit = ' ppm';
+    threshold = 5.0;
+    thresholdLabel = 'OISD PEL: 5.0 ppm';
+    decimals = 2;
+  } else {
+    min = Math.min(...values);
+    max = Math.max(...values);
+    if (min === max) { min -= 1; max += 1; }
   }
 
-  // Risk line
+  const left = 38;
+  const right = W - 14;
+  const top = 16;
+  const bottom = H - 20;
+  const stepX = (right - left) / Math.max(1, values.length - 1);
+  const y = value => bottom - ((value - min) / Math.max(0.001, max - min)) * (bottom - top);
+
+  // Background subtle grid lines & Y-axis labels
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillStyle = '#9C9288';
+  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = 1;
+
+  for (let i = 0; i <= 3; i++) {
+    const frac = i / 3;
+    const gy = top + ((bottom - top) * (1 - frac));
+    const valAtGrid = min + frac * (max - min);
+    ctx.beginPath();
+    ctx.moveTo(left, gy);
+    ctx.lineTo(right, gy);
+    ctx.stroke();
+    ctx.fillText(valAtGrid.toFixed(decimals), left - 5, gy);
+  }
+
+  // Draw statutory threshold line if inside range
+  if (threshold !== null && threshold >= min && threshold <= max) {
+    const ty = y(threshold);
+    ctx.save();
+    ctx.strokeStyle = 'rgba(200, 50, 50, 0.4)';
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(left, ty);
+    ctx.lineTo(right, ty);
+    ctx.stroke();
+    ctx.fillStyle = '#C83232';
+    ctx.font = '8.5px "JetBrains Mono", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(thresholdLabel, right - 4, ty - 5);
+    ctx.restore();
+  }
+
+  // Draw area gradient fill under the curve
+  const latestValue = values[values.length - 1];
+  const isElevated = metricKey === 'risk.score' ? latestValue >= 60 : (threshold !== null && latestValue >= threshold);
+  const strokeColor = isElevated ? '#C83232' : '#2D8A4E';
+
+  const grad = ctx.createLinearGradient(0, top, 0, bottom);
+  grad.addColorStop(0, isElevated ? 'rgba(200, 50, 50, 0.18)' : 'rgba(45, 138, 78, 0.15)');
+  grad.addColorStop(1, 'rgba(45, 138, 78, 0.0)');
+
   ctx.beginPath();
   values.forEach((value, i) => {
     const x = left + i * stepX;
     const yy = y(value);
     if (i === 0) ctx.moveTo(x, yy); else ctx.lineTo(x, yy);
   });
-  const latestScore = values[values.length - 1];
-  ctx.strokeStyle = latestScore >= 80 ? '#C83232' : latestScore >= 60 ? '#D49B45' : '#2D8A4E';
-  ctx.lineWidth = 2.2;
+  ctx.lineTo(left + (values.length - 1) * stepX, bottom);
+  ctx.lineTo(left, bottom);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Draw telemetry trend stroke
+  ctx.beginPath();
+  values.forEach((value, i) => {
+    const x = left + i * stepX;
+    const yy = y(value);
+    if (i === 0) ctx.moveTo(x, yy); else ctx.lineTo(x, yy);
+  });
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = 2.0;
   ctx.stroke();
 
+  // Draw latest point pulse dot
+  const lastX = left + (values.length - 1) * stepX;
+  const lastY = y(latestValue);
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 3.5, 0, 2 * Math.PI);
+  ctx.fillStyle = strokeColor;
+  ctx.fill();
+
+  // Update current readout banner
   if (lpEl('lp-chart-current')) {
-    lpEl('lp-chart-current').textContent = `Current: ${Math.round(latestScore)} / 100`;
+    if (metricKey === 'risk.score') {
+      lpEl('lp-chart-current').textContent = `Current: ${Math.round(latestValue)} / 100 (Nominal / Zero Risk)`;
+    } else {
+      lpEl('lp-chart-current').textContent = `Current: ${latestValue.toFixed(decimals)}${unit}`;
+    }
   }
 }
 // DRISHTI LIVE PLANT - END
