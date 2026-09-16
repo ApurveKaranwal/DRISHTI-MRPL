@@ -495,7 +495,6 @@ function renderLiveExecutionCard(container, state) {
         </div>
         <div style="display: flex; align-items: center; gap: 6px;">
           <span class="domain-pill-tag">${escapeHtml(domain)}</span>
-          <span class="execution-step-counter">Step ${currentStep}/${totalSteps}</span>
         </div>
       </div>
       <div class="execution-timeline">
@@ -1127,7 +1126,7 @@ async function fetchSystemTelemetry() {
     // 2. Update Header Telemetry Nodes
     const hdrWan = document.getElementById('hdr-metric-wan');
     if (hdrWan) {
-      hdrWan.textContent = `${wanBytes} B (${wanCount} Sockets)`;
+      hdrWan.textContent = isAirGapped ? '0 B • Air-Gapped' : `${formatBytes(wanBytes)} (${wanCount} WAN)`;
       hdrWan.className = isAirGapped ? 'node-value val-emerald' : 'node-value';
       if (!isAirGapped) hdrWan.style.color = '#B71C1C';
     }
@@ -1156,7 +1155,7 @@ async function fetchSystemTelemetry() {
       if (blockedCount > 0) {
         bannerWanSub.innerHTML = `0 WAN • <strong style="color: #2E7D32;">${blockedCount} Intercepted</strong>`;
       } else {
-        bannerWanSub.textContent = `0 WAN Sockets (0 Blocked)`;
+        bannerWanSub.textContent = `Zero WAN Sockets`;
       }
     }
 
@@ -1187,7 +1186,7 @@ async function fetchSystemTelemetry() {
       if (blockedCount > 0) {
         execWanSub.innerHTML = `0 Ext Packets • <strong style="color: #2E7D32;">${blockedCount} Blocked</strong>`;
       } else {
-        execWanSub.textContent = `0 Ext Packets (0 Blocked)`;
+        execWanSub.textContent = `Zero External Egress`;
       }
     }
 
@@ -1217,7 +1216,7 @@ async function fetchSystemTelemetry() {
     // Render roster HTML
     let rosterHtml = '';
     if (connectedClients.length === 0) {
-      rosterHtml = `<span class="interlink-roster-tag">${isClientNode ? 'Linked via Hotspot' : '0 Hotspot Clients Linked'}</span>`;
+      rosterHtml = `<span class="interlink-roster-tag">${isClientNode ? 'Linked via Hotspot' : 'Local Enclave (Host Only)'}</span>`;
     } else {
       rosterHtml = connectedClients.map(c => `
         <span class="interlink-client-pill ${c.status === 'ACTIVE' ? 'active' : ''}" title="${escapeHtml(c.device)} • Action: ${escapeHtml(c.last_action)} (${c.last_seen_seconds_ago}s ago) • Inferences: ${c.total_inferences}">
