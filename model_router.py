@@ -360,6 +360,12 @@ class ModelRouter:
             }
 
 
+    def get_active_selection(self) -> dict[str, str]:
+        """Returns the current active role-to-model mapping dict."""
+        with self._file_lock:
+            return dict(self._registry_data.get("active_selection", {}))
+
+
 def get_model_router() -> ModelRouter:
     """Convenience accessor for the ModelRouter singleton."""
     return ModelRouter.get_instance()

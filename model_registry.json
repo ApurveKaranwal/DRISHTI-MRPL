@@ -110,6 +110,19 @@
       "context_window": 4096,
       "temperature": 0.1,
       "description": "Structured prose generator and Python code engine for PSU memorandum drafting and technical calculations."
+    },
+    "BGE-M3:latest": {
+      "capabilities": [
+        "text"
+      ],
+      "roles": [
+        "general",
+        "supervisor"
+      ],
+      "vram_estimate_gb": 4.0,
+      "context_window": 4096,
+      "temperature": 0.1,
+      "description": "User-registered model BGE-M3:latest"
     }
   },
   "fallbacks": {

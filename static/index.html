@@ -1245,11 +1245,11 @@
         </div>
       </div>
       <div class="copilot-header-tools">
-        <button class="copilot-icon-btn" onclick="clearCopilotChat()" title="Clear Chat History">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        <button class="copilot-icon-btn" onclick="clearCopilotChat()" title="Clear Chat History" aria-label="Clear Chat History">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         </button>
-        <button class="copilot-icon-btn" onclick="toggleCopilot()" title="Collapse Panel">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <button class="copilot-icon-btn" onclick="toggleCopilot()" title="Collapse Panel" aria-label="Collapse Panel">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
     </div>
@@ -1332,7 +1332,7 @@
   <div class="modal-window">
     <div class="modal-header">
       <div class="card-title-serif">Sovereign Air-Gap Audit Certificate</div>
-      <button class="copilot-icon-btn" onclick="closeCertificateModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="copilot-icon-btn" onclick="closeCertificateModal()" aria-label="Close Modal"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body" id="certificate-modal-body">
       <div style="text-align: center; color: var(--text-taupe); padding: 20px;">Fetching cryptographically signed air-gap certificate...</div>
@@ -1345,7 +1345,7 @@
   <div class="modal-window" style="width: 580px;">
     <div class="modal-header">
       <div class="card-title-serif">Register Local Open-Weight Model</div>
-      <button class="copilot-icon-btn" onclick="closeRegisterModelModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="copilot-icon-btn" onclick="closeRegisterModelModal()" aria-label="Close Modal"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <form id="form-register-model" onsubmit="submitRegisterModel(event)" style="display: flex; flex-direction: column; gap: 14px;">
@@ -1416,7 +1416,7 @@
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span>Download</span>
         </a>
-        <button class="copilot-icon-btn" onclick="closeFilePreviewModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <button class="copilot-icon-btn" onclick="closeFilePreviewModal()" aria-label="Close Modal"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
     </div>
     <div class="modal-body" id="file-preview-body" style="padding: 20px; flex: 1; overflow-y: auto; background: var(--bg-canvas);">

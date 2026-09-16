@@ -26,5 +26,9 @@ elif command -v xdg-open &> /dev/null; then
     (sleep 2 && xdg-open http://localhost:8000) &
 fi
 
-python3 server.py
+if [ -f "$SCRIPT_DIR/venv/bin/python" ]; then
+    "$SCRIPT_DIR/venv/bin/python" server.py
+else
+    python3 server.py
+fi
 

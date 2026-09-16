@@ -990,6 +990,8 @@ html, body {
 .copilot-icon-btn {
   width: 28px;
   height: 28px;
+  min-width: 28px;
+  min-height: 28px;
   border-radius: var(--radius-sm);
   background: transparent;
   border: 1px solid var(--border-sand);
@@ -997,8 +999,19 @@ html, body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--text-taupe);
+  color: var(--text-charcoal);
   transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.copilot-icon-btn svg {
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  min-height: 14px;
+  stroke: currentColor;
+  display: block;
+  flex-shrink: 0;
 }
 
 .copilot-icon-btn:hover {
@@ -1834,6 +1847,7 @@ html, body {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   flex: 1;
+  min-width: 0;
   max-width: 960px;
 }
 
