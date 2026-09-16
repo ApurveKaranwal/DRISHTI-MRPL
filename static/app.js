@@ -1213,7 +1213,6 @@ async function fetchSystemTelemetry() {
     const txRate = netThroughput.tx_rate_kbps || 0;
     const rxRate = netThroughput.rx_rate_kbps || 0;
     const throughputStr = `▲ ${txRate.toFixed(1)} KB/s TX • ▼ ${rxRate.toFixed(1)} KB/s RX`;
-    const inferencesStr = `${clusterInferences.total || 0} Total (${clusterInferences.client || 0} Client / ${clusterInferences.host || 0} Host)`;
 
     // Render roster HTML
     let rosterHtml = '';
@@ -1230,8 +1229,8 @@ async function fetchSystemTelemetry() {
     }
 
     const pairs = [
-      { badgeId: 'interlink-role-badge', ipId: 'interlink-node-ip', pingId: 'interlink-ping-val', thId: 'interlink-throughput-val', infId: 'interlink-inferences-val', rosterId: 'interlink-client-roster' },
-      { badgeId: 'exec-interlink-role-badge', ipId: 'exec-interlink-node-ip', pingId: 'exec-interlink-ping-val', thId: 'exec-interlink-throughput-val', infId: 'exec-interlink-inferences-val', rosterId: 'exec-interlink-client-roster' }
+      { badgeId: 'interlink-role-badge', ipId: 'interlink-node-ip', pingId: 'interlink-ping-val', thId: 'interlink-throughput-val', rosterId: 'interlink-client-roster' },
+      { badgeId: 'exec-interlink-role-badge', ipId: 'exec-interlink-node-ip', pingId: 'exec-interlink-ping-val', thId: 'exec-interlink-throughput-val', rosterId: 'exec-interlink-client-roster' }
     ];
 
     pairs.forEach(p => {
@@ -1248,9 +1247,6 @@ async function fetchSystemTelemetry() {
 
       const thEl = document.getElementById(p.thId);
       if (thEl) thEl.textContent = throughputStr;
-
-      const infEl = document.getElementById(p.infId);
-      if (infEl) infEl.textContent = inferencesStr;
 
       const rEl = document.getElementById(p.rosterId);
       if (rEl) rEl.innerHTML = rosterHtml;
