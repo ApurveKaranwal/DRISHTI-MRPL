@@ -2,6 +2,9 @@ import csv
 import os
 import pymupdf as fitz
 
+from pathlib import Path
+ROOT_DIR = Path(__file__).resolve().parent.parent
+os.chdir(ROOT_DIR)
 os.makedirs("data", exist_ok=True)
 
 # -----------------------------------------------------------------------------

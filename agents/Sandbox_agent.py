@@ -26,9 +26,15 @@ from typing import Any
 
 def _detect_python_executable() -> str:
     """Detects virtual environment python executable or falls back to sys.executable."""
-    venv_py = Path(__file__).parent.absolute() / "venv" / "bin" / "python"
-    if venv_py.is_file():
-        return str(venv_py)
+    candidates = [
+        Path(__file__).resolve().parent.parent / "venv" / "Scripts" / "python.exe",
+        Path(__file__).resolve().parent.parent / "venv" / "bin" / "python",
+        Path(__file__).resolve().parent / "venv" / "Scripts" / "python.exe",
+        Path(__file__).resolve().parent / "venv" / "bin" / "python",
+    ]
+    for c in candidates:
+        if c.is_file():
+            return str(c)
     return sys.executable
 
 

@@ -48,6 +48,8 @@ data/uploads/*
 # Test and Runtime artifacts
 .pytest_cache/
 model_discovery_state.json
+models/model_discovery_state.json
+models/*.tmp
 
 # Output root-level artifacts (preserve subdirectory structure)
 outputs/*

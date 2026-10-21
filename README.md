@@ -534,12 +534,12 @@ Hydraulic profile generated automatically in the isolated CPython sandbox (`outp
 ---
 
 ### Figure 4: Master Dataset Reference Guide Documentation
-Comprehensive data lineage documentation generated for MRPL operational verification (`scratch/page_1.png` and `scratch/page_2.png`):
+Comprehensive data lineage documentation generated for MRPL operational verification (`docs/images/page_1.png` and `docs/images/page_2.png`):
 
-![Dataset Reference Guide Page 1](scratch/page_1.png)
+![Dataset Reference Guide Page 1](docs/images/page_1.png)
 *Figure 4: Master Dataset Reference Guide (Page 1) detailing official MoPNG PPAC crude processing records and product slates.*
 
-![Dataset Reference Guide Page 2](scratch/page_2.png)
+![Dataset Reference Guide Page 2](docs/images/page_2.png)
 *Figure 5: Master Dataset Reference Guide (Page 2) detailing chemical assay matrices, ASME pipe schedules, and statutory evaluation defense cheat sheets.*
 
 ---
@@ -762,8 +762,34 @@ DRISHTI-MRPL is engineered in strict compliance with statutory regulations gover
 
 ## 17. Repository File Structure
 
-```
+``
 DRISHTI-MRPL/
+├── agents/                                  # Multi-Agent Core & Deterministic Execution Workers
+│   ├── __init__.py                          # Package exports and environment bootstrap
+│   ├── Supervisor_agent.py                  # Autonomous ReAct Supervisor Engine (3,249 lines)
+│   ├── Data_agent.py                        # Worker 1: Embedded DuckDB OLAP SQL Worker
+│   ├── Sandbox_agent.py                     # Worker 2: Isolated CPython AST Sandbox Worker
+│   ├── Document_agent.py                    # Worker 3: Dual-Mode Document Retrieval Worker
+│   ├── Vision_agent.py                      # Worker 4: Multimodal VLM + PyMuPDF Vision Worker
+│   ├── Template_agent.py                    # Worker 5: PSU Deliverables Authoring Worker
+│   ├── Document_modifier.py                 # Worker 6: In-Place Document Modifier Worker
+│   └── Sovereign_monitor.py                 # Air-gap kernel socket hook & cluster telemetry
+├── models/                                  # Sovereign Model Router, Discovery, and Intake Subsystem
+│   ├── __init__.py                          # Subsystem exports and singleton accessors
+│   ├── model_router.py                      # Dynamic role-to-model router singleton
+│   ├── model_discovery.py                   # Ollama installed weights auto-discovery
+│   ├── model_capability_detector.py         # Multi-signal model capability detector
+│   ├── model_intake.py                      # Review queue and confirmation pipeline
+│   ├── model_registry.json                  # Persistent model configurations and active roles
+│   └── model_discovery_state.json           # Discovery queue state tracker (git-ignored)
+├── runtime_data/                            # Live SCADA Simulation and Telemetry Subsystem
+│   ├── config.py                            # Sensor baselines, noise STDs, and thresholds
+│   ├── risk_engine.py                       # API 610 and OISD-STD-129 risk scoring engine
+│   ├── runtime_api.py                       # FastAPI router for SCADA telemetry endpoints
+│   ├── scenarios.py                         # 7 pre-calibrated operational failure modes
+│   ├── sensors.py                           # Thermal/hydraulic inertia physics engine
+│   ├── simulator.py                         # Background SCADA telemetry generation thread
+│   └── store.py                             # Circular bounded time-series memory store
 ├── data/                                    # Verified Ground-Truth Industrial Datasets
 │   ├── asme_pipe_schedules_astm_a106.csv    # ASME B36.10M pipe schedule dimensions
 │   ├── ppac_mrpl_monthly_crude_processing.csv# 16 months of PPAC crude throughput data
@@ -777,20 +803,25 @@ DRISHTI-MRPL/
 │   ├── csb_chevron_api_recommendation.pdf   # US CSB sulfidation investigation report
 │   ├── pid_process_piping_01.jpg            # High-resolution process piping P&ID
 │   └── uploads/                             # Secure directory for runtime document uploads
-├── runtime_data/                            # Live SCADA Simulation and Telemetry Subsystem
-│   ├── config.py                            # Sensor baselines, noise STDs, and thresholds
-│   ├── risk_engine.py                       # API 610 and OISD-STD-129 risk scoring engine
-│   ├── runtime_api.py                       # FastAPI router for SCADA telemetry endpoints
-│   ├── scenarios.py                         # 7 pre-calibrated operational failure modes
-│   ├── sensors.py                           # Thermal/hydraulic inertia physics engine
-│   ├── simulator.py                         # Background SCADA telemetry generation thread
-│   └── store.py                             # Circular bounded time-series memory store
+├── docs/                                    # Documentation, Engineering Guides & Visual Assets
+│   ├── DATASET_GUIDE.md                     # Master Dataset Reference Guide
+│   ├── DATASET_GUIDE.pdf                    # Formatted printable dataset reference guide
+│   ├── SIH_2026_Sovereign_AI_Workbench_InDepth_Report.pdf# Full engineering report
+│   └── images/                              # Architecture and documentation figures
+│       ├── page_1.png                       # Dataset guide page 1 preview
+│       └── page_2.png                       # Dataset guide page 2 preview
+├── scripts/                                 # Maintenance, Verification, and Setup Scripts
+│   ├── setup_models.bat / .sh               # Automated Ollama model download scripts
+│   ├── verify_all_models.py                 # 1-Click 4-model GPU health verification script
+│   ├── generate_real_datasets.py            # Ground-truth dataset compilation script
+│   └── build_dataset_pdf.py                 # ReportLab dataset guide generator
 ├── static/                                  # Warm-Technical Editorial Frontend
 │   ├── index.html                           # 13-module operations console layout
 │   ├── app.js                               # Real-time state management, NDJSON, and canvas
 │   ├── app.css                              # High-density responsive editorial styling
 │   └── images/                              # Hero and branding assets
 ├── tests/                                   # Automated Pytest Verification Suite (50 Tests)
+│   ├── conftest.py                          # Pytest environment and sys.path bootstrap
 │   ├── test_all_agents.py                   # End-to-end multi-agent execution tests
 │   ├── test_api.py                          # REST API endpoint tests
 │   ├── test_core_features.py                # Core feature verification
@@ -802,27 +833,13 @@ DRISHTI-MRPL/
 │   ├── reports/                             # Generated PSU notes (.docx), decks, certificates
 │   │   └── audit_logs/                      # Persistent SHA-256 hash-chained JSONL ledgers
 │   └── sandbox/                             # Matplotlib plots and physics calculation scripts
-├── Supervisor_agent.py                      # Autonomous ReAct Supervisor Engine (3,249 lines)
-├── Data_agent.py                            # Worker 1: Embedded DuckDB OLAP SQL Worker
-├── Sandbox_agent.py                         # Worker 2: Isolated CPython AST Sandbox Worker
-├── Document_agent.py                        # Worker 3: Dual-Mode Document Retrieval Worker
-├── Vision_agent.py                          # Worker 4: Multimodal VLM + PyMuPDF Vision Worker
-├── Template_agent.py                        # Worker 5: PSU Deliverables Authoring Worker
-├── Document_modifier.py                     # Worker 6: In-Place Document Modifier Worker
-├── Sovereign_monitor.py                     # Air-gap kernel socket hook & cluster telemetry
-├── model_router.py                          # Dynamic role-to-model router singleton
-├── model_discovery.py                       # Ollama installed weights auto-discovery
-├── model_capability_detector.py             # Multi-signal model capability detector
-├── model_intake.py                          # Review queue and confirmation pipeline
-├── model_registry.json                      # Persistent model configurations and active roles
-├── generate_real_datasets.py                # Ground-truth dataset compilation script
-├── verify_all_models.py                     # 1-Click 4-model GPU health verification script
 ├── server.py                                # Industrial FastAPI / Uvicorn server core
-├── setup_models.bat / setup_models.sh       # Automated Ollama model download scripts
-├── run_dashboard.bat / run_dashboard.sh     # 1-Click operations dashboard launch scripts
+├── run_dashboard.bat / run_dashboard.sh     # 1-Click operations dashboard launch shortcuts
+├── setup_models.bat / setup_models.sh       # 1-Click model setup shortcuts
 ├── requirements.txt                         # Production Python dependencies
-└── DATASET_GUIDE.md                         # Field reference guide to all ingested datasets
-```
+├── LICENSE                                  # MIT License
+└── README.md                                # Master Technical Architecture Documentation
+``
 
 ---
 

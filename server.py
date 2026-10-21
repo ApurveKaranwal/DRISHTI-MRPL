@@ -27,6 +27,12 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict
 
 import requests
+import sys
+
+BASE_DIR = Path(__file__).parent.resolve()
+for _p in [str(BASE_DIR), str(BASE_DIR / 'agents'), str(BASE_DIR / 'models')]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 from Supervisor_agent import SupervisorAgent
 from Sovereign_monitor import SovereignNetworkAuditor

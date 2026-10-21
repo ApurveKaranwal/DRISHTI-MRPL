@@ -32,6 +32,14 @@ from pathlib import Path
 from typing import Any
 
 import requests
+import sys
+
+_AGENTS_DIR = Path(__file__).resolve().parent
+_ROOT_DIR = _AGENTS_DIR.parent
+_MODELS_DIR = _ROOT_DIR / 'models'
+for _p in [str(_ROOT_DIR), str(_AGENTS_DIR), str(_MODELS_DIR)]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 from Data_agent import DataAnalysisWorker, DuplicateFileError
 from Document_agent import RetrievalWorker
